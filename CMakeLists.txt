@@ -4,6 +4,7 @@ project(stem_tracker)
 find_package(catkin REQUIRED COMPONENTS
     sensor_msgs
     roscpp
+    code_profiler
 )
 
 # find_package(Boost REQUIRED COMPONENTS system program_options)
