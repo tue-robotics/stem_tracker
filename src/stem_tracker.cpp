@@ -1,16 +1,18 @@
-/* ros includes */
-#include <ros/ros.h>
-#include <sensor_msgs/JointState.h>
-#include <urdf/model.h>
+#include <string>
+#include <stdlib.h>
+#include <iostream>
+#include <math.h>
 
-/* kdl for ros includes */
-#include <kdl_parser/kdl_parser.hpp>
-#include <kdl/tree.hpp>
+/* config */
+bool torsoUpAndDown = false;
+bool useWholeBodyContr = true;
+int rate = 1; // 10 for torsoUpAndDown, 1 for wholeBodyContr
+double startXYZ[3] = {0.45, 0.3, 0.3};
+double endXYZ[3] = {0.25, 0.5, 1.6};
+std::string wbcCall;
+#define WBC_CALL_PREFIX "rosrun amigo_whole_body_controller TestCartesianMotionObjective.py "
 
-/* amigo tooling includes */
-#include <profiling/StatsPublisher.h>
 
-/* header for this node */
 #include "stem_tracker.h"
 
 int main(int argc, char** argv){
@@ -18,11 +20,16 @@ int main(int argc, char** argv){
     /* initialize node */
     ros::init(argc, argv, "stem_tracker");
     ros::NodeHandle n;
-    ros::Publisher joint_pub = n.advertise<sensor_msgs::JointState>("/amigo/torso/references", 1000);
-    ros::Rate loop_rate(10);
+    ros::Publisher torsoRefPub = n.advertise<sensor_msgs::JointState>("/amigo/torso/references", 1000);
+    ros::Publisher vis_pub = n.advertise<visualization_msgs::Marker>( "visualization_marker", 0 );
+    ros::Rate loop_rate( rate );
 
     /* initialize profiling */
     sp.initialize();
+
+    if (useWholeBodyContr){
+        memcpy(endEffDes,startXYZ,sizeof(startXYZ));
+    }
 
     /* update loop */
     while(ros::ok()){
@@ -30,24 +37,31 @@ int main(int argc, char** argv){
         /* start sample timing, for profiling */
         sp.startTimer("main");
 
-        /* calculated desired joint reference */
-        if(count > 90 || count < 20)
-            up = -up;
+        /* move torso up and down */
+        if (torsoUpAndDown)
+            publishTorsoReference( torsoRefPub, determineTorsoReference() );
 
-        count=count+up;
-        ref = ( (double)count ) / 200.0;
+        if (useWholeBodyContr){
 
-        /* publish updated joint reference */
-        sensor_msgs::JointState msg;
+            visualizeStem(vis_pub);
 
-        msg.name.push_back("torso_joint");
-        msg.position.push_back(ref);
-        msg.header.stamp = ros::Time::now();
+            wbcCall.clear();
+            wbcCall.append(WBC_CALL_PREFIX);
+            for(i=0;i<6;++i){
+                std::ostringstream strs;
+                strs << endEffDes[i];
+                wbcCall.append(strs.str());
+                wbcCall.append(" ");
+            }
 
-        joint_pub.publish(msg);
-        ROS_INFO("spinnin, ref = %f",ref);
+            wbcCall.append(">> /dev/null");
+            std::cout << wbcCall << std::endl;
+            ret = system(wbcCall.c_str());
+            ROS_INFO("ret = %d",ret);
+            updateEndEffectorReference(endEffDes);
+        }
 
-        /* stop and publish sample time, for profiling */
+        /* stop and publish time, for profiling */
         sp.stopTimer("main");
         sp.publish();
 
@@ -59,3 +73,5 @@ int main(int argc, char** argv){
 
     return 0;
 };
+
+
