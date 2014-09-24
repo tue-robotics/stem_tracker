@@ -52,21 +52,22 @@ catkin_package(
 #                                              BUILD
 # ------------------------------------------------------------------------------------------------
 
+
+# show the headers in qtcreator
+file(GLOB HEADERS
+  RELATIVE ${PROJECT_SOURCE_DIR} "include/*.h"
+)
+
 include_directories(
     include
     ${catkin_INCLUDE_DIRS}
 )
 
-# add_library(library_name
-#     src/lib_source_file1.cpp
-#     ...
-# )
-# target_link_libraries(library_name ${catkin_LIBRARIES})
-
 add_executable(stem_tracker
+    ${HEADERS}
     src/stem_tracker.cpp
 )
 
-target_link_libraries(stem_tracker ${catkin_LIBRARIES})
+target_link_libraries(stem_tracker ${catkin_LIBRARIES} )
 
 
