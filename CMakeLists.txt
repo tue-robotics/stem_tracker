@@ -4,6 +4,13 @@ project(stem_tracker)
 find_package(catkin REQUIRED COMPONENTS
     roscpp
     code_profiler
+    genmsg
+    actionlib_msgs
+    actionlib
+    arm_navigation_msgs
+    geometry_msgs
+    std_msgs
+    tf
 )
 
 # find_package(Boost REQUIRED COMPONENTS system program_options)
@@ -14,14 +21,18 @@ find_package(catkin REQUIRED COMPONENTS
 #                                     ROS MESSAGES AND SERVICES
 # ------------------------------------------------------------------------------------------------
 
-#Generate messages(
-#)
+add_action_files(DIRECTORY ../amigo_whole_body_controller/action FILES ArmTask.action)
 
-# add_message_files(
-#    FILES
-#    message1.msg
-#    ...
-# )
+add_message_files(DIRECTORY ../amigo_whole_body_controller/msg FILES WholeBodyControllerStatus.msg)
+
+generate_messages(DEPENDENCIES
+    actionlib_msgs
+    arm_navigation_msgs
+    std_msgs
+    geometry_msgs
+)
+
+
 
 # Generate services
 # add_service_files(

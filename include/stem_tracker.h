@@ -4,45 +4,27 @@
 /* ros includes */
 #include <ros/ros.h>
 #include <visualization_msgs/Marker.h>
+#include <tf/transform_datatypes.h>
+#include <actionlib/client/simple_action_client.h>
 
-/* amigo tooling includes */
+/* amigo includes */
 #include <profiling/StatsPublisher.h>
+#include <amigo_whole_body_controller/ArmTaskAction.h>
 
 /* for code profiling */
 StatsPublisher sp;
 
 /* subtarget global data */
-double endEffDes[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-double prevEndEffDes[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+int state = 0;
+int up = 1;
 
 /* general */
-int ret, i;
+int i;
 
 
 /* =============================================== */
 
 
-/* calculate euclidian distance between two 3d vectors */
-double euclDist(double* a, double* b){
-    return sqrt(pow(a[0]-b[0],2)+pow(a[1]-b[1],2)+pow(a[2]-b[2],2));
-}
-
-/* check if sufficiently close to end-point, if so than set
- * subtarget to end-point, if than add ten percent of path to go
- * note: this will lead to zeno-behavior so endpoint tol needs to
- * be sufficiently large */
-void updateEndEffRef(double* endEffDes){
-
-    for(i=0;i<3;++i){
-        if ( euclDist(endEffDes,endXYZ) < TOL_ENDPOINT )
-            endEffDes[i] = endXYZ[i];
-        else
-            endEffDes[i] += 0.1 * (endXYZ[i] - endEffDes[i]);
-    }
-
-    return;
-
-}
 
 /* publish a line strip marker to visualize the
  * main stem in rviz */
@@ -63,22 +45,44 @@ void visualizeStem( ros::Publisher vis_pub){
     marker.color.g = 0.65;
     marker.color.b = 0.35;
 
-    /* construct starting point */
-    geometry_msgs::Point p;
-    p.x = startXYZ[0];
-    p.y = startXYZ[1];
-    p.z = startXYZ[2];
-    marker.points.push_back(p);
-
-    /* construct end point */
-    p.x = endXYZ[0];
-    p.y = endXYZ[1];
-    p.z = endXYZ[2];
-    marker.points.push_back(p);
+    /* construct nodes point */
+    for(i=0;i<(int)sizeof(stemNodesXYZ)/sizeof(double_t)/3;++i){
+        geometry_msgs::Point p;
+        p.x = stemNodesXYZ[3*i];
+        p.y = stemNodesXYZ[3*i+1];
+        p.z = stemNodesXYZ[3*i+2];
+        marker.points.push_back(p);
+    }
 
     /* publish marker */
     vis_pub.publish( marker );
 
+}
+
+amigo_whole_body_controller::ArmTaskGoal obtainStemGoal(int state){
+
+    amigo_whole_body_controller::ArmTaskGoal stem_goal;
+
+    stem_goal.goal_type = "grasp";
+    stem_goal.position_constraint.header.frame_id = "base_link";
+    stem_goal.position_constraint.link_name = "grippoint_left";
+    stem_goal.position_constraint.target_point_offset.x = 0.0;
+    stem_goal.position_constraint.target_point_offset.y = 0.0;
+    stem_goal.position_constraint.target_point_offset.z = 0.0;
+    stem_goal.position_constraint.position.x = stemNodesXYZ[3*state];
+    stem_goal.position_constraint.position.y = stemNodesXYZ[3*state+1];
+    stem_goal.position_constraint.position.z = stemNodesXYZ[3*state+2];
+    stem_goal.orientation_constraint.header.frame_id = "base_link";
+    stem_goal.orientation_constraint.link_name = "grippoint_left";
+    stem_goal.orientation_constraint.orientation = tf::createQuaternionMsgFromRollPitchYaw(0.0, 0.0, 0.0);
+    stem_goal.stiffness.force.x =  70.0 * WBC_STIFFNESS;
+    stem_goal.stiffness.force.y =  70.0 * WBC_STIFFNESS;
+    stem_goal.stiffness.force.z =  50.0 * WBC_STIFFNESS;
+    stem_goal.stiffness.torque.x = 5.0 * WBC_STIFFNESS;
+    stem_goal.stiffness.torque.y = 5.0 * WBC_STIFFNESS;
+    stem_goal.stiffness.torque.z = 5.0 * WBC_STIFFNESS;
+
+    return stem_goal;
 }
 
 #endif // STEM_TRACKER_H
