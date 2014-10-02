@@ -1,33 +1,37 @@
 
+#include "stem_tracker.h"
+
+
 /* config */
 
-int rate = 100;             // sample rate of this node
-#define USE_LEFTARM true    // use left arm if true, else use right arm
+#define USE_LEFTARM false    // use left arm if true, else use right arm
 
-double stemNodesXYZ[] = {0.3, 0.3, 0.4,
-                         0.35, 0.35, 0.6,
-                         0.3, 0.35, 0.9,
+double stemNodesXYZ[] = {0.3, 0.3, 0.4,     // nodes of a virtual stem,
+                         0.35, 0.35, 0.6,   // list of coordinates xyzxyzxyz...
+                         0.3, 0.35, 0.9,    // defined in amigo base_link
                          0.35, 0.4, 1.2,
                          0.3, 0.55, 1.4,
                          0.25, 0.6, 1.6};
 \
 
-#include "stem_tracker.h"
-
-
 int main(int argc, char** argv){
+
+    int state = 0;
+    int up = 1;
 
     /* initialize node */
     ros::init(argc, argv, "stem_tracker");
     ros::NodeHandle n;
     ros::Publisher vis_pub = n.advertise<visualization_msgs::Marker>( "visualization_marker", 0 );
+    ros::Rate r(2); // hz
 
+    ros::Publisher arm_pub;
     if (USE_LEFTARM)
-        ros::Publisher arm_pub = n.advertise<sensor_msgs::JointState>("/amigo/left_arm/references", 0);
+        arm_pub = n.advertise<sensor_msgs::JointState>("/amigo/left_arm/references", 0);
     else
-        ros::Publisher arm_pub = n.advertise<sensor_msgs::JointState>("/amigo/right_arm/references", 0);
+        arm_pub = n.advertise<sensor_msgs::JointState>("/amigo/right_arm/references", 0);
 
-    sensor_msgs::JointState joint_msg;
+    sensor_msgs::JointState arm_joint_msg;
 
     /* initialize profiling */
     sp.initialize();
@@ -38,9 +42,12 @@ int main(int argc, char** argv){
         /* start sample timing, for profiling */
         sp.startTimer("main");
 
-        /* publish line strip marker to visualize stem */
-        visualizeStem(vis_pub);
+        /* publish linestrip marker to visualize stem */
+        visualizeStem(vis_pub, stemNodesXYZ, sizeof(stemNodesXYZ)/sizeof(*stemNodesXYZ)/3);
 
+        /* bring arm to initial position */
+        arm_joint_msg = getInitialPosition(USE_LEFTARM);
+        arm_pub.publish(arm_joint_msg);
 
         /* check have we reached end of stem */
         state += up;
@@ -60,6 +67,7 @@ int main(int argc, char** argv){
         sp.publish();
 
         /* selftrigger */
+        r.sleep();
         ros::spinOnce();
 
     }

@@ -12,21 +12,56 @@
 /* for code profiling */
 StatsPublisher sp;
 
-/* subtarget global data */
-int state = 0;
-int up = 1;
-
-/* general */
-int i;
 
 
 /* =============================================== */
 
+sensor_msgs::JointState getInitialPosition( bool use_leftarm ){
+
+    sensor_msgs::JointState arm_joint_msg;
+
+    arm_joint_msg.header.stamp = ros::Time::now();
+
+    arm_joint_msg.name.clear();
+    arm_joint_msg.position.clear();
+
+    if ( use_leftarm ){
+        arm_joint_msg.name.push_back("shoulder_roll_joint_left");
+        arm_joint_msg.name.push_back("shoulder_pitch_joint_left");
+        arm_joint_msg.name.push_back("shoulder_yaw_joint_left");
+        arm_joint_msg.name.push_back("elbow_roll_joint_left");
+        arm_joint_msg.name.push_back("elbow_pitch_joint_left");
+        arm_joint_msg.name.push_back("wrist_pitch_joint_left");
+        arm_joint_msg.name.push_back("wrist_yaw_joint_left");
+    }
+    else {
+        arm_joint_msg.name.push_back("shoulder_roll_joint_right");
+        arm_joint_msg.name.push_back("shoulder_pitch_joint_right");
+        arm_joint_msg.name.push_back("shoulder_yaw_joint_right");
+        arm_joint_msg.name.push_back("elbow_roll_joint_right");
+        arm_joint_msg.name.push_back("elbow_pitch_joint_right");
+        arm_joint_msg.name.push_back("wrist_pitch_joint_right");
+        arm_joint_msg.name.push_back("wrist_yaw_joint_right");
+    }
+
+    /* this corresponds to amigo 'give' position */
+    arm_joint_msg.position.push_back(0.0);
+    arm_joint_msg.position.push_back(0.4);
+    arm_joint_msg.position.push_back(-0.1);
+    arm_joint_msg.position.push_back(0.0);
+    arm_joint_msg.position.push_back(1.2);
+    arm_joint_msg.position.push_back(0.0);
+    arm_joint_msg.position.push_back(0.0);
+
+    return arm_joint_msg;
+}
 
 
 /* publish a line strip marker to visualize the
  * main stem in rviz */
-void visualizeStem( ros::Publisher vis_pub){
+void visualizeStem( ros::Publisher vis_pub, double *nodes, int n_nodes){
+
+    int i;
 
     /* construct line strip marker object */
     visualization_msgs::Marker marker;
@@ -44,11 +79,11 @@ void visualizeStem( ros::Publisher vis_pub){
     marker.color.b = 0.35;
 
     /* construct nodes point */
-    for(i=0;i<(int)sizeof(stemNodesXYZ)/sizeof(double_t)/3;++i){
+    for(i=0;i<n_nodes;++i){
         geometry_msgs::Point p;
-        p.x = stemNodesXYZ[3*i];
-        p.y = stemNodesXYZ[3*i+1];
-        p.z = stemNodesXYZ[3*i+2];
+        p.x = nodes[3*i];
+        p.y = nodes[3*i+1];
+        p.z = nodes[3*i+2];
         marker.points.push_back(p);
     }
 
