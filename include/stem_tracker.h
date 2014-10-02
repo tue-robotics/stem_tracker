@@ -4,12 +4,10 @@
 /* ros includes */
 #include <ros/ros.h>
 #include <visualization_msgs/Marker.h>
-#include <tf/transform_datatypes.h>
-#include <actionlib/client/simple_action_client.h>
+#include <sensor_msgs/JointState.h>
 
 /* amigo includes */
 #include <profiling/StatsPublisher.h>
-#include <amigo_whole_body_controller/ArmTaskAction.h>
 
 /* for code profiling */
 StatsPublisher sp;
@@ -59,30 +57,5 @@ void visualizeStem( ros::Publisher vis_pub){
 
 }
 
-amigo_whole_body_controller::ArmTaskGoal obtainStemGoal(int state){
-
-    amigo_whole_body_controller::ArmTaskGoal stem_goal;
-
-    stem_goal.goal_type = "grasp";
-    stem_goal.position_constraint.header.frame_id = "base_link";
-    stem_goal.position_constraint.link_name = "grippoint_left";
-    stem_goal.position_constraint.target_point_offset.x = 0.0;
-    stem_goal.position_constraint.target_point_offset.y = 0.0;
-    stem_goal.position_constraint.target_point_offset.z = 0.0;
-    stem_goal.position_constraint.position.x = stemNodesXYZ[3*state];
-    stem_goal.position_constraint.position.y = stemNodesXYZ[3*state+1];
-    stem_goal.position_constraint.position.z = stemNodesXYZ[3*state+2];
-    stem_goal.orientation_constraint.header.frame_id = "base_link";
-    stem_goal.orientation_constraint.link_name = "grippoint_left";
-    stem_goal.orientation_constraint.orientation = tf::createQuaternionMsgFromRollPitchYaw(0.0, 0.0, 0.0);
-    stem_goal.stiffness.force.x =  70.0 * WBC_STIFFNESS;
-    stem_goal.stiffness.force.y =  70.0 * WBC_STIFFNESS;
-    stem_goal.stiffness.force.z =  50.0 * WBC_STIFFNESS;
-    stem_goal.stiffness.torque.x = 5.0 * WBC_STIFFNESS;
-    stem_goal.stiffness.torque.y = 5.0 * WBC_STIFFNESS;
-    stem_goal.stiffness.torque.z = 5.0 * WBC_STIFFNESS;
-
-    return stem_goal;
-}
 
 #endif // STEM_TRACKER_H
