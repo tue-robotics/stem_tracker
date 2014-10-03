@@ -5,6 +5,7 @@ find_package(catkin REQUIRED COMPONENTS
     roscpp
     code_profiler
     sensor_msgs
+    kdl_parser
 )
 
 
@@ -32,7 +33,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 catkin_package(
 #    INCLUDE_DIRS include
-#  LIBRARIES bla
+  LIBRARIES stem_tracker_libs
 #  CATKIN_DEPENDS other_catkin_pkg
 #  DEPENDS system_lib
 )
@@ -52,11 +53,21 @@ include_directories(
     ${catkin_INCLUDE_DIRS}
 )
 
+# Declare a cpp library
+add_library(stem_tracker_libs
+  ${HEADERS}
+  src/kinematic_tree.cpp
+)
+
+target_link_libraries(stem_tracker_libs
+     ${catkin_LIBRARIES}
+)
+
 add_executable(stem_tracker
     ${HEADERS}
     src/stem_tracker.cpp
 )
+target_link_libraries(stem_tracker stem_tracker_libs)
 
-target_link_libraries(stem_tracker ${catkin_LIBRARIES} )
 
 
