@@ -52,7 +52,6 @@ int main(int argc, char** argv){
     /* turn xml robot description in kdl tree */
     kinematic_tree = getKinematicTree(robot_description_xml);
 
-
     /* initialize profiling */
     sp.initialize();
 
