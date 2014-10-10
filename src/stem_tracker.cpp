@@ -48,10 +48,11 @@ int main(int argc, char** argv){
         arm_reference_publisher = n.advertise<sensor_msgs::JointState>("/amigo/right_arm/references", 0);
 
     /* create a vitual stem */
-    TomatoStem.printAll();
     TomatoStem.setFloatsPerNode(FLOATS_PER_NODE);
     TomatoStem.setRGB(STEM_R, STEM_G, STEM_B);
     TomatoStem.addNodes(stemNodesXYZ, sizeof(stemNodesXYZ)/sizeof(*stemNodesXYZ)/3);
+    if(!USE_LEFTARM)
+        TomatoStem.flipNodes();
     if(DEBUG)
         TomatoStem.printAll();
 

@@ -29,6 +29,7 @@ class VirtualStem
      *
      * This class depends on:
         <vector>
+        <iostream>
     */
 
     private:
@@ -128,6 +129,7 @@ class VirtualStem
         void printAll(){
 
             std::cout << "===============" << std::endl;
+
             std::cout << "Stem id: " << m_stem_id << std::endl;
             std::cout << "RGB: " << m_rgb[0] << " " << m_rgb[1] << " " << m_rgb[2] << " " << std::endl;
             std::cout << "Number of nodes: " << m_n_nodes << std::endl;
@@ -142,6 +144,10 @@ class VirtualStem
             }
             std::cout << "===============" << std::endl;
 
+        }
+
+        ~VirtualStem(){
+            // destructor
         }
 
 };
@@ -230,6 +236,9 @@ class RobotConfig
 
         }
 
+        ~RobotConfig(){
+            // destructor
+        }
 };
 
 
