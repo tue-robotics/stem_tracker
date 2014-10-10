@@ -22,7 +22,7 @@ ros::Publisher arm_reference_publisher;
 sensor_msgs::JointState arm_joint_msg;
 std::string robot_description_xml;
 StatsPublisher sp;
-Tree kinematic_tree;
+KDL::Tree kinematic_tree;
 
 
 int main(int argc, char** argv){
@@ -50,7 +50,7 @@ int main(int argc, char** argv){
     robot_description_xml = getRobotDescription(n, ROBOT_DESCRIPTION_ROSPARAM);
 
     /* turn xml robot description in kdl tree */
-    kinematic_tree = getKinematicTree(robot_description_xml);
+    getKinematicTree(&kinematic_tree, robot_description_xml);
 
     /* initialize profiling */
     sp.initialize();

@@ -11,17 +11,18 @@
 #include <profiling/StatsPublisher.h>
 
 /* my/wbc includes */
-#include "kinematic_tree.h"
+#include <vector>
+#include <map>
+#include <kdl/treejnttojacsolver.hpp>
+
 
 
 /* ===== FUNCTIONS ================== */
 
 
-Tree getKinematicTree(std::string xml_string){
+ void getKinematicTree(KDL::Tree* kinematic_tree, std::string xml_string){
 
-    Tree kinematic_tree;
-
-    if (!kdl_parser::treeFromString(xml_string, kinematic_tree.kdl_tree_)) {
+    if (!kdl_parser::treeFromString(xml_string, *kinematic_tree)) {
         ROS_FATAL("Could not initialize kdl tree object");
     }
     ROS_INFO("KDL tree object initialized");
