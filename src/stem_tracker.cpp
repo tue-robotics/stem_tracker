@@ -1,17 +1,24 @@
-#include "stem_tracker.h"
+#include "stem_tracker.hpp"
 
 /* configure */
 
 #define USE_LEFTARM                     true                            // use left arm if true, else use right arm
-#define ROBOT_DESCRIPTION_ROSPARAM      "/amigo/robot_description"      // xml, generated from urdf model
+#define ROBOT_DESCRIPTION_ROSPARAM      "/amigo/robot_description"      // amigo urdf model gets loaded in this rosparam
+#define DEBUG                           true                            // if true additional information will be printed
+#define UPDATE_RATE                     2                               // spin rate of this node, in hz
+#define STEM_R                          0.05
+#define STEM_G                          0.65
+#define STEM_B                          0.35
 
-
-double stemNodesXYZ[] = {0.3, 0.3, 0.4,     // nodes of a virtual stem,
+float stemNodesXYZ[] = { 0.3, 0.3, 0.4,     // nodes of a virtual stem,
                          0.35, 0.35, 0.6,   // list of coordinates xyzxyzxyz...
                          0.3, 0.35, 0.9,    // defined in amigo base_link
-                         0.35, 0.4, 1.2,    // for left-arm, y-coordinates will be
+                         0.35, 0.4, 1.2,    // y-coordinates will be
                          0.3, 0.55, 1.4,    // flipped if use_leftarm is false
                          0.25, 0.6, 1.6};
+
+#define FLOATS_PER_NODE                 3
+
 \
 /* initialize */
 
@@ -20,10 +27,10 @@ int i, up = 1;
 ros::Publisher visualization_publisher;
 ros::Publisher arm_reference_publisher;
 sensor_msgs::JointState arm_joint_msg;
-std::string robot_description_xml;
 StatsPublisher sp;
-KDL::Tree kinematic_tree;
 
+RobotConfig AmigoConfig("amigo");
+VirtualStem TomatoStem(1);
 
 int main(int argc, char** argv){
 
@@ -31,7 +38,7 @@ int main(int argc, char** argv){
     /* initialize node */
     ros::init(argc, argv, "stem_tracker");
     ros::NodeHandle n;
-    ros::Rate r(2); // hz
+    ros::Rate r(UPDATE_RATE);
 
     /* initialize node communication */
     visualization_publisher = n.advertise<visualization_msgs::Marker>( "visualization_marker", 0 );
@@ -40,17 +47,22 @@ int main(int argc, char** argv){
     else
         arm_reference_publisher = n.advertise<sensor_msgs::JointState>("/amigo/right_arm/references", 0);
 
-    /* flip stem coordinates if use right instead of left arm */
-    if (!USE_LEFTARM){
-        for(i=1;i<(int)sizeof(stemNodesXYZ)/sizeof(double_t);i+=3)
-            stemNodesXYZ[i] *= -1;
-    }
+    /* create a vitual stem */
+    TomatoStem.printAll();
+    TomatoStem.setFloatsPerNode(FLOATS_PER_NODE);
+    TomatoStem.setRGB(STEM_R, STEM_G, STEM_B);
+    TomatoStem.addNodes(stemNodesXYZ, sizeof(stemNodesXYZ)/sizeof(*stemNodesXYZ)/3);
+    if(DEBUG)
+        TomatoStem.printAll();
 
-    /* get robot description from ros parameter server */
-    robot_description_xml = getRobotDescription(n, ROBOT_DESCRIPTION_ROSPARAM);
+    /* load robot hardware configuration */
+    AmigoConfig.loadUrdfFromRosparam(n, ROBOT_DESCRIPTION_ROSPARAM);
+    AmigoConfig.loadKinematicTreeFromUrdf();
+    AmigoConfig.setLeftArmIsPreferred(USE_LEFTARM);
 
-    /* turn xml robot description in kdl tree */
-    getKinematicTree(&kinematic_tree, robot_description_xml);
+    if(DEBUG)
+        AmigoConfig.printAll();
+
 
     /* initialize profiling */
     sp.initialize();
