@@ -2,13 +2,16 @@
 
 /* configure */
 
-#define USE_LEFTARM                     true                            // use left arm if true, else use right arm
-#define ROBOT_DESCRIPTION_ROSPARAM      "/amigo/robot_description"      // amigo urdf model gets loaded in this rosparam
 #define DEBUG                           true                            // if true additional information will be printed
 #define UPDATE_RATE                     2                               // spin rate of this node, in hz
+
+#define USE_LEFTARM                     true                            // use left arm if true, else use right arm
+#define ROBOT_DESCRIPTION_ROSPARAM      "/amigo/robot_description"      // amigo urdf model gets loaded in this rosparam
+
 #define STEM_R                          0.05
 #define STEM_G                          0.65
 #define STEM_B                          0.35
+#define STEM_THICKNESS                  0.03                            // thickness in cm
 
 float stemNodesXYZ[] = { 0.3, 0.3, 0.4,     // nodes of a virtual stem,
                          0.35, 0.35, 0.6,   // list of coordinates xyzxyzxyz...
@@ -26,11 +29,11 @@ int state = 0;
 int i, up = 1;
 ros::Publisher visualization_publisher;
 ros::Publisher arm_reference_publisher;
-sensor_msgs::JointState arm_joint_msg;
 StatsPublisher sp;
 
 RobotConfig AmigoConfig("amigo");
 VirtualStem TomatoStem(1);
+
 
 int main(int argc, char** argv){
 
@@ -41,7 +44,7 @@ int main(int argc, char** argv){
     ros::Rate r(UPDATE_RATE);
 
     /* initialize node communication */
-    visualization_publisher = n.advertise<visualization_msgs::Marker>( "visualization_marker", 0 );
+    visualization_publisher = n.advertise<visualization_msgs::Marker>( "visualization_marker", 1 );
     if (USE_LEFTARM)
         arm_reference_publisher = n.advertise<sensor_msgs::JointState>("/amigo/left_arm/references", 0);
     else
@@ -50,6 +53,7 @@ int main(int argc, char** argv){
     /* create a vitual stem */
     TomatoStem.setFloatsPerNode(FLOATS_PER_NODE);
     TomatoStem.setRGB(STEM_R, STEM_G, STEM_B);
+    TomatoStem.setThickness(STEM_THICKNESS);
     TomatoStem.addNodes(stemNodesXYZ, sizeof(stemNodesXYZ)/sizeof(*stemNodesXYZ)/3);
     if(!USE_LEFTARM)
         TomatoStem.flipNodes();
@@ -59,11 +63,13 @@ int main(int argc, char** argv){
     /* load robot hardware configuration */
     AmigoConfig.loadUrdfFromRosparam(n, ROBOT_DESCRIPTION_ROSPARAM);
     AmigoConfig.loadKinematicTreeFromUrdf();
-    AmigoConfig.setLeftArmIsPreferred(USE_LEFTARM);
+    if(USE_LEFTARM)
+        AmigoConfig.setLeftArmIsPreferred();
+    else
+        AmigoConfig.setRightArmIsPreferred();
 
     if(DEBUG)
         AmigoConfig.printAll();
-
 
     /* initialize profiling */
     sp.initialize();
@@ -75,15 +81,14 @@ int main(int argc, char** argv){
         sp.startTimer("main");
 
         /* publish linestrip marker to visualize stem */
-        visualizeStem(visualization_publisher, stemNodesXYZ, sizeof(stemNodesXYZ)/sizeof(*stemNodesXYZ)/3);
+        TomatoStem.showInRviz(&visualization_publisher);
 
         /* bring arm to initial position */
-        arm_joint_msg = amigoGetInitialPosition(USE_LEFTARM);
-        arm_reference_publisher.publish(arm_joint_msg);
+        AmigoConfig.publishInitialPose(&arm_reference_publisher);
 
         /* check have we reached end of stem */
         state += up;
-        if(state>=(int)sizeof(stemNodesXYZ)/sizeof(double_t)/3-1 || state < 0){
+        if(state>=(int)sizeof(stemNodesXYZ)/sizeof(*stemNodesXYZ)/FLOATS_PER_NODE-1 || state < 0){
             up = -up;
             ROS_INFO("reached end of stem");
             if(state<0){
