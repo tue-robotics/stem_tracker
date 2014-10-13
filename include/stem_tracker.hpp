@@ -39,7 +39,7 @@ class VirtualStem
         int m_stem_id;
         float m_rgb[3]; // between 0.0 - 1.0
         int m_n_nodes;
-        int m_floats_per_node;
+        int m_node_dimension;
         float m_thickness; // in cm
         std::vector<float> m_nodes;
 
@@ -48,7 +48,7 @@ class VirtualStem
         VirtualStem(int stem_id=-1){
             m_stem_id = stem_id;
             m_n_nodes = 0;
-            m_floats_per_node = -1;
+            m_node_dimension = -1;
             m_thickness = -1.0;
             m_rgb[0] = -1.0;
             m_rgb[1] = -1.0;
@@ -59,20 +59,20 @@ class VirtualStem
 
             bool IamOK = true;
 
-            if(m_floats_per_node < 1){
-                std::cout << "In stem with id " << m_stem_id << ", floats per node was not initialized or was set to value smaller than 1" << std::endl;
+            if(m_node_dimension < 1){
+                INFO_STREAM("In stem with id " << m_stem_id << ", node dimension was not initialized or was set to value smaller than 1");
                 IamOK = false;
             }
 
             for(int i=0;i<3;++i){
                 if(m_rgb[i] < 0.0){
-                    std::cout << "In stem with id " << m_stem_id << ", rgb value not initialized or set to value smaller than 0.0" << std::endl;
+                    INFO_STREAM("In stem with id " << m_stem_id << ", rgb value not initialized or set to value smaller than 0.0");
                     IamOK = false;
                 }
             }
 
             if(m_thickness <= 0.0){
-                std::cout << "In stem with id " << m_stem_id << ", thickness not initialized or set to value smaller than 0.0" << std::endl;
+                INFO_STREAM("In stem with id " << m_stem_id << ", thickness not initialized or set to value smaller than 0.0");
                 IamOK = false;
             }
 
@@ -101,7 +101,7 @@ class VirtualStem
                 return;
             }
 
-            for(int i=0;i<m_floats_per_node;++i){
+            for(int i=0;i<m_node_dimension;++i){
                 m_nodes.push_back(new_node[i]);
             }
             ++m_n_nodes;
@@ -114,12 +114,12 @@ class VirtualStem
                 return;
             }
 
-            if(n_new_nodes % m_floats_per_node != 0){
-                std::cout << "You are trying to add half-nodes" << std::endl;
+            if(n_new_nodes % m_node_dimension != 0){
+                INFO_STREAM("You are trying to add half-nodes");
                 return;
             }
 
-            for(int i=0;i<n_new_nodes*m_floats_per_node;++i){
+            for(int i=0;i<n_new_nodes*m_node_dimension;++i){
                 m_nodes.push_back(new_nodes[i]);
             }
             m_n_nodes+=n_new_nodes;
@@ -127,7 +127,7 @@ class VirtualStem
         }
 
         void setFloatsPerNode(int floats_per_node){
-            m_floats_per_node = floats_per_node;
+            m_node_dimension = floats_per_node;
         }
 
         int getNumberOfNodes(){
@@ -182,22 +182,25 @@ class VirtualStem
 
         void printAll(){
 
-            std::cout << "===============" << std::endl;
+            INFO_STREAM("===============");
+            INFO_STREAM("Stem id: " << m_stem_id);
+            INFO_STREAM("RGB: " << m_rgb[0] << " " << m_rgb[1] << " " << m_rgb[2] << " ");
+            INFO_STREAM("Thickness: " << m_thickness << " cm");
+            INFO_STREAM("Number of nodes: " << m_n_nodes);
+            INFO_STREAM("Node dimension: " << m_node_dimension);
 
-            std::cout << "Stem id: " << m_stem_id << std::endl;
-            std::cout << "RGB: " << m_rgb[0] << " " << m_rgb[1] << " " << m_rgb[2] << " " << std::endl;
-            std::cout << "Thickness: " << m_thickness << " cm" << std::endl;
-            std::cout << "Number of nodes: " << m_n_nodes << std::endl;
-            std::cout << "Floats per node: " << m_floats_per_node << std::endl;
-            std::cout << "Nodes: " << std::endl;
+            std::stringstream nodes_stream;
+            nodes_stream << "Nodes:" << std::endl;
             for(int i=0;i<m_n_nodes;++i){
-                std::cout << "\t";
-                for(int j=0;j<m_floats_per_node;++j){
-                    std::cout << m_nodes[i*m_floats_per_node+j] << "\t";
+                nodes_stream << "\t\t\t\t\t";
+                for(int j=0;j<m_node_dimension;++j){
+                    nodes_stream << m_nodes[i*m_node_dimension+j] << "\t";
                 }
-                std::cout << std::endl;
+                nodes_stream << std::endl;
             }
-            std::cout << "===============" << std::endl;
+            INFO_STREAM(nodes_stream.str());
+
+            INFO_STREAM("===============");
 
         }
 
@@ -237,7 +240,7 @@ class RobotConfig
         bool selfCheck(){
 
             if(!m_preferred_arm_set){
-                std::cout << "In RobotConfig of " << m_name << " preferred arm was not set" << std::endl;
+                INFO_STREAM("In RobotConfig of " << m_name << " preferred arm was not set");
                 return false;
             }
 
@@ -248,10 +251,10 @@ class RobotConfig
         void loadUrdfFromRosparam(ros::NodeHandle n, const std::string urdf_rosparam){
 
             if (!n.getParam(urdf_rosparam, m_urdf)) {
-                std::cout << "Loading of robot urdf from rosparam \"" << urdf_rosparam << "\" failed!" << std::endl;
+                INFO_STREAM("Loading of robot urdf from rosparam \"" << urdf_rosparam << "\" failed!");
             }
             else{
-                std::cout << "Urdf loaded from rosparam \"" << urdf_rosparam << "\"" << std::endl;
+                INFO_STREAM("Urdf loaded from rosparam \"" << urdf_rosparam << "\"");
             }
         }
 
@@ -262,10 +265,10 @@ class RobotConfig
         void loadKinematicTreeFromUrdf(){
 
             if (!kdl_parser::treeFromString(m_urdf, m_kinematic_tree)) {
-                std::cout << "Turning urdf into kdl tree failed!" << std::endl;
+                INFO_STREAM("Turning urdf into kdl tree failed!");
             }
             else{
-                std::cout << "Urdf has been turned in kdl tree." << std::endl;
+                INFO_STREAM("Urdf has been turned in kdl tree.");
             }
         }
 
@@ -332,21 +335,21 @@ class RobotConfig
 
         void printAll(){
 
-            std::cout << "===============" << std::endl;
-            std::cout << "Robot name: " << m_name << std::endl;
+            INFO_STREAM("===============");
+            INFO_STREAM("Robot name: " << m_name);
 
             if(m_urdf.empty())
-                std::cout << "URDF empty" << std::endl;
+                INFO_STREAM("URDF empty");
             else
-                std::cout << "URDF set, " << m_urdf.length() << " chars" << std::endl;
+                INFO_STREAM("URDF set, " << m_urdf.length() << " chars");
 
-            std::cout << "Preferred arm set: " << m_preferred_arm_set << std::endl;
-            std::cout << "Preferring left arm: " << m_prefer_left_arm << std::endl;
+            INFO_STREAM("Preferred arm set: " << m_preferred_arm_set);
+            INFO_STREAM("Preferring left arm: " << m_prefer_left_arm);
 
-            std::cout << "KDL tree:" << std::endl;
-            std::cout << "\tNumber of Joints: " << m_kinematic_tree.getNrOfJoints() << std::endl;
-            std::cout << "\tNumber of Segments: " << m_kinematic_tree.getNrOfSegments() << std::endl;
-            std::cout << "===============" << std::endl;
+            INFO_STREAM("KDL tree:");
+            INFO_STREAM("\tNumber of Joints: " << m_kinematic_tree.getNrOfJoints() );
+            INFO_STREAM("\tNumber of Segments: " << m_kinematic_tree.getNrOfSegments() );
+            INFO_STREAM("===============");
 
         }
 

@@ -1,8 +1,9 @@
+#define DEBUG                           true                            // if true additional information will be printed
+#define INFO_STREAM                     ROS_INFO_STREAM
+
 #include "stem_tracker.hpp"
 
-/* configure */
 
-#define DEBUG                           true                            // if true additional information will be printed
 #define UPDATE_RATE                     2                               // spin rate of this node, in hz
 
 #define USE_LEFTARM                     true                            // use left arm if true, else use right arm
@@ -20,7 +21,7 @@ float stemNodesXYZ[] = { 0.3, 0.3, 0.4,     // nodes of a virtual stem,
                          0.3, 0.55, 1.4,    // flipped if use_leftarm is false
                          0.25, 0.6, 1.6};
 
-#define FLOATS_PER_NODE                 3
+#define NODE_DIMENSION                 3
 
 \
 /* initialize */
@@ -51,7 +52,7 @@ int main(int argc, char** argv){
         arm_reference_publisher = n.advertise<sensor_msgs::JointState>("/amigo/right_arm/references", 0);
 
     /* create a vitual stem */
-    TomatoStem.setFloatsPerNode(FLOATS_PER_NODE);
+    TomatoStem.setFloatsPerNode(NODE_DIMENSION);
     TomatoStem.setRGB(STEM_R, STEM_G, STEM_B);
     TomatoStem.setThickness(STEM_THICKNESS);
     TomatoStem.addNodes(stemNodesXYZ, sizeof(stemNodesXYZ)/sizeof(*stemNodesXYZ)/3);
@@ -74,11 +75,9 @@ int main(int argc, char** argv){
     /* initialize profiling */
     sp.initialize();
 
+
     /* update loop */
     while(ros::ok()){
-
-        /* start sample timing, for profiling */
-        sp.startTimer("main");
 
         /* publish linestrip marker to visualize stem */
         TomatoStem.showInRviz(&visualization_publisher);
@@ -86,9 +85,12 @@ int main(int argc, char** argv){
         /* bring arm to initial position */
         AmigoConfig.publishInitialPose(&arm_reference_publisher);
 
+        /* start sample timing, for profiling */
+        sp.startTimer("main");
+
         /* check have we reached end of stem */
         state += up;
-        if(state>=(int)sizeof(stemNodesXYZ)/sizeof(*stemNodesXYZ)/FLOATS_PER_NODE-1 || state < 0){
+        if(state>=(int)sizeof(stemNodesXYZ)/sizeof(*stemNodesXYZ)/NODE_DIMENSION-1 || state < 0){
             up = -up;
             ROS_INFO("reached end of stem");
             if(state<0){
