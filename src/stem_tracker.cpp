@@ -23,10 +23,15 @@ float stemNodesXYZ[] = { 0.3, 0.3, 0.4,     // nodes of a virtual stem,
 
 #define NODE_DIMENSION                 3
 
+#define ROOT_LINK       "base_link"
+#define LEFT_END_LINK   "grippoint_left"
+#define RIGHT_END_LINK  "grippoint_right"
+
+
 \
 /* initialize */
 
-int state = 0;
+int state = -1;
 int i, up = 1;
 ros::Publisher visualization_publisher;
 ros::Publisher arm_reference_publisher;
@@ -52,7 +57,7 @@ int main(int argc, char** argv){
         arm_reference_publisher = n.advertise<sensor_msgs::JointState>("/amigo/right_arm/references", 0);
 
     /* create a vitual stem */
-    TomatoStem.setFloatsPerNode(NODE_DIMENSION);
+    TomatoStem.setNodeDimension(NODE_DIMENSION);
     TomatoStem.setRGB(STEM_R, STEM_G, STEM_B);
     TomatoStem.setThickness(STEM_THICKNESS);
     TomatoStem.addNodes(stemNodesXYZ, sizeof(stemNodesXYZ)/sizeof(*stemNodesXYZ)/3);
@@ -62,12 +67,21 @@ int main(int argc, char** argv){
         TomatoStem.printAll();
 
     /* load robot hardware configuration */
-    AmigoConfig.loadUrdfFromRosparam(n, ROBOT_DESCRIPTION_ROSPARAM);
-    AmigoConfig.loadKinematicTreeFromUrdf();
+
     if(USE_LEFTARM)
         AmigoConfig.setLeftArmIsPreferred();
     else
         AmigoConfig.setRightArmIsPreferred();
+
+    AmigoConfig.loadUrdfFromRosparam(n, ROBOT_DESCRIPTION_ROSPARAM);
+    AmigoConfig.loadKinematicTreeFromUrdf();
+
+    if(USE_LEFTARM)
+        AmigoConfig.loadKinematicChainFromTree(ROOT_LINK, LEFT_END_LINK);
+    else
+        AmigoConfig.loadKinematicChainFromTree(ROOT_LINK, RIGHT_END_LINK);
+
+    AmigoConfig.loadJointLimits();
 
     if(DEBUG)
         AmigoConfig.printAll();
@@ -82,23 +96,25 @@ int main(int argc, char** argv){
         /* publish linestrip marker to visualize stem */
         TomatoStem.showInRviz(&visualization_publisher);
 
-        /* bring arm to initial position */
-        AmigoConfig.publishInitialPose(&arm_reference_publisher);
-
         /* start sample timing, for profiling */
         sp.startTimer("main");
 
+        if(state == -1){
+            /* bring arm to initial position */
+            AmigoConfig.publishInitialPose(&arm_reference_publisher);
+        }
+
         /* check have we reached end of stem */
         state += up;
-        if(state>=(int)sizeof(stemNodesXYZ)/sizeof(*stemNodesXYZ)/NODE_DIMENSION-1 || state < 0){
+        if(state >= TomatoStem.getNumberOfNodes()-1 || state < 0){
             up = -up;
-            ROS_INFO("reached end of stem");
+            INFO_STREAM("reached end of stem");
             if(state<0){
                 state = 0;
             }
         }
         else{
-            ROS_INFO("subgoal accomplished");
+            INFO_STREAM("subgoal accomplished");
         }
 
         /* stop and publish sample timing, for profiling */

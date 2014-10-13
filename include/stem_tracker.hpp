@@ -6,14 +6,19 @@
 #include <map>
 #include <iostream>
 
+#include <boost/shared_ptr.hpp>
+
 /* ros includes */
 #include <ros/ros.h>
 #include <visualization_msgs/Marker.h>
 #include <sensor_msgs/JointState.h>
+#include <urdf/model.h>
 
 /* kdl includes */
 #include <kdl/tree.hpp>
 #include <kdl_parser/kdl_parser.hpp>
+#include <kdl/chain.hpp>
+#include <kdl/jntarray.hpp>
 //#include <kdl/treejnttojacsolver.hpp>
 
 /* amigo includes */
@@ -126,8 +131,8 @@ class VirtualStem
 
         }
 
-        void setFloatsPerNode(int floats_per_node){
-            m_node_dimension = floats_per_node;
+        void setNodeDimension(int node_dimension){
+            m_node_dimension = node_dimension;
         }
 
         int getNumberOfNodes(){
@@ -219,21 +224,29 @@ class RobotConfig
         <kdl_parser/kdl_parser.hpp>
         <sensor_msgs/JointState.h>
         <ros/ros.h>
+        <kdl/chain.hpp>
+        <kdl/jntarray.hpp>
+        <urdf/model.h>
     */
 
     private:
 
-        std::string m_name;             // name string of robot instance
-        std::string m_urdf;             // xml formatted text containing urdf model
+        std::string m_name;             // name of robot instance
+        urdf::Model m_urdf_model;       // urdf formatted model
         bool m_preferred_arm_set;
         bool m_prefer_left_arm;         // preferring left arm if true, right arm if false
         KDL::Tree m_kinematic_tree;
         sensor_msgs::JointState m_arm_joint_msg;
+        KDL::Chain m_kinematic_chain;
+        int m_n_joints_in_chain;
+        KDL::JntArray m_q_min, m_q_max;
+        std::vector<std::string> m_q_joint_names;
 
     public:
 
         RobotConfig(const std::string name = "defaultRobot"){
                m_preferred_arm_set = false;
+               m_n_joints_in_chain = -1;
                m_name = name;
         }
 
@@ -244,32 +257,87 @@ class RobotConfig
                 return false;
             }
 
+            if(m_n_joints_in_chain <= 0){
+                INFO_STREAM("In RobotConfig of " << m_name << " kinematic chain contains no joints");
+            }
+
             return true;
         }
 
         /* get robot description from ros parameter server */
         void loadUrdfFromRosparam(ros::NodeHandle n, const std::string urdf_rosparam){
 
-            if (!n.getParam(urdf_rosparam, m_urdf)) {
+            std::string urdf;
+            if (!n.getParam(urdf_rosparam, urdf)) {
                 INFO_STREAM("Loading of robot urdf from rosparam \"" << urdf_rosparam << "\" failed!");
+                return;
             }
             else{
-                INFO_STREAM("Urdf loaded from rosparam \"" << urdf_rosparam << "\"");
+                INFO_STREAM("Urdf xml loaded from rosparam \"" << urdf_rosparam << "\"");
+            }
+
+            if (!m_urdf_model.initString(urdf))
+            {
+                INFO_STREAM("Could not initialize urdf model from xml");
             }
         }
 
-        std::string getUrdf(){
-            return m_urdf;
+        urdf::Model getUrdfModel(){
+            return m_urdf_model;
         }
 
         void loadKinematicTreeFromUrdf(){
 
-            if (!kdl_parser::treeFromString(m_urdf, m_kinematic_tree)) {
-                INFO_STREAM("Turning urdf into kdl tree failed!");
+            if (!kdl_parser::treeFromUrdfModel(m_urdf_model, m_kinematic_tree)) {
+                INFO_STREAM("Turning urdf model into kdl tree failed!");
             }
             else{
-                INFO_STREAM("Urdf has been turned in kdl tree.");
+                INFO_STREAM("Urdf model has been turned in kdl tree.");
             }
+        }
+
+        void loadKinematicChainFromTree(const std::string root_link_name, const std::string tip_link_name){
+
+            if (!m_kinematic_tree.getChain(root_link_name, tip_link_name, m_kinematic_chain)){
+                INFO_STREAM("Could not initialize chain object");
+            }
+            INFO_STREAM("Kinematic chain initialized from tree");
+
+            m_n_joints_in_chain = m_kinematic_chain.getNrOfJoints();
+        }
+
+        void loadJointLimits(){
+
+            m_q_min.resize(m_n_joints_in_chain);
+            m_q_max.resize(m_n_joints_in_chain);
+            m_q_joint_names.resize(m_n_joints_in_chain);
+
+            int i,j=0;
+
+            for(i = 0; i < m_kinematic_chain.getNrOfSegments(); ++i){
+
+                const KDL::Joint& kdl_joint = m_kinematic_chain.getSegment(i).getJoint();
+
+                if (kdl_joint.getType() != KDL::Joint::None){
+
+                    m_q_joint_names[j] = kdl_joint.getName();
+
+                    boost::shared_ptr<const urdf::Joint> urdf_joint = m_urdf_model.getJoint(kdl_joint.getName());
+
+                    urdf_joint = m_urdf_model.getJoint(kdl_joint.getName());
+
+                    if (urdf_joint && urdf_joint->limits){
+                        m_q_min(j) = urdf_joint->limits->lower;
+                        m_q_max(j) = urdf_joint->limits->upper;
+                    } else{
+                        m_q_min(j) = -1e9;
+                        m_q_max(j) = 1e9;
+                    }
+                    ++j;
+                }
+                std::cout << "j = " << j << std::endl;
+            }
+
         }
 
         KDL::Tree getKinematicTree(){
@@ -335,20 +403,40 @@ class RobotConfig
 
         void printAll(){
 
+            int i;
+            std::stringstream tmp_stream;
+
             INFO_STREAM("===============");
             INFO_STREAM("Robot name: " << m_name);
 
-            if(m_urdf.empty())
-                INFO_STREAM("URDF empty");
-            else
-                INFO_STREAM("URDF set, " << m_urdf.length() << " chars");
-
-            INFO_STREAM("Preferred arm set: " << m_preferred_arm_set);
+            INFO_STREAM("Preferred arm is set: " << m_preferred_arm_set);
             INFO_STREAM("Preferring left arm: " << m_prefer_left_arm);
 
             INFO_STREAM("KDL tree:");
             INFO_STREAM("\tNumber of Joints: " << m_kinematic_tree.getNrOfJoints() );
             INFO_STREAM("\tNumber of Segments: " << m_kinematic_tree.getNrOfSegments() );
+            INFO_STREAM("KDL chain:");
+            INFO_STREAM("\tNumber of Joints: " << m_kinematic_chain.getNrOfJoints() );
+            INFO_STREAM("\tNumber of Segments: " << m_kinematic_chain.getNrOfSegments() );
+
+            tmp_stream.str(""); tmp_stream << "Jointnames:";
+            for(i=0;i<m_n_joints_in_chain;++i){
+                tmp_stream << std::endl << "\t\t\t\t\t " << m_q_joint_names.at(i);
+            }
+            INFO_STREAM(tmp_stream.str());
+
+            tmp_stream.str(""); tmp_stream << "Joint min:";
+            for(i=0;i<m_n_joints_in_chain;++i){
+                tmp_stream << std::endl << "\t\t\t\t\t " << m_q_min.data[i];
+            }
+            INFO_STREAM(tmp_stream.str());
+
+            tmp_stream.str(""); tmp_stream << "Joint max:";
+            for(i=0;i<m_n_joints_in_chain;++i){
+                tmp_stream << std::endl << "\t\t\t\t\t " << m_q_max.data[i];
+            }
+            INFO_STREAM(tmp_stream.str());
+
             INFO_STREAM("===============");
 
         }
@@ -357,7 +445,6 @@ class RobotConfig
             // destructor
         }
 };
-
 
 
 #endif // STEM_TRACKER_H
