@@ -5,6 +5,7 @@
 #include <vector>
 #include <map>
 #include <iostream>
+#include <cmath>
 
 #include <boost/shared_ptr.hpp>
 
@@ -19,13 +20,87 @@
 #include <kdl_parser/kdl_parser.hpp>
 #include <kdl/chain.hpp>
 #include <kdl/jntarray.hpp>
+#include <kdl/chainfksolver.hpp>
+#include <kdl/chainfksolverpos_recursive.hpp>
+
 //#include <kdl/treejnttojacsolver.hpp>
 
 /* amigo includes */
 #include <profiling/StatsPublisher.h>
 
 
-class VirtualStem
+class WhiskerInterpreter
+{
+    /* This class depends on:
+     *
+     * <vector>
+     * <cmath>
+     */
+
+    private:
+        int m_n_whiskers;
+        int m_gripper_id;
+        float m_whisker_length;
+        float m_gripper_diameter;
+
+    public:
+
+        WhiskerInterpreter(int n_whiskers, int gripper_id, float whisker_length, float gripper_diameter){
+            m_n_whiskers = n_whiskers;
+            m_gripper_id = gripper_id;
+            m_whisker_length = whisker_length;
+            m_gripper_diameter = gripper_diameter;
+        }
+
+        double selfCheck(){
+
+            bool IamOK = true;
+
+            if (m_n_whiskers <= 0){
+                INFO_STREAM("In whisker gripper with id " << m_gripper_id << " number of whiskers set to zero or negative number");
+                IamOK = false;
+            }
+
+            return IamOK;
+        }
+
+        std::vector<double> simulateWhiskerGripper(std::vector<double> gripper_center, std::vector<double> stem_center){
+
+            /* takes two doubles (xy) as coordinates of the gripper two doubles as coordinate of
+             * the stem (both are in the same z-plane).
+             * returns a force (xy) with origin at gripper center */
+
+            if(gripper_center.size() != 2 ){
+                INFO_STREAM("in simulateWhiskerGripper the gripper center should be of dimension 2!");
+            }
+
+            if(stem_center.size() != 2 ){
+                INFO_STREAM("in simulateWhiskerGripper the stem center should be of dimension 2!");
+            }
+
+            std::vector<double> force;
+            force.assign(2,0.0);
+
+            double x_diff = gripper_center[0] - stem_center[0];
+            double y_diff = gripper_center[1] - stem_center[1];
+
+            if(sqrt( x_diff * x_diff + y_diff * y_diff ) > 0.5 * m_gripper_diameter){
+                INFO_STREAM("whiskers out of range!");
+                return force;
+            }
+
+            /* simulated force is 1-1 map from distance to force */
+            force[0] = x_diff;
+            force[1] = y_diff;
+            return force;
+        }
+
+        ~WhiskerInterpreter(){
+            //destructor
+        }
+};
+
+class StemRepresentation
 {
 
     /* Nodes have to be specified as a sequence
@@ -45,12 +120,12 @@ class VirtualStem
         float m_rgb[3]; // between 0.0 - 1.0
         int m_n_nodes;
         int m_node_dimension;
-        float m_thickness; // in cm
+        float m_thickness; // in meters
         std::vector<float> m_nodes;
 
     public:
 
-        VirtualStem(int stem_id=-1){
+        StemRepresentation(int stem_id=-1){
             m_stem_id = stem_id;
             m_n_nodes = 0;
             m_node_dimension = -1;
@@ -190,7 +265,7 @@ class VirtualStem
             INFO_STREAM("===============");
             INFO_STREAM("Stem id: " << m_stem_id);
             INFO_STREAM("RGB: " << m_rgb[0] << " " << m_rgb[1] << " " << m_rgb[2] << " ");
-            INFO_STREAM("Thickness: " << m_thickness << " cm");
+            INFO_STREAM("Thickness: " << m_thickness << " meters");
             INFO_STREAM("Number of nodes: " << m_n_nodes);
             INFO_STREAM("Node dimension: " << m_node_dimension);
 
@@ -209,7 +284,7 @@ class VirtualStem
 
         }
 
-        ~VirtualStem(){
+        ~StemRepresentation(){
             // destructor
         }
 
@@ -335,13 +410,16 @@ class RobotConfig
                     }
                     ++j;
                 }
-                std::cout << "j = " << j << std::endl;
             }
 
         }
 
         KDL::Tree getKinematicTree(){
             return m_kinematic_tree;
+        }
+
+        KDL::Chain getKinematicChain(){
+            return m_kinematic_chain;
         }
 
 
@@ -383,7 +461,7 @@ class RobotConfig
             return !m_prefer_left_arm;
         }
 
-        void publishInitialPose( ros::Publisher* p_arm_pub ){
+        sensor_msgs::JointState getInitialPoseMsg(){
 
             m_arm_joint_msg.header.stamp = ros::Time::now();
             m_arm_joint_msg.position.clear();
@@ -397,7 +475,7 @@ class RobotConfig
             m_arm_joint_msg.position.push_back(0.0);
             m_arm_joint_msg.position.push_back(0.0);
 
-            p_arm_pub->publish(m_arm_joint_msg);
+            return m_arm_joint_msg;
 
         }
 
@@ -446,5 +524,51 @@ class RobotConfig
         }
 };
 
+class RobotStatus
+{
+    /* This class depends on:
+     *
+     */
+
+    private:
+        KDL::JntArray m_joints_to_monitor; // order should be: torso / shoulder-jaw / shoulder-pitch / shoulder-roll / elbow-pitch / elbow-roll / wrist-pitch / wrist-yaw
+        int m_n_joints_monitoring;
+
+    public:
+
+        RobotStatus(int n_joints_to_monitor){
+            m_joints_to_monitor = KDL::JntArray(n_joints_to_monitor);
+            m_n_joints_monitoring = n_joints_to_monitor;
+        }
+
+        void receivedTorsoMsg(const sensor_msgs::JointState & msg){
+            m_joints_to_monitor(0) = msg.position[0];
+        }
+
+        void receivedArmMsg(const sensor_msgs::JointState & msg){
+            for(int i = 1; i < m_n_joints_monitoring; ++i){
+                m_joints_to_monitor(i) = msg.position[i];
+//                INFO_STREAM("received msg.position[" << i << "] = " << msg.position[i]);
+            }
+        }
+
+        KDL::JntArray getJointStatus(){
+            return m_joints_to_monitor;
+        }
+
+        void printAll(){
+
+            INFO_STREAM("===============");
+            INFO_STREAM("Robot status: ");
+            for(int i; i<m_n_joints_monitoring; ++i){
+                INFO_STREAM("\t" << m_joints_to_monitor(i));
+            }
+            INFO_STREAM("===============");
+        }
+
+        ~RobotStatus(){
+            // destructor
+        }
+};
 
 #endif // STEM_TRACKER_H
