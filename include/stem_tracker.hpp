@@ -42,6 +42,7 @@ class WhiskerInterpreter
         int m_gripper_id;
         float m_whisker_length;
         float m_gripper_diameter;
+        std::vector<float> m_whisker_force;
 
     public:
 
@@ -64,35 +65,85 @@ class WhiskerInterpreter
             return IamOK;
         }
 
-        std::vector<double> simulateWhiskerGripper(std::vector<double> gripper_center, std::vector<double> stem_center){
+        void simulateWhiskerGripper(std::vector<float> gripper_center, std::vector<float> stem_center){
 
             /* takes two doubles (xy) as coordinates of the gripper two doubles as coordinate of
              * the stem (both are in the same z-plane).
              * returns a force (xy) with origin at gripper center */
 
-            if(gripper_center.size() != 2 ){
-                INFO_STREAM("in simulateWhiskerGripper the gripper center should be of dimension 2!");
+            m_whisker_force.clear();
+
+            if(gripper_center.size() < 2 ){
+                INFO_STREAM("in simulateWhiskerGripper gripper center xy needed!");
+                return;
             }
 
-            if(stem_center.size() != 2 ){
-                INFO_STREAM("in simulateWhiskerGripper the stem center should be of dimension 2!");
+            if(stem_center.size() < 2 ){
+                INFO_STREAM("in simulateWhiskerGripper stem center xy needed!");
+                return;
             }
 
-            std::vector<double> force;
-            force.assign(2,0.0);
+            HIER GEBLEVEN!!
+
+            m_whisker_force.assign(2,0.0);
 
             double x_diff = gripper_center[0] - stem_center[0];
             double y_diff = gripper_center[1] - stem_center[1];
 
-            if(sqrt( x_diff * x_diff + y_diff * y_diff ) > 0.5 * m_gripper_diameter){
-                INFO_STREAM("whiskers out of range!");
-                return force;
-            }
+//            if(sqrt( x_diff * x_diff + y_diff * y_diff ) > 0.5 * m_gripper_diameter){
+//                INFO_STREAM("whiskers out of range!");
+//            }
 
             /* simulated force is 1-1 map from distance to force */
-            force[0] = x_diff;
-            force[1] = y_diff;
-            return force;
+            m_whisker_force.at(0) = x_diff;
+            m_whisker_force.at(1) = y_diff;
+        }
+
+        std::vector<float> getWhiskerForce(){
+            return m_whisker_force;
+        }
+
+        void showForceInRviz(ros::Publisher* p_vis_pub, std::vector<float> gripper_loc){
+
+            if(!selfCheck()){
+                return;
+            }
+
+            if(!gripper_loc.size() >= 3){
+                INFO_STREAM("need gripper location xyz to visualize whisker force!");
+                return;
+            }
+
+            /* construct line strip marker object */
+            visualization_msgs::Marker marker;
+            marker.header.frame_id = "/amigo/base_link";
+            marker.header.stamp = ros::Time();
+            marker.id = 0;
+            marker.type = visualization_msgs::Marker::ARROW;
+            marker.action = visualization_msgs::Marker::ADD;
+            marker.pose.orientation.w = 1.0;
+            marker.scale.x = 0.03;
+            marker.color.a = 1.0;
+            marker.color.r = 1.0;
+            marker.color.g = 0.0;
+            marker.color.b = 0.0;
+
+            /* construct nodes point */
+            geometry_msgs::Point p_start, p_end;
+
+            p_start.x = gripper_loc.at(0);
+            p_start.y = gripper_loc.at(1);
+            p_start.z = gripper_loc.at(2);
+            marker.points.push_back(p_start);
+
+            p_end.x = gripper_loc.at(0) + m_whisker_force.at(0);
+            p_end.y = gripper_loc.at(1) + m_whisker_force.at(1);
+            p_end.z = gripper_loc.at(2);
+            marker.points.push_back(p_end);
+
+            /* publish marker */
+            p_vis_pub->publish( marker );
+
         }
 
         ~WhiskerInterpreter(){
@@ -112,6 +163,8 @@ class StemRepresentation
         <iostream>
         <ros/ros.h>
         <visualization_msgs/Marker.h>
+
+        Assumption: stem derivative is always positive
     */
 
     private:
@@ -153,12 +206,21 @@ class StemRepresentation
                 }
             }
 
-            if (index_first_above <= 1){
+            if (index_first_above < 1){
                 INFO_STREAM("z below stem start or not enough nodes to calc xy for stem at z!");
                 return xy;
             }
 
-            // HIER GEBLEVEN!
+            float atFraction;
+            if(m_z_nodes.at(index_first_above) - m_z_nodes.at(index_first_above-1) <= 0.0){
+                INFO_STREAM("stem bends down or goes horizontally, we don't support that. sorry");
+                atFraction = 0.0;
+            } else{
+                atFraction = (z - m_z_nodes.at(index_first_above-1)) / (m_z_nodes.at(index_first_above) - m_z_nodes.at(index_first_above-1));
+            }
+
+            xy.push_back( m_x_nodes.at(index_first_above-1) += atFraction * ( m_x_nodes.at(index_first_above) - m_x_nodes.at(index_first_above-1) ) );
+            xy.push_back( m_y_nodes.at(index_first_above-1) += atFraction * ( m_y_nodes.at(index_first_above) - m_y_nodes.at(index_first_above-1) ) );
 
             return xy;
 

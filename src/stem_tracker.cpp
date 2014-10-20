@@ -191,8 +191,11 @@ int main(int argc, char** argv){
         std::vector<float> gripper_center, stem_center, whisker_force;
         gripper_center.push_back(cartpos.p.x());
         gripper_center.push_back(cartpos.p.y());
+        gripper_center.push_back(cartpos.p.z());
 
-//        whisker_force = TomatoWhiskerGripper.simulateWhiskerGripper(gripper_center, stem_center);
+        stem_center = TomatoStem.getXYatZ(cartpos.p.z());
+        TomatoWhiskerGripper.simulateWhiskerGripper(gripper_center, stem_center);
+        TomatoWhiskerGripper.showForceInRviz(&visualization_publisher, gripper_center);
     }
 
     torso_measurements_subscriber.shutdown();
