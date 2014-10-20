@@ -118,29 +118,59 @@ class StemRepresentation
 
         int m_stem_id;
         float m_rgb[3]; // between 0.0 - 1.0
+
         int m_n_nodes;
-        int m_node_dimension;
+        std::vector<float> m_x_nodes;
+        std::vector<float> m_y_nodes;
+        std::vector<float> m_z_nodes;
+
         float m_thickness; // in meters
-        std::vector<float> m_nodes;
 
     public:
 
         StemRepresentation(int stem_id=-1){
             m_stem_id = stem_id;
             m_n_nodes = 0;
-            m_node_dimension = -1;
             m_thickness = -1.0;
             m_rgb[0] = -1.0;
             m_rgb[1] = -1.0;
             m_rgb[2] = -1.0;
         }
 
+        std::vector<float> getXYatZ(float z){
+
+            std::vector<float> xy;
+
+            if (m_z_nodes.back() < z){
+                INFO_STREAM("z above stem length!");
+                return xy;
+            }
+
+            int index_first_above;
+            for( index_first_above=0; index_first_above<m_z_nodes.size(); ++index_first_above){
+                if(m_z_nodes.at(index_first_above) > z){
+                    break;
+                }
+            }
+
+            if (index_first_above <= 1){
+                INFO_STREAM("z below stem start or not enough nodes to calc xy for stem at z!");
+                return xy;
+            }
+
+            // HIER GEBLEVEN!
+
+            return xy;
+
+        }
+
         bool selfCheck(){
 
             bool IamOK = true;
 
-            if(m_node_dimension < 1){
-                INFO_STREAM("In stem with id " << m_stem_id << ", node dimension was not initialized or was set to value smaller than 1");
+            if( !( ( m_x_nodes.size() == m_y_nodes.size() ) && ( m_y_nodes.size() == m_z_nodes.size() ) ) ) {
+                INFO_STREAM("in stem with id " << m_stem_id << ", vectors with node coordinates not of equal length!");
+                INFO_STREAM("\t x_nodes.size() = " << m_x_nodes.size() << " y_nodes.size() = " << m_y_nodes.size() << " z_nodes.size() = " << m_z_nodes.size() << std::endl);
                 IamOK = false;
             }
 
@@ -175,39 +205,22 @@ class StemRepresentation
             return m_thickness;
         }
 
-        void addNode(float* new_node){
+        void addNodesXYZ(std::vector<float> x, std::vector<float> y, std::vector<float> z){
 
             if(!selfCheck()){
                 return;
             }
 
-            for(int i=0;i<m_node_dimension;++i){
-                m_nodes.push_back(new_node[i]);
-            }
-            ++m_n_nodes;
-
-        }
-
-        void addNodes(float* new_nodes, int n_new_nodes){
-
-            if(!selfCheck()){
-                return;
+            for( int i=0; i<x.size(); ++i ){
+                m_x_nodes.push_back(x.at(i));
+                m_y_nodes.push_back(y.at(i));
+                m_z_nodes.push_back(z.at(i));
             }
 
-            if(n_new_nodes % m_node_dimension != 0){
-                INFO_STREAM("You are trying to add half-nodes");
-                return;
-            }
+            m_n_nodes = m_x_nodes.size();
 
-            for(int i=0;i<n_new_nodes*m_node_dimension;++i){
-                m_nodes.push_back(new_nodes[i]);
-            }
-            m_n_nodes+=n_new_nodes;
+            selfCheck();
 
-        }
-
-        void setNodeDimension(int node_dimension){
-            m_node_dimension = node_dimension;
         }
 
         int getNumberOfNodes(){
@@ -216,11 +229,10 @@ class StemRepresentation
 
         void flipNodes(){
 
-            if(m_n_nodes>0){
-                for(int i=1;i<3*m_n_nodes;i+=3){
-                    m_nodes[i] *= -1;
-                }
+            for(int i=0; i<m_y_nodes.size(); ++i){
+                m_y_nodes.at(i) *= -1;
             }
+
         }
 
         /* publish a line strip marker to visualize the main stem in rviz */
@@ -247,11 +259,11 @@ class StemRepresentation
             marker.color.b = m_rgb[2];
 
             /* construct nodes point */
-            for(i=0;i<m_n_nodes;++i){
+            for(i=0; i<m_x_nodes.size(); ++i){
                 geometry_msgs::Point p;
-                p.x = m_nodes[3*i];
-                p.y = m_nodes[3*i+1];
-                p.z = m_nodes[3*i+2];
+                p.x = m_x_nodes.at(i);
+                p.y = m_y_nodes.at(i);
+                p.z = m_z_nodes.at(i);
                 marker.points.push_back(p);
             }
 
@@ -267,16 +279,11 @@ class StemRepresentation
             INFO_STREAM("RGB: " << m_rgb[0] << " " << m_rgb[1] << " " << m_rgb[2] << " ");
             INFO_STREAM("Thickness: " << m_thickness << " meters");
             INFO_STREAM("Number of nodes: " << m_n_nodes);
-            INFO_STREAM("Node dimension: " << m_node_dimension);
 
             std::stringstream nodes_stream;
             nodes_stream << "Nodes:" << std::endl;
             for(int i=0;i<m_n_nodes;++i){
-                nodes_stream << "\t\t\t\t\t";
-                for(int j=0;j<m_node_dimension;++j){
-                    nodes_stream << m_nodes[i*m_node_dimension+j] << "\t";
-                }
-                nodes_stream << std::endl;
+                nodes_stream << "\t\t\t\t\t" << m_x_nodes.at(i) << "\t" << m_y_nodes.at(i) << "\t" << m_z_nodes.at(i) << std::endl;
             }
             INFO_STREAM(nodes_stream.str());
 
@@ -537,15 +544,40 @@ class RobotStatus
     public:
 
         RobotStatus(int n_joints_to_monitor){
+            if(n_joints_to_monitor <= 0){
+                INFO_STREAM("trying to initialize robot status object with zero or negative number of joints to monitor!");
+            }
             m_joints_to_monitor = KDL::JntArray(n_joints_to_monitor);
             m_n_joints_monitoring = n_joints_to_monitor;
         }
 
+        bool selfCheck(){
+
+            bool IamOK = true;
+
+            if(m_n_joints_monitoring <= 0){
+                INFO_STREAM("trying to use robot status object while number of joints to monitor is zero or negative!");
+                IamOK = false;
+            }
+
+            return IamOK;
+        }
+
         void receivedTorsoMsg(const sensor_msgs::JointState & msg){
+
+            if(!selfCheck()){
+                return;
+            }
+
             m_joints_to_monitor(0) = msg.position[0];
         }
 
         void receivedArmMsg(const sensor_msgs::JointState & msg){
+
+            if(!selfCheck()){
+                return;
+            }
+
             for(int i = 1; i < m_n_joints_monitoring; ++i){
                 m_joints_to_monitor(i) = msg.position[i];
 //                INFO_STREAM("received msg.position[" << i << "] = " << msg.position[i]);

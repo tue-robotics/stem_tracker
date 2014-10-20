@@ -6,6 +6,8 @@ find_package(catkin REQUIRED COMPONENTS
     code_profiler
     sensor_msgs
     kdl_parser
+    tue_config
+    roslib # For using ros::package::getPath
 )
 
 
