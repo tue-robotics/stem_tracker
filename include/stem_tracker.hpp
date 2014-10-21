@@ -83,20 +83,20 @@ class WhiskerInterpreter
                 return;
             }
 
-            HIER GEBLEVEN!!
-
             m_whisker_force.assign(2,0.0);
 
             double x_diff = gripper_center[0] - stem_center[0];
             double y_diff = gripper_center[1] - stem_center[1];
 
-//            if(sqrt( x_diff * x_diff + y_diff * y_diff ) > 0.5 * m_gripper_diameter){
-//                INFO_STREAM("whiskers out of range!");
-//            }
+            if(sqrt( x_diff * x_diff + y_diff * y_diff ) > 10000.0 * m_gripper_diameter){
+                INFO_STREAM("whiskers out of range!");
+            }
 
             /* simulated force is 1-1 map from distance to force */
             m_whisker_force.at(0) = x_diff;
             m_whisker_force.at(1) = y_diff;
+
+            INFO_STREAM("force_x = " << m_whisker_force[0] << " force_y " << m_whisker_force[1]);
         }
 
         std::vector<float> getWhiskerForce(){
@@ -219,8 +219,8 @@ class StemRepresentation
                 atFraction = (z - m_z_nodes.at(index_first_above-1)) / (m_z_nodes.at(index_first_above) - m_z_nodes.at(index_first_above-1));
             }
 
-            xy.push_back( m_x_nodes.at(index_first_above-1) += atFraction * ( m_x_nodes.at(index_first_above) - m_x_nodes.at(index_first_above-1) ) );
-            xy.push_back( m_y_nodes.at(index_first_above-1) += atFraction * ( m_y_nodes.at(index_first_above) - m_y_nodes.at(index_first_above-1) ) );
+            xy.push_back( m_x_nodes.at(index_first_above-1) + atFraction * ( m_x_nodes.at(index_first_above) - m_x_nodes.at(index_first_above-1) ) );
+            xy.push_back( m_y_nodes.at(index_first_above-1) + atFraction * ( m_y_nodes.at(index_first_above) - m_y_nodes.at(index_first_above-1) ) );
 
             return xy;
 
@@ -304,8 +304,6 @@ class StemRepresentation
                 return;
             }
 
-            int i;
-
             /* construct line strip marker object */
             visualization_msgs::Marker marker;
             marker.header.frame_id = "/amigo/base_link";
@@ -321,7 +319,7 @@ class StemRepresentation
             marker.color.b = m_rgb[2];
 
             /* construct nodes point */
-            for(i=0; i<m_x_nodes.size(); ++i){
+            for(int i=0; i<m_x_nodes.size(); ++i){
                 geometry_msgs::Point p;
                 p.x = m_x_nodes.at(i);
                 p.y = m_y_nodes.at(i);
@@ -456,9 +454,9 @@ class RobotConfig
             m_q_max.resize(m_n_joints_in_chain);
             m_q_joint_names.resize(m_n_joints_in_chain);
 
-            int i,j=0;
+            int j=0;
 
-            for(i = 0; i < m_kinematic_chain.getNrOfSegments(); ++i){
+            for(int i = 0; i < m_kinematic_chain.getNrOfSegments(); ++i){
 
                 const KDL::Joint& kdl_joint = m_kinematic_chain.getSegment(i).getJoint();
 
@@ -550,14 +548,18 @@ class RobotConfig
 
         void printAll(){
 
-            int i;
             std::stringstream tmp_stream;
 
             INFO_STREAM("===============");
             INFO_STREAM("Robot name: " << m_name);
 
-            INFO_STREAM("Preferred arm is set: " << m_preferred_arm_set);
-            INFO_STREAM("Preferring left arm: " << m_prefer_left_arm);
+            if (m_preferred_arm_set && m_prefer_left_arm){
+                INFO_STREAM("Preferred arm is set to left arm.");
+            } else if (m_preferred_arm_set && !m_prefer_left_arm){
+                INFO_STREAM("Preferred arm is set to right arm.");
+            } else {
+                INFO_STREAM("Preferred arm was not set!");
+            }
 
             INFO_STREAM("KDL tree:");
             INFO_STREAM("\tNumber of Joints: " << m_kinematic_tree.getNrOfJoints() );
@@ -567,19 +569,19 @@ class RobotConfig
             INFO_STREAM("\tNumber of Segments: " << m_kinematic_chain.getNrOfSegments() );
 
             tmp_stream.str(""); tmp_stream << "Jointnames:";
-            for(i=0;i<m_n_joints_in_chain;++i){
+            for(int i=0;i<m_n_joints_in_chain;++i){
                 tmp_stream << std::endl << "\t\t\t\t\t " << m_q_joint_names.at(i);
             }
             INFO_STREAM(tmp_stream.str());
 
             tmp_stream.str(""); tmp_stream << "Joint min:";
-            for(i=0;i<m_n_joints_in_chain;++i){
+            for(int i=0;i<m_n_joints_in_chain;++i){
                 tmp_stream << std::endl << "\t\t\t\t\t " << m_q_min.data[i];
             }
             INFO_STREAM(tmp_stream.str());
 
             tmp_stream.str(""); tmp_stream << "Joint max:";
-            for(i=0;i<m_n_joints_in_chain;++i){
+            for(int i=0;i<m_n_joints_in_chain;++i){
                 tmp_stream << std::endl << "\t\t\t\t\t " << m_q_max.data[i];
             }
             INFO_STREAM(tmp_stream.str());
@@ -641,7 +643,7 @@ class RobotStatus
             }
 
             for(int i = 1; i < m_n_joints_monitoring; ++i){
-                m_joints_to_monitor(i) = msg.position[i];
+                m_joints_to_monitor(i) = msg.position[i-1];
 //                INFO_STREAM("received msg.position[" << i << "] = " << msg.position[i]);
             }
         }
