@@ -103,13 +103,13 @@ class WhiskerInterpreter
             return m_whisker_force;
         }
 
-        void showForceInRviz(ros::Publisher* p_vis_pub, std::vector<float> gripper_loc){
+        void showForceInRviz(ros::Publisher* p_vis_pub, std::vector<float> gripper_xyz){
 
             if(!selfCheck()){
                 return;
             }
 
-            if(!gripper_loc.size() >= 3){
+            if(gripper_xyz.size() < 3){
                 INFO_STREAM("need gripper location xyz to visualize whisker force!");
                 return;
             }
@@ -118,27 +118,45 @@ class WhiskerInterpreter
             visualization_msgs::Marker marker;
             marker.header.frame_id = "/amigo/base_link";
             marker.header.stamp = ros::Time();
-            marker.id = 0;
+            marker.id = 3;
             marker.type = visualization_msgs::Marker::ARROW;
             marker.action = visualization_msgs::Marker::ADD;
             marker.pose.orientation.w = 1.0;
-            marker.scale.x = 0.03;
-            marker.color.a = 1.0;
-            marker.color.r = 1.0;
-            marker.color.g = 0.0;
-            marker.color.b = 0.0;
+            marker.scale.x = 0.015;
+            marker.color.a = 1.0f;
+            marker.color.r = 0.0f;
+            marker.color.g = 0.0f;
+            marker.color.b = 1.0f;
 
             /* construct nodes point */
             geometry_msgs::Point p_start, p_end;
 
-            p_start.x = gripper_loc.at(0);
-            p_start.y = gripper_loc.at(1);
-            p_start.z = gripper_loc.at(2);
+            p_start.x = gripper_xyz.at(0);
+            p_start.y = gripper_xyz.at(1);
+            p_start.z = gripper_xyz.at(2);
             marker.points.push_back(p_start);
 
-            p_end.x = gripper_loc.at(0) + m_whisker_force.at(0);
-            p_end.y = gripper_loc.at(1) + m_whisker_force.at(1);
-            p_end.z = gripper_loc.at(2);
+            hier gebleven!!
+
+            int sign;
+            if(m_whisker_force[0] > 0 ){
+                sign = 1;
+            }else if (m_whisker_force[0] < 0){
+                sign = -1;
+            }else{
+                sign = 0;
+            }
+            p_end.x = gripper_xyz.at(0) + m_whisker_force.at(0) - 0.05 * sign;
+
+            if(m_whisker_force[1] > 0 ){
+                sign = 1;
+            }else if (m_whisker_force[1] < 0){
+                sign = -1;
+            }else{
+                sign = 0;
+            }
+            p_end.y = gripper_xyz.at(1) + m_whisker_force.at(1) - 0.05 * sign;
+            p_end.z = gripper_xyz.at(2);
             marker.points.push_back(p_end);
 
             /* publish marker */
@@ -190,13 +208,13 @@ class StemRepresentation
             m_rgb[2] = -1.0;
         }
 
-        std::vector<float> getXYatZ(float z){
+        std::vector<float> getStemXYZatZ(float z){
 
-            std::vector<float> xy;
+            std::vector<float> xyz;
 
             if (m_z_nodes.back() < z){
                 INFO_STREAM("z above stem length!");
-                return xy;
+                return xyz;
             }
 
             int index_first_above;
@@ -208,7 +226,7 @@ class StemRepresentation
 
             if (index_first_above < 1){
                 INFO_STREAM("z below stem start or not enough nodes to calc xy for stem at z!");
-                return xy;
+                return xyz;
             }
 
             float atFraction;
@@ -219,10 +237,11 @@ class StemRepresentation
                 atFraction = (z - m_z_nodes.at(index_first_above-1)) / (m_z_nodes.at(index_first_above) - m_z_nodes.at(index_first_above-1));
             }
 
-            xy.push_back( m_x_nodes.at(index_first_above-1) + atFraction * ( m_x_nodes.at(index_first_above) - m_x_nodes.at(index_first_above-1) ) );
-            xy.push_back( m_y_nodes.at(index_first_above-1) + atFraction * ( m_y_nodes.at(index_first_above) - m_y_nodes.at(index_first_above-1) ) );
+            xyz.push_back( m_x_nodes.at(index_first_above-1) + atFraction * ( m_x_nodes.at(index_first_above) - m_x_nodes.at(index_first_above-1) ) );
+            xyz.push_back( m_y_nodes.at(index_first_above-1) + atFraction * ( m_y_nodes.at(index_first_above) - m_y_nodes.at(index_first_above-1) ) );
+            xyz.push_back(z);
 
-            return xy;
+            return xyz;
 
         }
 
@@ -309,6 +328,7 @@ class StemRepresentation
             marker.header.frame_id = "/amigo/base_link";
             marker.header.stamp = ros::Time();
             marker.id = 0;
+            marker.ns = "stem";
             marker.type = visualization_msgs::Marker::LINE_STRIP;
             marker.action = visualization_msgs::Marker::ADD;
             marker.pose.orientation.w = 1.0;
@@ -528,6 +548,10 @@ class RobotConfig
             return !m_prefer_left_arm;
         }
 
+        const std::string getName(){
+            return m_name;
+        }
+
         sensor_msgs::JointState getInitialPoseMsg(){
 
             m_arm_joint_msg.header.stamp = ros::Time::now();
@@ -599,15 +623,23 @@ class RobotStatus
 {
     /* This class depends on:
      *
+     * stem_tracker RobotConfig
+     * sensor_msgs/jointstate
+     * kdl frame
+     * <kdl/chainfksolverpos_recursive.hpp>
      */
 
     private:
+        RobotConfig m_robot_config;
         KDL::JntArray m_joints_to_monitor; // order should be: torso / shoulder-jaw / shoulder-pitch / shoulder-roll / elbow-pitch / elbow-roll / wrist-pitch / wrist-yaw
         int m_n_joints_monitoring;
 
     public:
 
-        RobotStatus(int n_joints_to_monitor){
+        RobotStatus(int n_joints_to_monitor, RobotConfig robot_config){
+
+            m_robot_config = robot_config;
+
             if(n_joints_to_monitor <= 0){
                 INFO_STREAM("trying to initialize robot status object with zero or negative number of joints to monitor!");
             }
@@ -652,10 +684,34 @@ class RobotStatus
             return m_joints_to_monitor;
         }
 
+        std::vector<float> getGripperXYZ(){
+
+            std::vector<float> gripper_xyz;
+
+            KDL::ChainFkSolverPos_recursive forward_kinematics_solver = KDL::ChainFkSolverPos_recursive(m_robot_config.getKinematicChain());
+
+            KDL::Frame cartpos;
+            int fk_ret;
+
+            fk_ret = forward_kinematics_solver.JntToCart(getJointStatus(),cartpos);
+
+            gripper_xyz.push_back(cartpos.p.x());
+            gripper_xyz.push_back(cartpos.p.y());
+            gripper_xyz.push_back(cartpos.p.z());
+
+            if( fk_ret < 0 ){
+                INFO_STREAM("Warning: something went wrong in solving forward kinematics in getGripperXYZ");
+            }
+
+            return gripper_xyz;
+
+        }
+
         void printAll(){
 
             INFO_STREAM("===============");
             INFO_STREAM("Robot status: ");
+            INFO_STREAM("\t initialized with robot config of: " << m_robot_config.getName());
             for(int i; i<m_n_joints_monitoring; ++i){
                 INFO_STREAM("\t" << m_joints_to_monitor(i));
             }

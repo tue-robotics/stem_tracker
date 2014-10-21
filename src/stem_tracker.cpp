@@ -31,7 +31,6 @@ std::string ROOT_LINK;
 #define RIGHT_END_LINK  "grippoint_right"
 
 
-\
 /* initialize */
 
 bool initializing = true;
@@ -44,13 +43,13 @@ ros::Subscriber torso_measurements_subscriber;
 
 StatsPublisher sp;
 
-void showXYZInRviz(ros::Publisher* p_xyz_pub, float x, float y, float z, float r, float g, float b, int id){
+void showXYZInRviz(ros::Publisher* p_marker_pub, float x, float y, float z, float r, float g, float b, int id, const std::string ns){
 
     /* construct line strip marker object */
     visualization_msgs::Marker marker;
     marker.header.frame_id = "/amigo/base_link";
     marker.header.stamp = ros::Time::now();
-    marker.ns = "my_point";
+    marker.ns = ns;
     marker.action = visualization_msgs::Marker::ADD;
 
     marker.id = id;
@@ -77,7 +76,7 @@ void showXYZInRviz(ros::Publisher* p_xyz_pub, float x, float y, float z, float r
      marker.lifetime = ros::Duration();
 
     /* publish marker */
-    p_xyz_pub->publish( marker );
+    p_marker_pub->publish( marker );
 
 }
 
@@ -158,14 +157,15 @@ int main(int argc, char** argv){
 
     /* initialize robot status object */
 
-    RobotStatus AmigoStatus(AmigoConfig.getKinematicChain().getNrOfJoints());
+    RobotStatus AmigoStatus(AmigoConfig.getKinematicChain().getNrOfJoints(), AmigoConfig);
 
     /* initialize node communication */
 
     visualization_publisher = n.advertise<visualization_msgs::Marker>( "visualization_marker", 1 );
-    // marker id    0   stem
-    // marker id    1   stem-gripper intersection
-    // marker id    2   gripper center
+    //      marker id   0   stem
+    //      marker id   1   stem-gripper intersection
+    //      marker id   2   gripper center
+    //      marker id   3   whisker force
 
     if (USE_LEFTARM)
         arm_reference_publisher = n.advertise<sensor_msgs::JointState>("/amigo/left_arm/references", 0);
@@ -219,26 +219,16 @@ int main(int argc, char** argv){
 
         //    ===============================
 
-        KDL::ChainFkSolverPos_recursive forward_kinematics_solver = KDL::ChainFkSolverPos_recursive(AmigoConfig.getKinematicChain());
-        bool kin_stat;
-        KDL::Frame cartpos;
-        kin_stat = forward_kinematics_solver.JntToCart(AmigoStatus.getJointStatus(),cartpos);
 
-        INFO_STREAM("===============");
-        INFO_STREAM("gripper_x = " << cartpos.p.x() << " gripper_y = " << cartpos.p.y() << " gripper_z = " << cartpos.p.z());
 
-        std::vector<float> gripper_center, stem_center;
-        gripper_center.push_back(cartpos.p.x());
-        gripper_center.push_back(cartpos.p.y());
-        gripper_center.push_back(cartpos.p.z());
+        std::vector<float> gripper_xyz = AmigoStatus.getGripperXYZ();
+        std::vector<float> stem_center = TomatoStem.getStemXYZatZ(gripper_xyz[2]);
 
-        stem_center = TomatoStem.getXYatZ(cartpos.p.z());
-        INFO_STREAM("stem_x = " << stem_center[0] << " stem_y = " << stem_center[1]);
-        showXYZInRviz(&visualization_publisher, stem_center[0], stem_center[1], cartpos.p.z(), 0.0f, 1.0f, 0.0f, 1);
-        showXYZInRviz(&visualization_publisher, cartpos.p.x(), cartpos.p.y(), cartpos.p.z(), 1.0f, 0.0f, 0.0f, 2);
+        showXYZInRviz(&visualization_publisher, stem_center[0], stem_center[1], stem_center[2], 0.0f, 1.0f, 0.0f, 1, "stem_intersection");
+        showXYZInRviz(&visualization_publisher, gripper_xyz[0], gripper_xyz[1], gripper_xyz[2], 1.0f, 0.0f, 0.0f, 2, "gripper_center");
 
-        TomatoWhiskerGripper.simulateWhiskerGripper(gripper_center, stem_center);
-//        TomatoWhiskerGripper.showForceInRviz(&visualization_publisher, gripper_center);
+        TomatoWhiskerGripper.simulateWhiskerGripper(gripper_xyz, stem_center);
+        TomatoWhiskerGripper.showForceInRviz(&visualization_publisher, gripper_xyz);
     }
 
     torso_measurements_subscriber.shutdown();
