@@ -8,7 +8,7 @@
 #include <ros/package.h>
 
 
-#define UPDATE_RATE                     2                               // spin rate of this node, in hz
+#define UPDATE_RATE                     100                             // spin rate of this node, in hz
 
 #define USE_LEFTARM                     true                            // use left arm if true, else use right arm
 #define ROBOT_DESCRIPTION_ROSPARAM      "/amigo/robot_description"      // amigo urdf model gets loaded in this rosparam
@@ -62,9 +62,9 @@ void showXYZInRviz(ros::Publisher* p_marker_pub, float x, float y, float z, floa
     marker.pose.orientation.z = 0.0;
     marker.pose.orientation.w = 1.0;
 
-    marker.scale.x = 0.05;
-    marker.scale.y = 0.05;
-    marker.scale.z = 0.05;
+    marker.scale.x = 0.025;
+    marker.scale.y = 0.025;
+    marker.scale.z = 0.025;
 
     marker.type = visualization_msgs::Marker::SPHERE;
 
@@ -161,7 +161,7 @@ int main(int argc, char** argv){
 
     /* initialize node communication */
 
-    visualization_publisher = n.advertise<visualization_msgs::Marker>( "visualization_marker", 1 );
+    visualization_publisher = n.advertise<visualization_msgs::Marker>( "visualization_marker", 100 );
     //      marker id   0   stem
     //      marker id   1   stem-gripper intersection
     //      marker id   2   gripper center
@@ -209,6 +209,19 @@ int main(int argc, char** argv){
             /* subgoal accomplished */
         }
 
+        std::vector<float> gripper_xyz, stem_intersection_xyz;
+        gripper_xyz = AmigoStatus.getGripperXYZ();
+        if(AmigoStatus.isGripperXYZvalid())
+            stem_intersection_xyz = TomatoStem.getStemXYZatZ(gripper_xyz[2]);
+
+        if(AmigoStatus.isGripperXYZvalid() && TomatoStem.isXYZonStem(stem_intersection_xyz)){
+            showXYZInRviz(&visualization_publisher, stem_intersection_xyz[0], stem_intersection_xyz[1], stem_intersection_xyz[2], 0.0f, 1.0f, 0.0f, 1, "stem_intersection");
+            showXYZInRviz(&visualization_publisher, gripper_xyz[0], gripper_xyz[1], gripper_xyz[2], 1.0f, 0.0f, 0.0f, 2, "gripper_center");
+        }
+
+        TomatoWhiskerGripper.simulateWhiskerGripper(gripper_xyz, stem_intersection_xyz);
+        TomatoWhiskerGripper.showForceInRviz(&visualization_publisher, gripper_xyz);
+
         /* stop and publish sample timing, for profiling */
         sp.stopTimer("main");
         sp.publish();
@@ -217,18 +230,6 @@ int main(int argc, char** argv){
         r.sleep();
         ros::spinOnce();
 
-        //    ===============================
-
-
-
-        std::vector<float> gripper_xyz = AmigoStatus.getGripperXYZ();
-        std::vector<float> stem_center = TomatoStem.getStemXYZatZ(gripper_xyz[2]);
-
-        showXYZInRviz(&visualization_publisher, stem_center[0], stem_center[1], stem_center[2], 0.0f, 1.0f, 0.0f, 1, "stem_intersection");
-        showXYZInRviz(&visualization_publisher, gripper_xyz[0], gripper_xyz[1], gripper_xyz[2], 1.0f, 0.0f, 0.0f, 2, "gripper_center");
-
-        TomatoWhiskerGripper.simulateWhiskerGripper(gripper_xyz, stem_center);
-        TomatoWhiskerGripper.showForceInRviz(&visualization_publisher, gripper_xyz);
     }
 
     torso_measurements_subscriber.shutdown();

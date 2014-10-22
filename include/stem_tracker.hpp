@@ -42,6 +42,8 @@ class WhiskerInterpreter
         int m_gripper_id;
         float m_whisker_length;
         float m_gripper_diameter;
+        float m_gripper_radius;
+        int m_status; // 0 - unknown, 1 - gripper not around stem, 2 - gripper around stem but touching whiskers, 3 - gripper around stem and not touching whiskers
         std::vector<float> m_whisker_force;
 
     public:
@@ -51,6 +53,12 @@ class WhiskerInterpreter
             m_gripper_id = gripper_id;
             m_whisker_length = whisker_length;
             m_gripper_diameter = gripper_diameter;
+            m_gripper_radius = gripper_diameter / 2.0f;
+            m_status = 0;
+        }
+
+        int getStatus(){
+            return m_status;
         }
 
         double selfCheck(){
@@ -59,6 +67,11 @@ class WhiskerInterpreter
 
             if (m_n_whiskers <= 0){
                 INFO_STREAM("In whisker gripper with id " << m_gripper_id << " number of whiskers set to zero or negative number");
+                IamOK = false;
+            }
+
+            if (m_whisker_length > m_gripper_radius){
+                INFO_STREAM("in whisker gripper with id " << m_gripper_id << " length of whiskers is larger than radius of gripper");
                 IamOK = false;
             }
 
@@ -71,32 +84,40 @@ class WhiskerInterpreter
              * the stem (both are in the same z-plane).
              * returns a force (xy) with origin at gripper center */
 
+            float max_whisker_force = 0.1f;
+
             m_whisker_force.clear();
 
             if(gripper_center.size() < 2 ){
                 INFO_STREAM("in simulateWhiskerGripper gripper center xy needed!");
+                m_status = 0;
                 return;
             }
 
             if(stem_center.size() < 2 ){
                 INFO_STREAM("in simulateWhiskerGripper stem center xy needed!");
+                m_status = 0;
                 return;
             }
 
             m_whisker_force.assign(2,0.0);
 
-            double x_diff = gripper_center[0] - stem_center[0];
-            double y_diff = gripper_center[1] - stem_center[1];
+            float x_diff = gripper_center[0] - stem_center[0];
+            float y_diff = gripper_center[1] - stem_center[1];
+            float dist_gripper_to_stem = sqrt( x_diff * x_diff + y_diff * y_diff );
 
-            if(sqrt( x_diff * x_diff + y_diff * y_diff ) > 10000.0 * m_gripper_diameter){
-                INFO_STREAM("whiskers out of range!");
+            if( dist_gripper_to_stem > m_gripper_radius ){
+                m_status = 1;
+            } else if (dist_gripper_to_stem < m_gripper_radius - m_whisker_length){
+                m_status = 3;
+            } else {
+                m_status = 2;
+                /* simulated force is inverse of distance to force */
+                float whisker_fraction_deformed = ( dist_gripper_to_stem - (m_gripper_radius - m_whisker_length) ) / m_whisker_length;
+                m_whisker_force.at(0) = (x_diff / dist_gripper_to_stem) * max_whisker_force * whisker_fraction_deformed;
+                m_whisker_force.at(1) = (y_diff / dist_gripper_to_stem) * max_whisker_force * whisker_fraction_deformed;
             }
 
-            /* simulated force is 1-1 map from distance to force */
-            m_whisker_force.at(0) = x_diff;
-            m_whisker_force.at(1) = y_diff;
-
-            INFO_STREAM("force_x = " << m_whisker_force[0] << " force_y " << m_whisker_force[1]);
         }
 
         std::vector<float> getWhiskerForce(){
@@ -109,20 +130,27 @@ class WhiskerInterpreter
                 return;
             }
 
-            if(gripper_xyz.size() < 3){
+            if(gripper_xyz.size() != 3){
                 INFO_STREAM("need gripper location xyz to visualize whisker force!");
+                return;
+            }
+
+            if(m_whisker_force.size() != 2){
+                INFO_STREAM("trying to show a force vector that does not exist!");
                 return;
             }
 
             /* construct line strip marker object */
             visualization_msgs::Marker marker;
             marker.header.frame_id = "/amigo/base_link";
-            marker.header.stamp = ros::Time();
+            marker.header.stamp = ros::Time().now();
             marker.id = 3;
             marker.type = visualization_msgs::Marker::ARROW;
             marker.action = visualization_msgs::Marker::ADD;
             marker.pose.orientation.w = 1.0;
-            marker.scale.x = 0.015;
+            marker.ns = "whisker_force";
+            marker.scale.x = 0.01;
+            marker.scale.y = 0.02;
             marker.color.a = 1.0f;
             marker.color.r = 0.0f;
             marker.color.g = 0.0f;
@@ -131,31 +159,13 @@ class WhiskerInterpreter
             /* construct nodes point */
             geometry_msgs::Point p_start, p_end;
 
-            p_start.x = gripper_xyz.at(0);
-            p_start.y = gripper_xyz.at(1);
+            p_start.x = gripper_xyz.at(0) - m_whisker_force.at(0);
+            p_start.y = gripper_xyz.at(1) - m_whisker_force.at(1);
             p_start.z = gripper_xyz.at(2);
             marker.points.push_back(p_start);
 
-            hier gebleven!!
-
-            int sign;
-            if(m_whisker_force[0] > 0 ){
-                sign = 1;
-            }else if (m_whisker_force[0] < 0){
-                sign = -1;
-            }else{
-                sign = 0;
-            }
-            p_end.x = gripper_xyz.at(0) + m_whisker_force.at(0) - 0.05 * sign;
-
-            if(m_whisker_force[1] > 0 ){
-                sign = 1;
-            }else if (m_whisker_force[1] < 0){
-                sign = -1;
-            }else{
-                sign = 0;
-            }
-            p_end.y = gripper_xyz.at(1) + m_whisker_force.at(1) - 0.05 * sign;
+            p_end.x = gripper_xyz.at(0);
+            p_end.y = gripper_xyz.at(1);
             p_end.z = gripper_xyz.at(2);
             marker.points.push_back(p_end);
 
@@ -276,6 +286,18 @@ class StemRepresentation
             m_rgb[1] = g;
             m_rgb[2] = b;
 
+        }
+
+        bool isXYZonStem(std::vector<float> xyz){
+            if(xyz.size() != 3){
+                return false;
+            }
+
+            if(m_z_nodes.back() < xyz[2]  || m_z_nodes.front() > xyz[2] ){
+                return false;
+            }
+            //todo: check if really on stem
+            return true;
         }
 
         void setThickness(float thickness){
@@ -633,6 +655,7 @@ class RobotStatus
         RobotConfig m_robot_config;
         KDL::JntArray m_joints_to_monitor; // order should be: torso / shoulder-jaw / shoulder-pitch / shoulder-roll / elbow-pitch / elbow-roll / wrist-pitch / wrist-yaw
         int m_n_joints_monitoring;
+        std::vector<float> m_gripper_xyz;
 
     public:
 
@@ -686,7 +709,7 @@ class RobotStatus
 
         std::vector<float> getGripperXYZ(){
 
-            std::vector<float> gripper_xyz;
+            m_gripper_xyz.clear();
 
             KDL::ChainFkSolverPos_recursive forward_kinematics_solver = KDL::ChainFkSolverPos_recursive(m_robot_config.getKinematicChain());
 
@@ -695,16 +718,24 @@ class RobotStatus
 
             fk_ret = forward_kinematics_solver.JntToCart(getJointStatus(),cartpos);
 
-            gripper_xyz.push_back(cartpos.p.x());
-            gripper_xyz.push_back(cartpos.p.y());
-            gripper_xyz.push_back(cartpos.p.z());
+            m_gripper_xyz.push_back(cartpos.p.x());
+            m_gripper_xyz.push_back(cartpos.p.y());
+            m_gripper_xyz.push_back(cartpos.p.z());
 
             if( fk_ret < 0 ){
                 INFO_STREAM("Warning: something went wrong in solving forward kinematics in getGripperXYZ");
             }
 
-            return gripper_xyz;
+            return m_gripper_xyz;
 
+        }
+
+        bool isGripperXYZvalid(){
+            if(m_gripper_xyz.size() == 3){
+                return true;
+            } else {
+                return false;
+            }
         }
 
         void printAll(){
