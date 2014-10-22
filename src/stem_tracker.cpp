@@ -1,12 +1,12 @@
 #define DEBUG                           true                            // if true additional information will be printed
 #define INFO_STREAM                     ROS_INFO_STREAM
 
-#include "stem_tracker.hpp"
+#include "stemtrackermain.h"
 
-// Loading configuration
-#include <tue/config/configuration.h>
-#include <ros/package.h>
-
+#include "whiskerinterpreter.cpp"
+#include "stemrepresentation.cpp"
+#include "robotconfig.cpp"
+#include "robotstatus.cpp"
 
 #define UPDATE_RATE                     100                             // spin rate of this node, in hz
 

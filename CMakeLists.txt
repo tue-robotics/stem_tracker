@@ -47,7 +47,7 @@ catkin_package(
 
 # show the headers in qtcreator
 file(GLOB HEADERS
-  RELATIVE ${PROJECT_SOURCE_DIR} "include/*.hpp"
+  RELATIVE ${PROJECT_SOURCE_DIR} "include/*.h"
 )
 
 include_directories(
