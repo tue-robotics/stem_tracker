@@ -1,15 +1,26 @@
 update_rate:                    100                             # spin rate of stem_tracking node, in hz
 debug:                          1                               # if true (1) additional information will be printed, else set to false (0)
+base_frame:                     /amigo/base_link                # frame we use to define stem and to show markers in rviz
+this_package:                   stem_tracker                    # name of this rospackage (also hardcoded in finding default config file)
 
 #######################
 # ROBOT CONFIG
 #######################
 
+robot_name:                     amigo                           # name of robot we are using
 use_leftarm:                    1                               # use left arm if true (1), else use right arm
 robot_description_rosparam:     /amigo/robot_description        # amigo urdf model gets loaded from this rosparam
-root_link:                      base_link                       # frame used to publish markers and to define stem
-left_end_link:                  grippoint_left                  # name of left gripper in rostopic measurements
-right_end_link:                 grippoint_right                 # name of right gripper in rostopic measurements
+root_link:                      base_link                       # start of kinematic chain we are controlling
+left_end_link:                  grippoint_left                  # end of kinematic chain we are controlling, if use_leftarm
+right_end_link:                 grippoint_right                 # end of kinematic chain we are controlling, if not use_leftarm
+
+#######################
+# WHISKER CONFIG
+#######################
+
+n_whiskers:                     10                              # total numbers of whiskers in gripper
+whisker_length:                 0.08                            # length of a single whisker, in meters
+gripper_diameter:               0.2                             # diameter of gripper at whisker-root, in meters
 
 #######################
 # TOMATO STEM CONFIG
@@ -29,4 +40,5 @@ stem_nodes:                                                     # stem nodes, de
     - {x: 0.35, y: 0.4, z: 1.2}
     - {x: 0.3, y: 0.55, z: 1.4}
     - {x: 0.25, y: 0.6, z: 1.6}
+    - {x: 0.1, y: 0.4, z: 2.0}
 

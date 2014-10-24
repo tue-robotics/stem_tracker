@@ -80,6 +80,10 @@ void StemRepresentation::setRGB(float r, float g, float b){
 
 }
 
+void StemRepresentation::setFrame(const std::string frame){
+    m_frame = frame;
+}
+
 bool StemRepresentation::isXYZonStem(std::vector<float> xyz){
     if(xyz.size() != 3){
         return false;
@@ -130,7 +134,7 @@ void StemRepresentation::flipNodes(){
 
 }
 
-void StemRepresentation::showInRviz(ros::Publisher* p_vis_pub){
+void StemRepresentation::showInRviz(ros::Publisher* p_vis_pub, const std::string ns){
 
     if(!selfCheck()){
         return;
@@ -138,10 +142,10 @@ void StemRepresentation::showInRviz(ros::Publisher* p_vis_pub){
 
     /* construct line strip marker object */
     visualization_msgs::Marker marker;
-    marker.header.frame_id = "/amigo/base_link";
+    marker.header.frame_id = m_frame;
     marker.header.stamp = ros::Time();
     marker.id = 0;
-    marker.ns = "stem";
+    marker.ns = ns;
     marker.type = visualization_msgs::Marker::LINE_STRIP;
     marker.action = visualization_msgs::Marker::ADD;
     marker.pose.orientation.w = 1.0;

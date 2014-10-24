@@ -28,12 +28,19 @@
 
 bool DEBUG;
 int UPDATE_RATE;
+std::string BASE_FRAME;
+std::string THIS_PACKAGE;
 
+std::string ROBOT_NAME;
 std::string ROOT_LINK;
 bool USE_LEFTARM;
 std::string ROBOT_DESCRIPTION_ROSPARAM;
 std::string LEFT_END_LINK;
 std::string RIGHT_END_LINK;
+
+int N_WHISKERS;
+float GRIPPER_DIAMETER;
+float WHISKER_LENGTH;
 
 float STEM_THICKNESS;
 float STEM_RGB[3];

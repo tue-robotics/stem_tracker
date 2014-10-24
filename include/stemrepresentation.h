@@ -24,12 +24,15 @@ class StemRepresentation
         std::vector<float> m_y_nodes;
         std::vector<float> m_z_nodes;
 
+        std::string m_frame;
+
         float m_thickness; // in meters
 
     public:
         StemRepresentation(int stem_id);
         std::vector<float> getStemXYZatZ(float z);
         bool selfCheck();
+        void setFrame(std::string frame);
         void setRGB(float r, float g, float b);
         bool isXYZonStem(std::vector<float> xyz);
         void setThickness(float thickness);
@@ -37,7 +40,7 @@ class StemRepresentation
         void addNodesXYZ(std::vector<float> x, std::vector<float> y, std::vector<float> z);
         int getNumberOfNodes();
         void flipNodes();
-        void showInRviz(ros::Publisher* p_vis_pub);
+        void showInRviz(ros::Publisher* p_vis_pub, const std::string ns);
         void printAll();
 
         ~StemRepresentation();

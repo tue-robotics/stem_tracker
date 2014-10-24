@@ -28,6 +28,8 @@ class RobotConfig
         int m_n_joints_in_chain;
         KDL::JntArray m_q_min, m_q_max;
         std::vector<std::string> m_q_joint_names;
+        std::string m_root_link_name;
+        std::string m_tip_link_name;
 
     public:
         RobotConfig(const std::string name);

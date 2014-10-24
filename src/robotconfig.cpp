@@ -56,6 +56,9 @@ void RobotConfig::loadKinematicTreeFromUrdf(){
 
 void RobotConfig::loadKinematicChainFromTree(const std::string root_link_name, const std::string tip_link_name){
 
+    m_root_link_name = root_link_name;
+    m_tip_link_name = tip_link_name;
+
     if (!m_kinematic_tree.getChain(root_link_name, tip_link_name, m_kinematic_chain)){
         INFO_STREAM("Could not initialize chain object");
     }
@@ -183,7 +186,10 @@ void RobotConfig::printAll(){
     INFO_STREAM("KDL tree:");
     INFO_STREAM("\tNumber of Joints: " << m_kinematic_tree.getNrOfJoints() );
     INFO_STREAM("\tNumber of Segments: " << m_kinematic_tree.getNrOfSegments() );
+
     INFO_STREAM("KDL chain:");
+    INFO_STREAM("\tRoot link: " << m_root_link_name);
+    INFO_STREAM("\tTip link: " << m_tip_link_name);
     INFO_STREAM("\tNumber of Joints: " << m_kinematic_chain.getNrOfJoints() );
     INFO_STREAM("\tNumber of Segments: " << m_kinematic_chain.getNrOfSegments() );
 
