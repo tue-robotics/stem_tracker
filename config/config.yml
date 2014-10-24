@@ -1,1 +1,32 @@
-root_link: base_link
+update_rate:                    100                             # spin rate of stem_tracking node, in hz
+debug:                          1                               # if true (1) additional information will be printed, else set to false (0)
+
+#######################
+# ROBOT CONFIG
+#######################
+
+use_leftarm:                    1                               # use left arm if true (1), else use right arm
+robot_description_rosparam:     /amigo/robot_description        # amigo urdf model gets loaded from this rosparam
+root_link:                      base_link                       # frame used to publish markers and to define stem
+left_end_link:                  grippoint_left                  # name of left gripper in rostopic measurements
+right_end_link:                 grippoint_right                 # name of right gripper in rostopic measurements
+
+#######################
+# TOMATO STEM CONFIG
+#######################
+
+stem_thickness:                 0.03                            # thickness, in meters
+
+stem_rgb:                                                       # rgb color value of stem visualization in rviz
+    r: 0.05
+    g: 0.65
+    b: 0.35
+
+stem_nodes:                                                     # stem nodes, defined in root_link
+    - {x: 0.3, y: 0.3, z: 0.4}
+    - {x: 0.35, y: 0.35, z: 0.6}
+    - {x: 0.3, y: 0.35, z: 0.9}
+    - {x: 0.35, y: 0.4, z: 1.2}
+    - {x: 0.3, y: 0.55, z: 1.4}
+    - {x: 0.25, y: 0.6, z: 1.6}
+

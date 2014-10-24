@@ -2,10 +2,11 @@
 
 void showXYZInRviz(ros::Publisher* p_marker_pub, float x, float y, float z, float r, float g, float b, int id, const std::string ns){
 
-    /* construct line strip marker object */
     visualization_msgs::Marker marker;
+
     marker.header.frame_id = "/amigo/base_link";
     marker.header.stamp = ros::Time::now();
+
     marker.ns = ns;
     marker.action = visualization_msgs::Marker::ADD;
 
@@ -30,57 +31,99 @@ void showXYZInRviz(ros::Publisher* p_marker_pub, float x, float y, float z, floa
     marker.color.b = b;
     marker.color.a = 1.0;
 
-     marker.lifetime = ros::Duration();
+    marker.lifetime = ros::Duration();
 
-    /* publish marker */
     p_marker_pub->publish( marker );
 
 }
 
+void configure(tue::Configuration config){
+
+    INFO_STREAM("================");
+    INFO_STREAM("(Re)Configuring");
+
+    /* general configuration */
+    config.value("root_link", ROOT_LINK);
+    INFO_STREAM("root link = " << ROOT_LINK);
+    config.value("debug", DEBUG);
+    INFO_STREAM("debug = " << DEBUG);
+    config.value("update_rate", UPDATE_RATE);
+    INFO_STREAM("update_rate = " << UPDATE_RATE);
+
+    /* robot configuration */
+    config.value("use_leftarm", USE_LEFTARM);
+    config.value("robot_description_rosparam", ROBOT_DESCRIPTION_ROSPARAM);
+    config.value("left_end_link", LEFT_END_LINK);
+    config.value("right_end_link", RIGHT_END_LINK);
+
+    /* tomato stem configuration */
+    config.value("stem_thickness", STEM_THICKNESS);
+
+    if (config.readGroup("stem_rgb")){
+        config.value("r",STEM_RGB[0]);
+        config.value("g",STEM_RGB[1]);
+        config.value("b",STEM_RGB[2]);
+
+        config.endGroup();
+    }
+
+    if (config.readArray("stem_nodes")){
+        float tmp;
+        while(config.nextArrayItem()){
+            config.value("x", tmp); stemNodesX.push_back(tmp);
+            config.value("y", tmp); stemNodesY.push_back(tmp);
+            config.value("z", tmp); stemNodesZ.push_back(tmp);
+        }
+
+        config.endArray();
+    }
+
+}
+
+
 int main(int argc, char** argv){
 
+    bool initializing = true;
+    int state = 0, up = 1;
 
-    /* initialize node */
-    ros::init(argc, argv, "stem_tracker");
-    ros::NodeHandle n;
-    ros::Rate r(UPDATE_RATE);
+    ros::Publisher visualization_publisher;
+    ros::Publisher arm_reference_publisher;
+    ros::Subscriber arm_measurements_subscriber;
+    ros::Subscriber torso_measurements_subscriber;
+
+    StatsPublisher sp;
 
     tue::Configuration config;
 
-    // Check if a config file was provided. If so, load it. If not, load a default config.
-    if (argc >= 2)
-    {
+    /* load yaml config file */
+
+    if (argc >= 2){
         std::string yaml_filename = argv[1];
         config.loadFromYAMLFile(yaml_filename);
-    }
-    else
-    {
-        // Get this nodes directory
+    } else {
         std::string ed_dir = ros::package::getPath("stem_tracker");
-
-        // Load the YAML config file
         config.loadFromYAMLFile(ed_dir + "/config/config.yml");
     }
 
-    config.value("root_link", ROOT_LINK);
+    configure(config);
 
-    INFO_STREAM("\t\t\t Tha root link = " << ROOT_LINK);
-    // ...
-
-
-    if (config.hasError())
-    {
-        std::cout << "Could not load configuration: " << std::endl;
-        std::cout << config.error() << std::endl;
+    if (config.hasError()){
+        INFO_STREAM("Could not load configuration: " << config.error());
         return 1;
     }
+
+    /* initialize node */
+
+    ros::init(argc, argv, "stem_tracker");
+    ros::NodeHandle n;
+    ros::Rate r(UPDATE_RATE);
 
     /* initialize stem represenation object */
 
     RobotConfig AmigoConfig("amigo");
     StemRepresentation TomatoStem(1);
 
-    TomatoStem.setRGB(STEM_R, STEM_G, STEM_B);
+    TomatoStem.setRGB(STEM_RGB[0], STEM_RGB[1], STEM_RGB[2]);
     TomatoStem.setThickness(STEM_THICKNESS);
     TomatoStem.addNodesXYZ(stemNodesX, stemNodesY, stemNodesZ);
     if(!USE_LEFTARM)
@@ -150,43 +193,47 @@ int main(int argc, char** argv){
     /* update loop */
     while(ros::ok()){
 
-        /* publish linestrip marker to visualize stem */
-        TomatoStem.showInRviz(&visualization_publisher);
-
-        /* start sample timing, for profiling */
-        sp.startTimer("main");
-
-        /* check have we reached end of stem */
-        state += up;
-        if(state >= TomatoStem.getNumberOfNodes()-1 || state <= 0){
-            up = -up;
-            /* reached end of stem */
-        }
-        else{
-            /* subgoal accomplished */
+        if (config.sync()){
+            /* Configuration changed, so reconfigure */
+            configure(config);
         }
 
-        std::vector<float> gripper_xyz, stem_intersection_xyz;
-        gripper_xyz = AmigoStatus.getGripperXYZ(AmigoConfig);
-        if(AmigoStatus.isGripperXYZvalid())
-            stem_intersection_xyz = TomatoStem.getStemXYZatZ(gripper_xyz[2]);
+        if (!config.hasError()){
 
-        if(AmigoStatus.isGripperXYZvalid() && TomatoStem.isXYZonStem(stem_intersection_xyz)){
-            showXYZInRviz(&visualization_publisher, stem_intersection_xyz[0], stem_intersection_xyz[1], stem_intersection_xyz[2], 0.0f, 1.0f, 0.0f, 1, "stem_intersection");
-            showXYZInRviz(&visualization_publisher, gripper_xyz[0], gripper_xyz[1], gripper_xyz[2], 1.0f, 0.0f, 0.0f, 2, "gripper_center");
+            /* publish linestrip marker to visualize stem */
+            TomatoStem.showInRviz(&visualization_publisher);
+
+            /* start sample timing, for profiling */
+            sp.startTimer("main");
+
+            /* check have we reached end of stem */
+            state += up;
+            if(state >= TomatoStem.getNumberOfNodes()-1 || state <= 0){
+                /* reached end of stem */
+                up = -up;
+            }
+
+            std::vector<float> gripper_xyz, stem_intersection_xyz;
+            gripper_xyz = AmigoStatus.getGripperXYZ(AmigoConfig);
+            if(AmigoStatus.isGripperXYZvalid())
+                stem_intersection_xyz = TomatoStem.getStemXYZatZ(gripper_xyz[2]);
+
+            if(AmigoStatus.isGripperXYZvalid() && TomatoStem.isXYZonStem(stem_intersection_xyz)){
+                showXYZInRviz(&visualization_publisher, stem_intersection_xyz[0], stem_intersection_xyz[1], stem_intersection_xyz[2], 0.0f, 1.0f, 0.0f, 1, "stem_intersection");
+                showXYZInRviz(&visualization_publisher, gripper_xyz[0], gripper_xyz[1], gripper_xyz[2], 1.0f, 0.0f, 0.0f, 2, "gripper_center");
+            }
+
+            TomatoWhiskerGripper.simulateWhiskerGripper(gripper_xyz, stem_intersection_xyz);
+            TomatoWhiskerGripper.showForceInRviz(&visualization_publisher, gripper_xyz);
+
+            /* stop and publish sample timing, for profiling */
+            sp.stopTimer("main");
+            sp.publish();
         }
 
-        TomatoWhiskerGripper.simulateWhiskerGripper(gripper_xyz, stem_intersection_xyz);
-        TomatoWhiskerGripper.showForceInRviz(&visualization_publisher, gripper_xyz);
-
-        /* stop and publish sample timing, for profiling */
-        sp.stopTimer("main");
-        sp.publish();
-
-        /* selftrigger and wait for next sample */
+        /* wait for next sample */
         r.sleep();
         ros::spinOnce();
-
     }
 
     torso_measurements_subscriber.shutdown();
