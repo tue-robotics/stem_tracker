@@ -1,6 +1,8 @@
 #ifndef ROBOTCONFIG_H
 #define ROBOTCONFIG_H
 
+#define INFO_STREAM     ROS_INFO_STREAM
+
 #include <iostream>
 #include <ros/ros.h>
 #include <kdl_parser/kdl_parser.hpp>
@@ -13,6 +15,8 @@
 
 class RobotConfig
 {
+    friend class RobotStatus;
+
     private:
         std::string m_name;             // name of robot instance
         urdf::Model m_urdf_model;       // urdf formatted model

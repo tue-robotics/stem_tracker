@@ -55,21 +55,24 @@ include_directories(
     ${catkin_INCLUDE_DIRS}
 )
 
-## Declare a cpp library
-#add_library(stem_tracker_libs
-#  ${HEADERS}
-#  src/kinematic_tree.cpp
-#)
+# Declare a cpp library
+add_library(stem_tracker_libs
+  ${HEADERS}
+  src/robotconfig.cpp
+  src/robotstatus.cpp
+  src/stemrepresentation.cpp
+  src/whiskerinterpreter.cpp
+)
 
-#target_link_libraries(stem_tracker_libs
-#     ${catkin_LIBRARIES}
-#)
+target_link_libraries(stem_tracker_libs
+     ${catkin_LIBRARIES}
+)
 
 add_executable(stem_tracker
     ${HEADERS}
     src/stem_tracker.cpp
 )
-target_link_libraries(stem_tracker ${catkin_LIBRARIES})# stem_tracker_libs)
+target_link_libraries(stem_tracker ${catkin_LIBRARIES} stem_tracker_libs)
 
 
 

@@ -7,6 +7,9 @@
 #include <visualization_msgs/Marker.h>
 #include <geometry_msgs/Point.h>
 
+
+#define INFO_STREAM     ROS_INFO_STREAM
+
 class WhiskerInterpreter
 {
     private:

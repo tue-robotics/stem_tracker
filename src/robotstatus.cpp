@@ -1,9 +1,7 @@
 #include "robotstatus.h"
 
-RobotStatus::RobotStatus(int n_joints_to_monitor, RobotConfig robot_config)
+RobotStatus::RobotStatus(int n_joints_to_monitor)
 {
-    m_robot_config = robot_config;
-
     if(n_joints_to_monitor <= 0){
         INFO_STREAM("trying to initialize robot status object with zero or negative number of joints to monitor!");
     }
@@ -49,11 +47,11 @@ KDL::JntArray RobotStatus::getJointStatus(){
     return m_joints_to_monitor;
 }
 
-std::vector<float> RobotStatus::getGripperXYZ(){
+std::vector<float> RobotStatus::getGripperXYZ(RobotConfig robot_config ){
 
     m_gripper_xyz.clear();
 
-    KDL::ChainFkSolverPos_recursive forward_kinematics_solver = KDL::ChainFkSolverPos_recursive(m_robot_config.getKinematicChain());
+    KDL::ChainFkSolverPos_recursive forward_kinematics_solver = KDL::ChainFkSolverPos_recursive(robot_config.m_kinematic_chain);
 
     KDL::Frame cartpos;
     int fk_ret;
@@ -84,7 +82,7 @@ void RobotStatus::printAll(){
 
     INFO_STREAM("===============");
     INFO_STREAM("Robot status: ");
-    INFO_STREAM("\t initialized with robot config of: " << m_robot_config.getName());
+//    INFO_STREAM("\t initialized with robot config of: " << m_robot_config.getName());
     for(int i; i<m_n_joints_monitoring; ++i){
         INFO_STREAM("\t" << m_joints_to_monitor(i));
     }
