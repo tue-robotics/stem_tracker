@@ -22,7 +22,7 @@
 #include "robotconfig.h"
 #include "robotstatus.h"
 
-#define INFO_STREAM                     ROS_INFO_STREAM
+#define INFO_STREAM     ROS_INFO_STREAM
 
 /* init configurable params */
 

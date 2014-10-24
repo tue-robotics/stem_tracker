@@ -37,7 +37,7 @@ class StemRepresentation
         bool isXYZonStem(std::vector<float> xyz);
         void setThickness(float thickness);
         float getThickness();
-        void addNodesXYZ(std::vector<float> x, std::vector<float> y, std::vector<float> z);
+        void loadNodesXYZ(std::vector<float> x, std::vector<float> y, std::vector<float> z);
         int getNumberOfNodes();
         void flipNodes();
         void showInRviz(ros::Publisher* p_vis_pub, const std::string ns);

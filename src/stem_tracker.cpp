@@ -1,5 +1,13 @@
 #include "stem_tracker.h"
 
+TODO:
+- check stem na opnieuw config loaden
+- robot status ref geven naar robot config ipv friends
+- robot interface object
+- toevoegen kdl inverse kin
+
+
+
 void showXYZInRviz(ros::Publisher* p_marker_pub, const std::string frame, float x, float y, float z, float r, float g, float b, int id, const std::string ns){
 
     visualization_msgs::Marker marker;
@@ -89,6 +97,39 @@ void configure(tue::Configuration config){
 
 }
 
+void initStem(StemRepresentation* stem){
+
+    stem->setRGB(STEM_RGB[0], STEM_RGB[1], STEM_RGB[2]);
+    stem->setThickness(STEM_THICKNESS);
+    stem->loadNodesXYZ(stemNodesX, stemNodesY, stemNodesZ);
+    stem->setFrame(BASE_FRAME);
+    if(!USE_LEFTARM)
+        stem->flipNodes();
+    if(DEBUG)
+        stem->printAll();
+}
+
+void initRobotConfig(RobotConfig* robot_config, ros::NodeHandle n){
+
+    if(USE_LEFTARM)
+        robot_config->setLeftArmIsPreferred();
+    else
+        robot_config->setRightArmIsPreferred();
+
+    robot_config->loadUrdfFromRosparam(n, ROBOT_DESCRIPTION_ROSPARAM);
+    robot_config->loadKinematicTreeFromUrdf();
+
+    if(USE_LEFTARM)
+        robot_config->loadKinematicChainFromTree(ROOT_LINK, LEFT_END_LINK);
+    else
+        robot_config->loadKinematicChainFromTree(ROOT_LINK, RIGHT_END_LINK);
+
+    robot_config->loadJointLimits();
+
+    if(DEBUG)
+        robot_config->printAll();
+}
+
 
 int main(int argc, char** argv){
 
@@ -129,37 +170,12 @@ int main(int argc, char** argv){
     /* initialize stem represenation object */
 
     StemRepresentation TomatoStem(1);
-
-    TomatoStem.setRGB(STEM_RGB[0], STEM_RGB[1], STEM_RGB[2]);
-    TomatoStem.setThickness(STEM_THICKNESS);
-    TomatoStem.addNodesXYZ(stemNodesX, stemNodesY, stemNodesZ);
-    TomatoStem.setFrame(BASE_FRAME);
-    if(!USE_LEFTARM)
-        TomatoStem.flipNodes();
-    if(DEBUG)
-        TomatoStem.printAll();
+    initStem(&TomatoStem);
 
     /* initialize robot configuration object */
 
     RobotConfig AmigoConfig(ROBOT_NAME);
-
-    if(USE_LEFTARM)
-        AmigoConfig.setLeftArmIsPreferred();
-    else
-        AmigoConfig.setRightArmIsPreferred();
-
-    AmigoConfig.loadUrdfFromRosparam(n, ROBOT_DESCRIPTION_ROSPARAM);
-    AmigoConfig.loadKinematicTreeFromUrdf();
-
-    if(USE_LEFTARM)
-        AmigoConfig.loadKinematicChainFromTree(ROOT_LINK, LEFT_END_LINK);
-    else
-        AmigoConfig.loadKinematicChainFromTree(ROOT_LINK, RIGHT_END_LINK);
-
-    AmigoConfig.loadJointLimits();
-
-    if(DEBUG)
-        AmigoConfig.printAll();
+    initRobotConfig(&AmigoConfig, n);
 
     /* initialize whisker interpretation object */
 
@@ -206,6 +222,9 @@ int main(int argc, char** argv){
         if (config.sync()){
             /* Configuration changed, so reconfigure */
             configure(config);
+
+            initStem(&TomatoStem);
+            initRobotConfig(&AmigoConfig, n);
         }
 
         if (!config.hasError()){
@@ -231,10 +250,9 @@ int main(int argc, char** argv){
             if(AmigoStatus.isGripperXYZvalid() && TomatoStem.isXYZonStem(stem_intersection_xyz)){
                 showXYZInRviz(&visualization_publisher, BASE_FRAME, stem_intersection_xyz[0], stem_intersection_xyz[1], stem_intersection_xyz[2], 0.0f, 1.0f, 0.0f, 1, "stem_intersection");
                 showXYZInRviz(&visualization_publisher, BASE_FRAME, gripper_xyz[0], gripper_xyz[1], gripper_xyz[2], 1.0f, 0.0f, 0.0f, 2, "gripper_center");
+                TomatoWhiskerGripper.simulateWhiskerGripper(gripper_xyz, stem_intersection_xyz);
+                TomatoWhiskerGripper.showForceInRviz(&visualization_publisher, gripper_xyz);
             }
-
-            TomatoWhiskerGripper.simulateWhiskerGripper(gripper_xyz, stem_intersection_xyz);
-            TomatoWhiskerGripper.showForceInRviz(&visualization_publisher, gripper_xyz);
 
             /* stop and publish sample timing, for profiling */
             sp.stopTimer("main");

@@ -104,11 +104,15 @@ float StemRepresentation::getThickness(){
     return m_thickness;
 }
 
-void StemRepresentation::addNodesXYZ(std::vector<float> x, std::vector<float> y, std::vector<float> z){
+void StemRepresentation::loadNodesXYZ(std::vector<float> x, std::vector<float> y, std::vector<float> z){
 
     if(!selfCheck()){
         return;
     }
+
+    m_x_nodes.clear();
+    m_y_nodes.clear();
+    m_z_nodes.clear();
 
     for( int i=0; i<x.size(); ++i ){
         m_x_nodes.push_back(x.at(i));
