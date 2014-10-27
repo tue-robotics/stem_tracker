@@ -64,6 +64,8 @@ void configure(tue::Configuration config){
     config.value("robot_description_rosparam", ROBOT_DESCRIPTION_ROSPARAM);
     config.value("left_end_link", LEFT_END_LINK);
     config.value("right_end_link", RIGHT_END_LINK);
+    config.value("up_to_date_threshold", UP_TO_DATE_THRESHOLD);
+    INFO_STREAM("up_to_date_threshold = " << UP_TO_DATE_THRESHOLD);
 
     /* whisker configuration */
     config.value("n_whiskers", N_WHISKERS);
@@ -128,12 +130,15 @@ void initRobotConfig(RobotConfig* robot_config, ros::NodeHandle n){
         robot_config->printAll();
 }
 
+void initRobotStatus(RobotStatus* robot_status){
+    robot_status->setUpToDateThreshold( UP_TO_DATE_THRESHOLD );
+}
+
 
 int main(int argc, char** argv){
 
     bool initializing = true;
     int state = 0, up = 1;
-    int skip = 0 ;
 
     ros::Publisher visualization_publisher;
     ros::Publisher arm_reference_publisher;
@@ -183,6 +188,7 @@ int main(int argc, char** argv){
     /* initialize robot status object */
 
     RobotStatus AmigoStatus(AmigoConfig.getKinematicChain().getNrOfJoints());
+    initRobotStatus(&AmigoStatus);
 
     /* initialize node communication */
 
@@ -225,15 +231,15 @@ int main(int argc, char** argv){
             /* start sample timing, for profiling */
             sp.startTimer("main");
 
-            if(initializing && skip == 10){
+            if(initializing && AmigoStatus.isUpToDate()){
 
                 /* bring arm to initial position */
                 arm_reference_publisher.publish(AmigoConfig.getInitialPoseMsg());
                 initializing = false;
+                INFO_STREAM("==========\n\t\t\t\tInitialized");
             }
-            ++skip;
 
-            if (!initializing) {
+            if (!initializing && AmigoStatus.isUpToDate() ) {
 
                 /* check have we reached end of stem */
                 state += up;
@@ -254,6 +260,11 @@ int main(int argc, char** argv){
                     TomatoWhiskerGripper.showForceInRviz(&visualization_publisher, gripper_xyz);
                 }
             }
+
+            if(!AmigoStatus.isUpToDate()){
+                INFO_STREAM("waiting for up to date robot status information");
+            }
+
             /* stop and publish sample timing, for profiling */
             sp.stopTimer("main");
             sp.publish();

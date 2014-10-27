@@ -37,6 +37,7 @@ bool USE_LEFTARM;
 std::string ROBOT_DESCRIPTION_ROSPARAM;
 std::string LEFT_END_LINK;
 std::string RIGHT_END_LINK;
+double UP_TO_DATE_THRESHOLD;
 
 int N_WHISKERS;
 float GRIPPER_DIAMETER;

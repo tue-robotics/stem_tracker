@@ -9,8 +9,6 @@ RobotStatus::RobotStatus(int n_joints_to_monitor)
     m_n_joints_monitoring = n_joints_to_monitor;
 }
 
-
-
 bool RobotStatus::selfCheck(){
 
     bool IamOK = true;
@@ -29,6 +27,8 @@ void RobotStatus::receivedTorsoMsg(const sensor_msgs::JointState & msg){
         return;
     }
 
+    m_last_update = ros::Time::now();
+
     m_joints_to_monitor(0) = msg.position[0];
 }
 
@@ -41,10 +41,36 @@ void RobotStatus::receivedArmMsg(const sensor_msgs::JointState & msg){
     for(int i = 1; i < m_n_joints_monitoring; ++i){
         m_joints_to_monitor(i) = msg.position[i-1];
     }
+
+    m_last_update = ros::Time::now();
+
+}
+
+ros::Time RobotStatus::getLastUpdateTime(){
+    return m_last_update;
+}
+
+double RobotStatus::getTimeSinceLastUpdate(){
+    // returns n seconds since last update in any of
+    // the joints we are monitoring
+    ros::Duration interval = ros::Time::now() - RobotStatus::getLastUpdateTime();
+    return interval.toSec();
+}
+
+bool RobotStatus::isUpToDate(){
+    if(getTimeSinceLastUpdate() < m_up_to_date_threshold){
+        return true;
+    } else {
+        return false;
+    }
 }
 
 KDL::JntArray RobotStatus::getJointStatus(){
     return m_joints_to_monitor;
+}
+
+void RobotStatus::setUpToDateThreshold(double threshold){
+    m_up_to_date_threshold = threshold;
 }
 
 std::vector<float> RobotStatus::getGripperXYZ(RobotConfig* robot_config ){
@@ -63,7 +89,7 @@ std::vector<float> RobotStatus::getGripperXYZ(RobotConfig* robot_config ){
     m_gripper_xyz.push_back(cartpos.p.z());
 
     if( fk_ret < 0 ){
-        INFO_STREAM("Warning: something went wrong in solving forward kinematics in getGripperXYZ");
+        INFO_STREAM("Warning: something wrong in solving forward kinematics in getGripperXYZ");
     }
 
     return m_gripper_xyz;
@@ -82,7 +108,7 @@ void RobotStatus::printAll(){
 
     INFO_STREAM("===============");
     INFO_STREAM("Robot status: ");
-//    INFO_STREAM("\t initialized with robot config of: " << m_robot_config.getName());
+    //    INFO_STREAM("\t initialized with robot config of: " << m_robot_config.getName());
     for(int i; i<m_n_joints_monitoring; ++i){
         INFO_STREAM("\t" << m_joints_to_monitor(i));
     }
