@@ -47,11 +47,11 @@ KDL::JntArray RobotStatus::getJointStatus(){
     return m_joints_to_monitor;
 }
 
-std::vector<float> RobotStatus::getGripperXYZ(RobotConfig robot_config ){
+std::vector<float> RobotStatus::getGripperXYZ(RobotConfig* robot_config ){
 
     m_gripper_xyz.clear();
 
-    KDL::ChainFkSolverPos_recursive forward_kinematics_solver = KDL::ChainFkSolverPos_recursive(robot_config.m_kinematic_chain);
+    KDL::ChainFkSolverPos_recursive forward_kinematics_solver = KDL::ChainFkSolverPos_recursive(robot_config->getKinematicChain());
 
     KDL::Frame cartpos;
     int fk_ret;

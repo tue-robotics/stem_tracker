@@ -15,7 +15,6 @@
 
 class RobotConfig
 {
-    friend class RobotStatus;
 
     private:
         std::string m_name;             // name of robot instance

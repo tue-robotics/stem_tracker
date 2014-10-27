@@ -133,6 +133,7 @@ int main(int argc, char** argv){
 
     bool initializing = true;
     int state = 0, up = 1;
+    int skip = 0 ;
 
     ros::Publisher visualization_publisher;
     ros::Publisher arm_reference_publisher;
@@ -206,21 +207,12 @@ int main(int argc, char** argv){
     /* initialize profiling */
     sp.initialize();
 
-    if (initializing){
-        /* bring arm to initial position */
-        arm_reference_publisher.publish(AmigoConfig.getInitialPoseMsg());
-        INFO_STREAM("Can I continue? Press enter");
-        std::cin.get();
-        initializing = false;
-    }
-
     /* update loop */
     while(ros::ok()){
 
         if (config.sync()){
-            /* Configuration changed, so reconfigure */
+            /* config file changed */
             configure(config);
-
             initStem(&TomatoStem);
             initRobotConfig(&AmigoConfig, n);
         }
@@ -233,28 +225,41 @@ int main(int argc, char** argv){
             /* start sample timing, for profiling */
             sp.startTimer("main");
 
-            /* check have we reached end of stem */
-            state += up;
-            if(state >= TomatoStem.getNumberOfNodes()-1 || state <= 0){
-                /* reached end of stem */
-                up = -up;
+            if(initializing && skip == 10){
+
+                /* bring arm to initial position */
+                arm_reference_publisher.publish(AmigoConfig.getInitialPoseMsg());
+                initializing = false;
             }
+            ++skip;
 
-            std::vector<float> gripper_xyz, stem_intersection_xyz;
-            gripper_xyz = AmigoStatus.getGripperXYZ(AmigoConfig);
-            if(AmigoStatus.isGripperXYZvalid())
-                stem_intersection_xyz = TomatoStem.getStemXYZatZ(gripper_xyz[2]);
+            if (!initializing) {
 
-            if(AmigoStatus.isGripperXYZvalid() && TomatoStem.isXYZonStem(stem_intersection_xyz)){
-                showXYZInRviz(&visualization_publisher, BASE_FRAME, stem_intersection_xyz[0], stem_intersection_xyz[1], stem_intersection_xyz[2], 0.0f, 1.0f, 0.0f, 1, "stem_intersection");
-                showXYZInRviz(&visualization_publisher, BASE_FRAME, gripper_xyz[0], gripper_xyz[1], gripper_xyz[2], 1.0f, 0.0f, 0.0f, 2, "gripper_center");
-                TomatoWhiskerGripper.simulateWhiskerGripper(gripper_xyz, stem_intersection_xyz);
-                TomatoWhiskerGripper.showForceInRviz(&visualization_publisher, gripper_xyz);
+                /* check have we reached end of stem */
+                state += up;
+                if(state >= TomatoStem.getNumberOfNodes()-1 || state <= 0){
+                    /* reached end of stem */
+                    up = -up;
+                }
+
+                std::vector<float> gripper_xyz, stem_intersection_xyz;
+                gripper_xyz = AmigoStatus.getGripperXYZ(&AmigoConfig);
+                if(AmigoStatus.isGripperXYZvalid())
+                    stem_intersection_xyz = TomatoStem.getStemXYZatZ(gripper_xyz[2]);
+
+                if(AmigoStatus.isGripperXYZvalid() && TomatoStem.isXYZonStem(stem_intersection_xyz)){
+                    showXYZInRviz(&visualization_publisher, BASE_FRAME, stem_intersection_xyz[0], stem_intersection_xyz[1], stem_intersection_xyz[2], 0.0f, 1.0f, 0.0f, 1, "stem_intersection");
+                    showXYZInRviz(&visualization_publisher, BASE_FRAME, gripper_xyz[0], gripper_xyz[1], gripper_xyz[2], 1.0f, 0.0f, 0.0f, 2, "gripper_center");
+                    TomatoWhiskerGripper.simulateWhiskerGripper(gripper_xyz, stem_intersection_xyz);
+                    TomatoWhiskerGripper.showForceInRviz(&visualization_publisher, gripper_xyz);
+                }
             }
-
             /* stop and publish sample timing, for profiling */
             sp.stopTimer("main");
             sp.publish();
+
+        } else {
+            INFO_STREAM("error in loading config file!");
         }
 
         /* wait for next sample */

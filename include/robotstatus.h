@@ -28,7 +28,7 @@ class RobotStatus
         void receivedTorsoMsg(const sensor_msgs::JointState & msg);
         void receivedArmMsg(const sensor_msgs::JointState & msg);
         KDL::JntArray getJointStatus();
-        std::vector<float> getGripperXYZ(RobotConfig robot_config);
+        std::vector<float> getGripperXYZ(RobotConfig* robot_config);
         bool isGripperXYZvalid();
         void printAll();
 
