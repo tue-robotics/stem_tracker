@@ -1,10 +1,9 @@
 #include "stem_tracker.h"
 
-TODO:
-- check stem na opnieuw config loaden
-- robot status ref geven naar robot config ipv friends
-- robot interface object
-- toevoegen kdl inverse kin
+//TODO:
+//- robot status ref geven naar robot config ipv friends
+//- robot interface object
+//- toevoegen kdl inverse kin
 
 
 
@@ -57,8 +56,6 @@ void configure(tue::Configuration config){
     INFO_STREAM("debug = " << DEBUG);
     config.value("update_rate", UPDATE_RATE);
     INFO_STREAM("update_rate = " << UPDATE_RATE);
-    config.value("this_package", THIS_PACKAGE);
-    INFO_STREAM("this_package = " << THIS_PACKAGE);
 
     /* robot configuration */
     config.value("robot_name", ROBOT_NAME);
@@ -86,6 +83,7 @@ void configure(tue::Configuration config){
 
     if (config.readArray("stem_nodes")){
         float tmp;
+        stemNodesX.clear(); stemNodesY.clear(); stemNodesZ.clear();
         while(config.nextArrayItem()){
             config.value("x", tmp); stemNodesX.push_back(tmp);
             config.value("y", tmp); stemNodesY.push_back(tmp);
@@ -150,7 +148,7 @@ int main(int argc, char** argv){
         std::string yaml_filename = argv[1];
         config.loadFromYAMLFile(yaml_filename);
     } else {
-        std::string this_package_dir = ros::package::getPath("stem_tracker");
+        std::string this_package_dir = ros::package::getPath(THIS_PACKAGE);
         config.loadFromYAMLFile(this_package_dir + "/config/config.yml");
     }
 

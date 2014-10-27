@@ -22,14 +22,14 @@
 #include "robotconfig.h"
 #include "robotstatus.h"
 
-#define INFO_STREAM     ROS_INFO_STREAM
+#define     INFO_STREAM     ROS_INFO_STREAM
+#define     THIS_PACKAGE    "stem_tracker"
 
 /* init configurable params */
 
 bool DEBUG;
 int UPDATE_RATE;
 std::string BASE_FRAME;
-std::string THIS_PACKAGE;
 
 std::string ROBOT_NAME;
 std::string ROOT_LINK;

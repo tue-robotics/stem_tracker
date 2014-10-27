@@ -1,7 +1,6 @@
 update_rate:                    100                             # spin rate of stem_tracking node, in hz
 debug:                          1                               # if true (1) additional information will be printed, else set to false (0)
 base_frame:                     /amigo/base_link                # frame we use to define stem and to show markers in rviz
-this_package:                   stem_tracker                    # name of this rospackage (also hardcoded in finding default config file)
 
 #######################
 # ROBOT CONFIG
@@ -40,4 +39,3 @@ stem_nodes:                                                     # stem nodes, de
     - {x: 0.35, y: 0.4, z: 1.2}
     - {x: 0.3, y: 0.55, z: 1.4}
     - {x: 0.25, y: 0.6, z: 1.6}
-
