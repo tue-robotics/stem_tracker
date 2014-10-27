@@ -71,6 +71,7 @@ void RobotConfig::loadJointLimits(){
 
     m_q_min.resize(m_n_joints_in_chain);
     m_q_max.resize(m_n_joints_in_chain);
+    m_q_seed.resize(m_n_joints_in_chain);
     m_q_joint_names.resize(m_n_joints_in_chain);
 
     int j=0;
@@ -90,14 +91,28 @@ void RobotConfig::loadJointLimits(){
             if (urdf_joint && urdf_joint->limits){
                 m_q_min(j) = urdf_joint->limits->lower;
                 m_q_max(j) = urdf_joint->limits->upper;
+                m_q_seed(j) = ( m_q_min(j) + m_q_max(j) ) / 2;
             } else{
                 m_q_min(j) = -1e9;
                 m_q_max(j) = 1e9;
+                m_q_seed(j) = 0.0;
             }
             ++j;
         }
     }
 
+}
+
+KDL::JntArray RobotConfig::getJointMinima(){
+    return m_q_min;
+}
+
+KDL::JntArray RobotConfig::getJointMaxima(){
+    return m_q_max;
+}
+
+KDL::JntArray RobotConfig::getJointSeeds(){
+    return m_q_seed;
 }
 
 KDL::Tree RobotConfig::getKinematicTree(){
@@ -208,6 +223,12 @@ void RobotConfig::printAll(){
     tmp_stream.str(""); tmp_stream << "Joint max:";
     for(int i=0;i<m_n_joints_in_chain;++i){
         tmp_stream << std::endl << "\t\t\t\t\t " << m_q_max.data[i];
+    }
+    INFO_STREAM(tmp_stream.str());
+
+    tmp_stream.str(""); tmp_stream << "Joint seeds:";
+    for(int i=0;i<m_n_joints_in_chain;++i){
+        tmp_stream << std::endl << "\t\t\t\t\t " << m_q_seed.data[i];
     }
     INFO_STREAM(tmp_stream.str());
 

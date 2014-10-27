@@ -25,7 +25,7 @@ class RobotConfig
         sensor_msgs::JointState m_arm_joint_msg;
         KDL::Chain m_kinematic_chain;
         int m_n_joints_in_chain;
-        KDL::JntArray m_q_min, m_q_max;
+        KDL::JntArray m_q_min, m_q_max, m_q_seed;
         std::vector<std::string> m_q_joint_names;
         std::string m_root_link_name;
         std::string m_tip_link_name;
@@ -34,6 +34,9 @@ class RobotConfig
         RobotConfig(const std::string name);
 
         bool selfCheck();
+        KDL::JntArray getJointMinima();
+        KDL::JntArray getJointMaxima();
+        KDL::JntArray getJointSeeds();
         void loadUrdfFromRosparam(ros::NodeHandle n, const std::string urdf_rosparam);
         urdf::Model getUrdfModel();
         void loadKinematicTreeFromUrdf();

@@ -11,6 +11,11 @@
 #include <sensor_msgs/JointState.h>
 #include <ros/package.h> // used in config loading
 
+#include <kdl/chainiksolverpos_nr_jl.hpp>
+#include <kdl/chainfksolverpos_recursive.hpp>
+#include <kdl/chainiksolvervel_pinv.hpp>
+
+
 /* amigo includes */
 #include <profiling/StatsPublisher.h>
 #include <tue/config/configuration.h>

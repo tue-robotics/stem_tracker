@@ -1,7 +1,6 @@
 #include "stem_tracker.h"
 
 //TODO:
-//- robot status ref geven naar robot config ipv friends
 //- robot interface object
 //- toevoegen kdl inverse kin
 
@@ -138,7 +137,7 @@ void initRobotStatus(RobotStatus* robot_status){
 int main(int argc, char** argv){
 
     bool initializing = true;
-    int state = 0, up = 1;
+//    int state = 0, up = 1;
 
     ros::Publisher visualization_publisher;
     ros::Publisher arm_reference_publisher;
@@ -241,12 +240,12 @@ int main(int argc, char** argv){
 
             if (!initializing && AmigoStatus.isUpToDate() ) {
 
-                /* check have we reached end of stem */
-                state += up;
-                if(state >= TomatoStem.getNumberOfNodes()-1 || state <= 0){
-                    /* reached end of stem */
-                    up = -up;
-                }
+//                /* check have we reached end of stem */
+//                state += up;
+//                if(state >= TomatoStem.getNumberOfNodes()-1 || state <= 0){
+//                    /* reached end of stem */
+//                    up = -up;
+//                }
 
                 std::vector<float> gripper_xyz, stem_intersection_xyz;
                 gripper_xyz = AmigoStatus.getGripperXYZ(&AmigoConfig);
@@ -259,6 +258,48 @@ int main(int argc, char** argv){
                     TomatoWhiskerGripper.simulateWhiskerGripper(gripper_xyz, stem_intersection_xyz);
                     TomatoWhiskerGripper.showForceInRviz(&visualization_publisher, gripper_xyz);
                 }
+
+                //=========================================
+
+                boost::shared_ptr<KDL::ChainFkSolverPos> fksolver_;
+                boost::shared_ptr<KDL::ChainIkSolverVel> ik_vel_solver_;
+                boost::shared_ptr<KDL::ChainIkSolverPos> ik_solver_;
+
+                fksolver_.reset(new KDL::ChainFkSolverPos_recursive(AmigoConfig.getKinematicChain()));
+                ik_vel_solver_.reset(new KDL::ChainIkSolverVel_pinv(AmigoConfig.getKinematicChain()));
+                ik_solver_.reset(new KDL::ChainIkSolverPos_NR_JL(AmigoConfig.getKinematicChain(), AmigoConfig.getJointMinima(), AmigoConfig.getJointMaxima(), *fksolver_, *ik_vel_solver_, 100) );
+
+                KDL::JntArray q_out;
+
+                KDL::Vector desired_pose(stem_intersection_xyz[0], stem_intersection_xyz[1], stem_intersection_xyz[2]);
+                const KDL::Frame f_in(desired_pose);
+
+                hier gebleven, check wat R moet zijn
+
+                for(int i=0; i<4; ++i){
+                    for(int j=0; j<4; ++j){
+                        INFO_STREAM("i = " << i << " j = " << j << " frame(i,j) = " << f_in(i,j));
+                    }
+                }
+                int status = ik_solver_->CartToJnt(AmigoConfig.getJointSeeds(), f_in, q_out);
+                if (status < 0){
+                    INFO_STREAM("Inverse kinematics failed");
+                }
+
+//                m_arm_joint_msg.header.stamp = ros::Time::now();
+//                m_arm_joint_msg.position.clear();
+
+//                /* amigo 'give' position */
+//                m_arm_joint_msg.position.push_back(0.0);
+//                m_arm_joint_msg.position.push_back(0.4);
+//                m_arm_joint_msg.position.push_back(-0.1);
+//                m_arm_joint_msg.position.push_back(0.0);
+//                m_arm_joint_msg.position.push_back(1.2);
+//                m_arm_joint_msg.position.push_back(0.0);
+//                m_arm_joint_msg.position.push_back(0.0);
+
+                //=========================================
+
             }
 
             if(!AmigoStatus.isUpToDate()){
