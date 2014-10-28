@@ -23,16 +23,20 @@ class RobotStatus
         int m_n_joints_monitoring;
         std::vector<float> m_gripper_xyz;
         double m_up_to_date_threshold;
+        KDL::Frame m_gripper_kdlframe;
+        std::vector<std::string> m_joint_names;
 
     public:
-        RobotStatus(int n_joints_to_monitor);
+        RobotStatus(int n_joints_to_monitor, RobotConfig* robot_config);
 
         bool selfCheck();
+        std::vector<std::string> getJointNames();
         void setUpToDateThreshold(double threshold);
         void receivedTorsoMsg(const sensor_msgs::JointState & msg);
         void receivedArmMsg(const sensor_msgs::JointState & msg);
         KDL::JntArray getJointStatus();
         std::vector<float> getGripperXYZ(RobotConfig* robot_config);
+        KDL::Frame getGripperKDLframe(RobotConfig* robot_config);
         bool isGripperXYZvalid();
         ros::Time getLastUpdateTime();
         double getTimeSinceLastUpdate();

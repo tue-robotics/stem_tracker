@@ -133,6 +133,21 @@ void initRobotStatus(RobotStatus* robot_status){
     robot_status->setUpToDateThreshold( UP_TO_DATE_THRESHOLD );
 }
 
+void printKDLframe(KDL::Frame kdl_frame){
+
+    std::stringstream frame_stream;
+    for(int i=0; i<4; ++i){
+        frame_stream.str(""); frame_stream << std::scientific;
+        for(int j=0; j<4; ++j){
+            frame_stream << kdl_frame(i,j) << "\t";
+        }
+        INFO_STREAM(frame_stream.str());
+    }
+}
+
+void printXYZvector(std::vector<float> vect){
+    INFO_STREAM("x = " << vect.at(0) << " y = " << vect.at(1) << " z = " << vect.at(2));
+}
 
 int main(int argc, char** argv){
 
@@ -141,6 +156,7 @@ int main(int argc, char** argv){
 
     ros::Publisher visualization_publisher;
     ros::Publisher arm_reference_publisher;
+    ros::Publisher torso_references_publisher;
     ros::Subscriber arm_measurements_subscriber;
     ros::Subscriber torso_measurements_subscriber;
 
@@ -186,7 +202,7 @@ int main(int argc, char** argv){
 
     /* initialize robot status object */
 
-    RobotStatus AmigoStatus(AmigoConfig.getKinematicChain().getNrOfJoints());
+    RobotStatus AmigoStatus(AmigoConfig.getKinematicChain().getNrOfJoints(), &AmigoConfig);
     initRobotStatus(&AmigoStatus);
 
     /* initialize node communication */
@@ -203,6 +219,7 @@ int main(int argc, char** argv){
         arm_reference_publisher = n.advertise<sensor_msgs::JointState>("/amigo/right_arm/references", 0);
 
     torso_measurements_subscriber = n.subscribe("/amigo/torso/measurements", 1000, &RobotStatus::receivedTorsoMsg, &AmigoStatus);
+    torso_references_publisher = n.advertise<sensor_msgs::JointState>("/amigo/torso/references", 0);
 
     if (USE_LEFTARM)
         arm_measurements_subscriber = n.subscribe("/amigo/left_arm/measurements", 1000, &RobotStatus::receivedArmMsg, &AmigoStatus);
@@ -271,32 +288,45 @@ int main(int argc, char** argv){
 
                 KDL::JntArray q_out;
 
-                KDL::Vector desired_pose(stem_intersection_xyz[0], stem_intersection_xyz[1], stem_intersection_xyz[2]);
-                const KDL::Frame f_in(desired_pose);
+                KDL::Vector stem_inters( (double)stem_intersection_xyz[0], (double)stem_intersection_xyz[1], (double)stem_intersection_xyz[2] );
+                KDL::Frame f_in(AmigoStatus.getGripperKDLframe(&AmigoConfig).M, stem_inters);
 
-                hier gebleven, check wat R moet zijn
+                INFO_STREAM("=================");
+                INFO_STREAM("f_in:");
+                printKDLframe(f_in);
+                INFO_STREAM("gripper:");
+                printXYZvector(gripper_xyz);
+                INFO_STREAM("stem:");
+                printXYZvector(stem_intersection_xyz);
 
-                for(int i=0; i<4; ++i){
-                    for(int j=0; j<4; ++j){
-                        INFO_STREAM("i = " << i << " j = " << j << " frame(i,j) = " << f_in(i,j));
-                    }
-                }
                 int status = ik_solver_->CartToJnt(AmigoConfig.getJointSeeds(), f_in, q_out);
                 if (status < 0){
-                    INFO_STREAM("Inverse kinematics failed");
+                    INFO_STREAM("Inverse kinematics returns: " << ik_solver_->strError(ik_solver_->getError()) << " (returns " << status << ")" );
                 }
 
-//                m_arm_joint_msg.header.stamp = ros::Time::now();
-//                m_arm_joint_msg.position.clear();
+                INFO_STREAM("q_out: " << std::endl << q_out.data);
+                INFO_STREAM("jointstatus: " << std::endl << AmigoStatus.getJointStatus().data);
 
-//                /* amigo 'give' position */
-//                m_arm_joint_msg.position.push_back(0.0);
-//                m_arm_joint_msg.position.push_back(0.4);
-//                m_arm_joint_msg.position.push_back(-0.1);
-//                m_arm_joint_msg.position.push_back(0.0);
-//                m_arm_joint_msg.position.push_back(1.2);
-//                m_arm_joint_msg.position.push_back(0.0);
-//                m_arm_joint_msg.position.push_back(0.0);
+                std::vector<std::string> joint_names = AmigoStatus.getJointNames();
+
+                sensor_msgs::JointState arm_ref;
+                arm_ref.header.stamp = ros::Time::now();
+                arm_ref.position.clear();
+
+                for(int i = 1; i<8; ++i){
+                    arm_ref.position.push_back(q_out(i));
+                    arm_ref.name.push_back(joint_names[i]);
+                }
+
+                arm_reference_publisher.publish(arm_ref);
+
+                sensor_msgs::JointState torso_ref;
+                torso_ref.header.stamp = ros::Time::now();
+                torso_ref.position.clear();
+                torso_ref.position.push_back(q_out(0));
+                torso_ref.name.push_back(joint_names[0]);
+
+                torso_references_publisher.publish(torso_ref);
 
                 //=========================================
 
@@ -323,6 +353,7 @@ int main(int argc, char** argv){
     arm_measurements_subscriber.shutdown();
     arm_reference_publisher.shutdown();
     visualization_publisher.shutdown();
+    torso_references_publisher.shutdown();
 
     return 0;
 };
