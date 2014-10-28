@@ -1,6 +1,7 @@
 update_rate:                    100                             # spin rate of stem_tracking node, in hz
 debug:                          1                               # if true (1) additional information will be printed, else set to false (0)
 base_frame:                     /amigo/base_link                # frame we use to define stem and to show markers in rviz
+debug_ik:                       0                               # set to true (1) to see more information wrt inverse kinematics solution
 
 #######################
 # ROBOT CONFIG
@@ -34,9 +35,7 @@ stem_rgb:                                                       # rgb color valu
     b: 0.35
 
 stem_nodes:                                                     # stem nodes, defined in root_link
-    - {x: 0.3, y: 0.3, z: 0.4}
-    - {x: 0.35, y: 0.35, z: 0.6}
-    - {x: 0.3, y: 0.35, z: 0.9}
-    - {x: 0.35, y: 0.4, z: 1.2}
-    - {x: 0.3, y: 0.55, z: 1.4}
-    - {x: 0.25, y: 0.6, z: 1.6}
+    - {x: 0.55, y: 0.35, z: 0.6}
+    - {x: 0.5, y: 0.35, z: 0.9}
+    - {x: 0.55, y: 0.4, z: 1.2}
+    - {x: 0.5, y: 0.55, z: 1.4}

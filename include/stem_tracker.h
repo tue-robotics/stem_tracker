@@ -33,6 +33,7 @@
 /* init configurable params */
 
 bool DEBUG;
+bool DEBUG_IK;
 int UPDATE_RATE;
 std::string BASE_FRAME;
 
