@@ -24,13 +24,11 @@ class RobotStatus
         std::vector<float> m_gripper_xyz;
         double m_up_to_date_threshold;
         KDL::Frame m_gripper_kdlframe;
-        std::vector<std::string> m_joint_names;
 
     public:
         RobotStatus(int n_joints_to_monitor, RobotConfig* robot_config);
 
         bool selfCheck();
-        std::vector<std::string> getJointNames();
         void setUpToDateThreshold(double threshold);
         void receivedTorsoMsg(const sensor_msgs::JointState & msg);
         void receivedArmMsg(const sensor_msgs::JointState & msg);

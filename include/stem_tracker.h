@@ -30,7 +30,7 @@
 #define     INFO_STREAM     ROS_INFO_STREAM
 #define     THIS_PACKAGE    "stem_tracker"
 
-/* init configurable params */
+/* declare configurable parameters */
 
 bool DEBUG;
 bool DEBUG_IK;
@@ -54,6 +54,7 @@ float STEM_RGB[3];
 std::vector<float> stemNodesX;
 std::vector<float> stemNodesY;
 std::vector<float> stemNodesZ;
+tue::Configuration config;
 
 
 #endif // STEM_TRACKER_H

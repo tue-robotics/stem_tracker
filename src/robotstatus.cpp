@@ -8,33 +8,6 @@ RobotStatus::RobotStatus(int n_joints_to_monitor, RobotConfig* robot_config)
     m_joints_to_monitor = KDL::JntArray(n_joints_to_monitor);
     m_n_joints_monitoring = n_joints_to_monitor;
 
-    // robot status currently configured for joint names:
-    m_joint_names.push_back("torso_joint");
-    if(robot_config->isLeftArmPreferred()){
-        m_joint_names.push_back("shoulder_yaw_joint_left");
-        m_joint_names.push_back("shoulder_pitch_joint_left");
-        m_joint_names.push_back("shoulder_roll_joint_left");
-        m_joint_names.push_back("elbow_pitch_joint_left");
-        m_joint_names.push_back("elbow_roll_joint_left");
-        m_joint_names.push_back("wrist_pitch_joint_left");
-        m_joint_names.push_back("wrist_yaw_joint_left");
-    } else if (robot_config->isRightArmPreferred()){
-        m_joint_names.push_back("shoulder_yaw_joint_right");
-        m_joint_names.push_back("shoulder_pitch_joint_right");
-        m_joint_names.push_back("shoulder_roll_joint_right");
-        m_joint_names.push_back("elbow_pitch_joint_right");
-        m_joint_names.push_back("elbow_roll_joint_right");
-        m_joint_names.push_back("wrist_pitch_joint_right");
-        m_joint_names.push_back("wrist_yaw_joint_right");
-    } else {
-        INFO_STREAM("trying to initialize robot status without knowing whether we use left or right arm");
-    }
-
-
-}
-
-std::vector<std::string> RobotStatus::getJointNames(){
-    return m_joint_names;
 }
 
 bool RobotStatus::selfCheck(){

@@ -4,6 +4,7 @@
 #define INFO_STREAM     ROS_INFO_STREAM
 
 #include <iostream>
+#include <vector>
 #include <ros/ros.h>
 #include <kdl_parser/kdl_parser.hpp>
 #include <kdl/chain.hpp>
@@ -22,7 +23,6 @@ class RobotConfig
         bool m_preferred_arm_set;
         bool m_prefer_left_arm;         // preferring left arm if true, right arm if false
         KDL::Tree m_kinematic_tree;
-        sensor_msgs::JointState m_arm_joint_msg;
         KDL::Chain m_kinematic_chain;
         int m_n_joints_in_chain;
         KDL::JntArray m_q_min, m_q_max, m_q_seed;
@@ -37,6 +37,7 @@ class RobotConfig
         KDL::JntArray getJointMinima();
         KDL::JntArray getJointMaxima();
         KDL::JntArray getJointSeeds();
+        std::vector<std::string> getJointNames();
         void loadUrdfFromRosparam(ros::NodeHandle n, const std::string urdf_rosparam);
         urdf::Model getUrdfModel();
         void loadKinematicTreeFromUrdf();
@@ -49,7 +50,7 @@ class RobotConfig
         bool isLeftArmPreferred();
         bool isRightArmPreferred();
         const std::string getName();
-        sensor_msgs::JointState getInitialPoseMsg();
+        sensor_msgs::JointState getAmigoInitialPoseMsg();
         void printAll();
 
         ~RobotConfig();

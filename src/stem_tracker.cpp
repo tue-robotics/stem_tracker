@@ -7,7 +7,11 @@
 //- check maken voor wat er precies veranderd is ipv hele config opnieuw
 //- debug functies apart, verschillende loglevels maken
 //- slimmere pose target, niet door stem heen en met helling meedraaien
-//- reageren op whisker force ipv naar bekende coordinaat
+//- reageren op whisker force ipv naar bekende intersection
+//- stem track controller object maken
+
+// BUGS:
+//- links rechts wisselen at runtime werkt niet
 
 
 
@@ -158,8 +162,12 @@ void printXYZvector(std::vector<float> vect){
 
 int main(int argc, char** argv){
 
+    /* initialize state handling params */
+
     bool initializing = true;
     int up = 1;
+
+    /* declare communication objects */
 
     ros::Publisher visualization_publisher;
     ros::Publisher arm_reference_publisher;
@@ -168,7 +176,6 @@ int main(int argc, char** argv){
     ros::Subscriber torso_measurements_subscriber;
 
     StatsPublisher sp;
-    tue::Configuration config;
 
     /* load yaml config file */
 
@@ -246,6 +253,7 @@ int main(int argc, char** argv){
             configure(config);
             initStem(&TomatoStem);
             initRobotConfig(&AmigoConfig, n);
+            initRobotStatus(&AmigoStatus);
         }
 
         if (!config.hasError()){
@@ -259,7 +267,7 @@ int main(int argc, char** argv){
             if(initializing && AmigoStatus.isUpToDate()){
 
                 /* bring arm to initial position */
-                arm_reference_publisher.publish(AmigoConfig.getInitialPoseMsg());
+                arm_reference_publisher.publish(AmigoConfig.getAmigoInitialPoseMsg());
                 initializing = false;
                 INFO_STREAM("==========\n\t\t\t\tInitialized");
             }
@@ -304,7 +312,7 @@ int main(int argc, char** argv){
                         INFO_STREAM("Inverse kinematics returns " << status );
                     }
 
-                    std::vector<std::string> joint_names = AmigoStatus.getJointNames();
+                    std::vector<std::string> joint_names = AmigoConfig.getJointNames();
 
                     sensor_msgs::JointState arm_ref;
                     arm_ref.header.stamp = ros::Time::now();

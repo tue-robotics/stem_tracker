@@ -1,4 +1,6 @@
-update_rate:                    100                             # spin rate of stem_tracking node, in hz
+                                                                                                                                                        # on-line tunable y/n
+
+update_rate:                    100                             # spin rate of stem_tracking node, in hz                                                n
 debug:                          1                               # if true (1) additional information will be printed, else set to false (0)
 base_frame:                     /amigo/base_link                # frame we use to define stem and to show markers in rviz
 debug_ik:                       0                               # set to true (1) to see more information wrt inverse kinematics solution
@@ -8,7 +10,7 @@ debug_ik:                       0                               # set to true (1
 #######################
 
 robot_name:                     amigo                           # name of robot we are using
-use_leftarm:                    1                               # use left arm if true (1), else use right arm
+use_leftarm:                    0                               # use left arm if true (1), else use right arm                                          n
 robot_description_rosparam:     /amigo/robot_description        # amigo urdf model gets loaded from this rosparam
 root_link:                      base_link                       # start of kinematic chain we are controlling
 left_end_link:                  grippoint_left                  # end of kinematic chain we are controlling, if use_leftarm

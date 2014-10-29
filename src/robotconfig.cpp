@@ -61,10 +61,12 @@ void RobotConfig::loadKinematicChainFromTree(const std::string root_link_name, c
 
     if (!m_kinematic_tree.getChain(root_link_name, tip_link_name, m_kinematic_chain)){
         INFO_STREAM("Could not initialize chain object");
+        return;
     }
     INFO_STREAM("Kinematic chain initialized from tree");
 
     m_n_joints_in_chain = m_kinematic_chain.getNrOfJoints();
+
 }
 
 void RobotConfig::loadJointLimits(){
@@ -107,6 +109,10 @@ KDL::JntArray RobotConfig::getJointMinima(){
     return m_q_min;
 }
 
+std::vector<std::string> RobotConfig::getJointNames(){
+    return m_q_joint_names;
+}
+
 KDL::JntArray RobotConfig::getJointMaxima(){
     return m_q_max;
 }
@@ -125,31 +131,11 @@ KDL::Chain RobotConfig::getKinematicChain(){
 
 void RobotConfig::setLeftArmIsPreferred(){
     m_prefer_left_arm = true;
-
-    m_arm_joint_msg.name.clear();
-    m_arm_joint_msg.name.push_back("shoulder_roll_joint_left");
-    m_arm_joint_msg.name.push_back("shoulder_pitch_joint_left");
-    m_arm_joint_msg.name.push_back("shoulder_yaw_joint_left");
-    m_arm_joint_msg.name.push_back("elbow_roll_joint_left");
-    m_arm_joint_msg.name.push_back("elbow_pitch_joint_left");
-    m_arm_joint_msg.name.push_back("wrist_pitch_joint_left");
-    m_arm_joint_msg.name.push_back("wrist_yaw_joint_left");
-
     m_preferred_arm_set = true;
 }
 
 void RobotConfig::setRightArmIsPreferred(){
     m_prefer_left_arm = false;
-
-    m_arm_joint_msg.name.clear();
-    m_arm_joint_msg.name.push_back("shoulder_roll_joint_right");
-    m_arm_joint_msg.name.push_back("shoulder_pitch_joint_right");
-    m_arm_joint_msg.name.push_back("shoulder_yaw_joint_right");
-    m_arm_joint_msg.name.push_back("elbow_roll_joint_right");
-    m_arm_joint_msg.name.push_back("elbow_pitch_joint_right");
-    m_arm_joint_msg.name.push_back("wrist_pitch_joint_right");
-    m_arm_joint_msg.name.push_back("wrist_yaw_joint_right");
-
     m_preferred_arm_set = true;
 }
 
@@ -165,21 +151,27 @@ const std::string RobotConfig::getName(){
     return m_name;
 }
 
-sensor_msgs::JointState RobotConfig::getInitialPoseMsg(){
+sensor_msgs::JointState RobotConfig::getAmigoInitialPoseMsg(){
 
-    m_arm_joint_msg.header.stamp = ros::Time::now();
-    m_arm_joint_msg.position.clear();
+    sensor_msgs::JointState arm_joint_msg;
+    arm_joint_msg.header.stamp = ros::Time::now();
 
+    arm_joint_msg.position.clear();
     /* amigo 'give' position */
-    m_arm_joint_msg.position.push_back(0.0);
-    m_arm_joint_msg.position.push_back(0.4);
-    m_arm_joint_msg.position.push_back(-0.1);
-    m_arm_joint_msg.position.push_back(0.0);
-    m_arm_joint_msg.position.push_back(1.2);
-    m_arm_joint_msg.position.push_back(0.0);
-    m_arm_joint_msg.position.push_back(0.0);
+    arm_joint_msg.position.push_back(0.0);
+    arm_joint_msg.position.push_back(0.4);
+    arm_joint_msg.position.push_back(-0.1);
+    arm_joint_msg.position.push_back(0.0);
+    arm_joint_msg.position.push_back(1.2);
+    arm_joint_msg.position.push_back(0.0);
+    arm_joint_msg.position.push_back(0.0);
 
-    return m_arm_joint_msg;
+    arm_joint_msg.name.clear();
+    for(int i = 1; i < m_n_joints_in_chain; ++i){ // skip first joint (torso)
+        arm_joint_msg.name.push_back(m_q_joint_names.at(i));
+    }
+
+    return arm_joint_msg;
 
 }
 
