@@ -26,6 +26,7 @@
 #include "robotconfig.h"
 #include "robotstatus.h"
 #include "visualizationinterface.h"
+#include "debugfunctions.h"
 
 #define     INFO_STREAM     ROS_INFO_STREAM
 #define     THIS_PACKAGE    "stem_tracker"
