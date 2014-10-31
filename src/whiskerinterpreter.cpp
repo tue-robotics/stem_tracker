@@ -42,7 +42,7 @@ void WhiskerInterpreter::simulateWhiskerGripper(std::vector<float> gripper_cente
              * the stem (both are in the same z-plane).
              * returns a force (xy) with origin at gripper center */
 
-    float max_whisker_force = 0.1f;
+    float max_whisker_force = 1.0;
 
     m_whisker_force.clear();
 

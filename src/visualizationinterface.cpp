@@ -23,7 +23,7 @@ bool VisualizationInterface::configureSelf(MarkerIDs marker_id)
         m_rgb.push_back(0.0f);
         m_rgb.push_back(0.0f);
         m_ros_marker_id = marker_id;
-        m_sphere_radius = 0.025;
+        m_sphere_radius = 0.015;
         m_name = "gripper_center";
         return true;
 
@@ -48,7 +48,7 @@ bool VisualizationInterface::configureSelf(MarkerIDs marker_id)
         m_rgb.push_back(1.0f);
         m_rgb.push_back(0.0f);
         m_ros_marker_id = marker_id;
-        m_sphere_radius = 0.025;
+        m_sphere_radius = 0.015;
         m_name = "nearest_stem_intersection";
         return true;
 
@@ -59,7 +59,7 @@ bool VisualizationInterface::configureSelf(MarkerIDs marker_id)
         m_rgb.push_back(0.05f);
         m_rgb.push_back(0.65f);
         m_rgb.push_back(0.35f);
-        m_linestrip_diam = 0.03;
+        m_linestrip_diam = 0.02;
         m_ros_marker_id = marker_id;
         m_name = "stem";
         return true;

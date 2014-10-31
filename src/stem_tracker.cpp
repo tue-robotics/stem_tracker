@@ -5,10 +5,10 @@
 //- naar beginpunt als boven of onder stem in z
 //- niet alle config globaal beschikbaar
 //- check maken voor wat er precies veranderd is ipv hele config opnieuw
-//- debug functies apart, verschillende loglevels maken
 //- slimmere pose target, niet door stem heen en met helling meedraaien
-//- reageren op whisker force ipv naar bekende intersection
+//- reageren op combinatie van whisker forces ipv naar bekende intersection
 //- stem track controller object maken
+//- stem track monitor object maken (approach -> grasp -> track -> identify sidebranch)
 
 
 
@@ -234,12 +234,6 @@ int main(int argc, char** argv)
 
                 //===================================================================================================================================
 
-                std::vector<float> gripper_xyz, stem_intersection_xyz;
-
-                gripper_xyz = AmigoStatus.getGripperXYZ();
-                stem_intersection_xyz = TomatoStem.getNearestXYZonStem(gripper_xyz);
-
-                //=========================================
 
                 boost::shared_ptr<KDL::ChainFkSolverPos> fksolver_;
                 boost::shared_ptr<KDL::ChainIkSolverVel> ik_vel_solver_;
@@ -252,10 +246,13 @@ int main(int argc, char** argv)
                 KDL::JntArray q_out;
 
                 /* check have we reached end of stem */
-                if( (fabs(stem_intersection_xyz[2] - stemNodesZ.back()) < 0.05 && up > 0 ) || (fabs(stem_intersection_xyz[2] - stemNodesZ.front()) < 0.05 && up < 0) )
+                if( (fabs(TomatoStem.getNearestXYZonStem(AmigoStatus.getGripperXYZ()).at(2) - TomatoStem.getNodesZ().back()) < 0.05 && up > 0 ) || \
+                        (fabs(TomatoStem.getNearestXYZonStem(AmigoStatus.getGripperXYZ()).at(2) - TomatoStem.getNodesZ().front() ) < 0.05 && up < 0) )
                     up = -up;
 
-                KDL::Vector stem_inters( (double)stem_intersection_xyz[0], (double)stem_intersection_xyz[1], (double)stem_intersection_xyz[2]+0.001*(double) up );
+                KDL::Vector stem_inters( (double) TomatoStem.getNearestXYZonStem(AmigoStatus.getGripperXYZ()).at(0), \
+                        (double) TomatoStem.getNearestXYZonStem(AmigoStatus.getGripperXYZ()).at(1), \
+                        (double) TomatoStem.getNearestXYZonStem(AmigoStatus.getGripperXYZ()).at(2) + 0.005 * (double) up );
                 KDL::Frame f_in(AmigoStatus.getGripperKDLframe().M, stem_inters);
 
                 int status = ik_solver_->CartToJnt(AmigoConfig.getJointSeeds(), f_in, q_out);

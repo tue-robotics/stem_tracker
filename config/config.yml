@@ -22,8 +22,8 @@ up_to_date_threshold:           0.5                             # consider robot
 #######################
 
 n_whiskers:                     10                              # total numbers of whiskers in gripper
-whisker_length:                 0.08                            # length of a single whisker, in meters
-gripper_diameter:               0.2                             # diameter of gripper at whisker-root, in meters
+whisker_length:                 0.05                            # length of a single whisker, in meters
+gripper_diameter:               0.1                             # diameter of gripper at whisker-root, in meters
 
 #######################
 # TOMATO STEM CONFIG
