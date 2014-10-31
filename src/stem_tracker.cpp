@@ -10,9 +10,6 @@
 //- reageren op whisker force ipv naar bekende intersection
 //- stem track controller object maken
 
-// BUGS:
-//- links rechts wisselen at runtime werkt niet
-
 
 
 void showXYZInRviz(ros::Publisher* p_marker_pub, const std::string frame, float x, float y, float z, float r, float g, float b, int id, const std::string ns){
@@ -243,8 +240,6 @@ int main(int argc, char** argv){
     /* initialize profiling */
     sp.initialize();
 
-    ros::Time last_switch = ros::Time::now();
-
     /* update loop */
     while(ros::ok()){
 
@@ -299,9 +294,8 @@ int main(int argc, char** argv){
                     KDL::JntArray q_out;
 
                     /* check have we reached end of stem */
-                    if( (fabs(stem_intersection_xyz[2] - stemNodesZ.back()) < 0.05 || fabs(stem_intersection_xyz[2] - stemNodesZ.front()) < 0.05) && ros::Time::now().toSec() - last_switch.toSec() > 5){
+                    if( (fabs(stem_intersection_xyz[2] - stemNodesZ.back()) < 0.05 && up > 0 ) || (fabs(stem_intersection_xyz[2] - stemNodesZ.front()) < 0.05 && up < 0) ) {
                         up = -up;
-                        last_switch = ros::Time::now();
                     }
 
                     KDL::Vector stem_inters( (double)stem_intersection_xyz[0], (double)stem_intersection_xyz[1], (double)stem_intersection_xyz[2]+0.001*(double) up );
