@@ -55,6 +55,27 @@ std::vector<float> StemRepresentation::getStemXYZatZ(float z)
 
 }
 
+std::vector<float> StemRepresentation::getNearestXYZonStem(std::vector<float> from_xyz)
+{
+    std::vector<float> xyz;
+    if (m_z_nodes.back() < from_xyz.at(2))
+    {
+        xyz.push_back(m_x_nodes.back());
+        xyz.push_back(m_y_nodes.back());
+        xyz.push_back(m_z_nodes.back());
+        return xyz;
+    }
+    else if (m_z_nodes.front() > from_xyz.at(2))
+    {
+        xyz.push_back(m_x_nodes.front());
+        xyz.push_back(m_y_nodes.front());
+        xyz.push_back(m_z_nodes.front());
+        return xyz;
+    }
+    else
+        return getStemXYZatZ(from_xyz.at(2));
+}
+
 bool StemRepresentation::selfCheck()
 {
 

@@ -26,7 +26,7 @@ class WhiskerInterpreter
         bool selfCheck();
         int getStatus();
         void simulateWhiskerGripper(std::vector<float> gripper_center, std::vector<float> stem_center);
-        std::vector<float> getWhiskerForce();
+        std::vector<float> getWhiskerNetForce();
         void showForceInRviz(ros::Publisher* p_vis_pub, std::vector<float> gripper_xyz);
 
         ~WhiskerInterpreter();

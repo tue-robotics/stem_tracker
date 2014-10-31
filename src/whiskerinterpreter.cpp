@@ -85,7 +85,7 @@ void WhiskerInterpreter::simulateWhiskerGripper(std::vector<float> gripper_cente
 
 }
 
-std::vector<float> WhiskerInterpreter::getWhiskerForce()
+std::vector<float> WhiskerInterpreter::getWhiskerNetForce()
 {
     return m_whisker_force;
 }

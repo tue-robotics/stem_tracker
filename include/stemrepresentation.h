@@ -32,6 +32,7 @@ class StemRepresentation
         void setFrame(std::string frame);
         void setRGB(float r, float g, float b);
         bool isXYZonStem(std::vector<float> xyz);
+        std::vector<float> getNearestXYZonStem(std::vector<float> from_xyz);
         void setThickness(float thickness);
         float getThickness();
         void loadNodesXYZ(std::vector<float> x, std::vector<float> y, std::vector<float> z);

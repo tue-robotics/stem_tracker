@@ -4,9 +4,9 @@
 enum MarkerIDs
 {
     stem,
-    stem_gripper_intersection,
+    nearest_stem_intersection,
     gripper_center,
-    whisker_force,
+    whisker_net_force,
 };
 
 #endif // MARKERIDS_H
