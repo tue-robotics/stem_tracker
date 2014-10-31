@@ -62,6 +62,7 @@ add_library(stem_tracker_libs
   src/robotstatus.cpp
   src/stemrepresentation.cpp
   src/whiskerinterpreter.cpp
+  src/visualizationinterface.cpp
 )
 
 target_link_libraries(stem_tracker_libs

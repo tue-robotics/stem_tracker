@@ -21,11 +21,11 @@
 #include <tue/config/configuration.h>
 
 /* stem tracking includes */
-
 #include "whiskerinterpreter.h"
 #include "stemrepresentation.h"
 #include "robotconfig.h"
 #include "robotstatus.h"
+#include "visualizationinterface.h"
 
 #define     INFO_STREAM     ROS_INFO_STREAM
 #define     THIS_PACKAGE    "stem_tracker"

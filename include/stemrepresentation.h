@@ -18,14 +18,11 @@ class StemRepresentation
 
         int m_stem_id;
         float m_rgb[3]; // between 0.0 - 1.0
-
         int m_n_nodes;
         std::vector<float> m_x_nodes;
         std::vector<float> m_y_nodes;
         std::vector<float> m_z_nodes;
-
         std::string m_frame;
-
         float m_thickness; // in meters
 
     public:

@@ -11,45 +11,8 @@
 //- stem track controller object maken
 
 
-
-void showXYZInRviz(ros::Publisher* p_marker_pub, const std::string frame, float x, float y, float z, float r, float g, float b, int id, const std::string ns){
-
-    visualization_msgs::Marker marker;
-
-    marker.header.frame_id = frame;
-    marker.header.stamp = ros::Time::now();
-
-    marker.ns = ns;
-    marker.action = visualization_msgs::Marker::ADD;
-
-    marker.id = id;
-
-    marker.pose.position.x = x;
-    marker.pose.position.y = y;
-    marker.pose.position.z = z;
-    marker.pose.orientation.x = 0.0;
-    marker.pose.orientation.y = 0.0;
-    marker.pose.orientation.z = 0.0;
-    marker.pose.orientation.w = 1.0;
-
-    marker.scale.x = 0.025;
-    marker.scale.y = 0.025;
-    marker.scale.z = 0.025;
-
-    marker.type = visualization_msgs::Marker::SPHERE;
-
-    marker.color.r = r;
-    marker.color.g = g;
-    marker.color.b = b;
-    marker.color.a = 1.0;
-
-    marker.lifetime = ros::Duration();
-
-    p_marker_pub->publish( marker );
-
-}
-
-void configure(tue::Configuration config){
+void configure(tue::Configuration config)
+{
 
     INFO_STREAM("================");
     INFO_STREAM("(Re)Configuring");
@@ -82,18 +45,21 @@ void configure(tue::Configuration config){
     /* tomato stem configuration */
     config.value("stem_thickness", STEM_THICKNESS);
 
-    if (config.readGroup("stem_rgb")){
+    if (config.readGroup("stem_rgb"))
+    {
         config.value("r",STEM_RGB[0]);
         config.value("g",STEM_RGB[1]);
         config.value("b",STEM_RGB[2]);
-
         config.endGroup();
     }
 
-    if (config.readArray("stem_nodes")){
+    if (config.readArray("stem_nodes"))
+    {
         float tmp;
         stemNodesX.clear(); stemNodesY.clear(); stemNodesZ.clear();
-        while(config.nextArrayItem()){
+
+        while(config.nextArrayItem())
+        {
             config.value("x", tmp); stemNodesX.push_back(tmp);
             config.value("y", tmp); stemNodesY.push_back(tmp);
             config.value("z", tmp); stemNodesZ.push_back(tmp);
@@ -101,11 +67,10 @@ void configure(tue::Configuration config){
 
         config.endArray();
     }
-
 }
 
-void initStem(StemRepresentation* stem){
-
+void initStem(StemRepresentation* stem)
+{
     stem->setRGB(STEM_RGB[0], STEM_RGB[1], STEM_RGB[2]);
     stem->setThickness(STEM_THICKNESS);
     stem->loadNodesXYZ(stemNodesX, stemNodesY, stemNodesZ);
@@ -116,8 +81,8 @@ void initStem(StemRepresentation* stem){
         stem->printAll();
 }
 
-void initRobotConfig(RobotConfig* robot_config, ros::NodeHandle n){
-
+void initRobotConfig(RobotConfig* robot_config, ros::NodeHandle n)
+{
     if(USE_LEFTARM)
         robot_config->setLeftArmIsPreferred();
     else
@@ -137,27 +102,33 @@ void initRobotConfig(RobotConfig* robot_config, ros::NodeHandle n){
         robot_config->printAll();
 }
 
-void initRobotStatus(RobotStatus* robot_status){
+void initRobotStatus(RobotStatus* robot_status)
+{
     robot_status->setUpToDateThreshold( UP_TO_DATE_THRESHOLD );
 }
 
-void printKDLframe(KDL::Frame kdl_frame){
-
+void printKDLframe(KDL::Frame kdl_frame)
+{
     std::stringstream frame_stream;
-    for(int i=0; i<4; ++i){
+
+    for(int i=0; i<4; ++i)
+    {
         frame_stream.str(""); frame_stream << std::scientific;
-        for(int j=0; j<4; ++j){
+
+        for(int j=0; j<4; ++j)
             frame_stream << kdl_frame(i,j) << "\t";
-        }
+
         INFO_STREAM(frame_stream.str());
     }
 }
 
-void printXYZvector(std::vector<float> vect){
+void printXYZvector(std::vector<float> vect)
+{
     INFO_STREAM("x = " << vect.at(0) << " y = " << vect.at(1) << " z = " << vect.at(2));
 }
 
-int main(int argc, char** argv){
+int main(int argc, char** argv)
+{
 
     /* initialize state handling params */
 
@@ -176,17 +147,21 @@ int main(int argc, char** argv){
 
     /* load yaml config file */
 
-    if (argc >= 2){
+    if (argc >= 2)
+    {
         std::string yaml_filename = argv[1];
         config.loadFromYAMLFile(yaml_filename);
-    } else {
+    }
+    else
+    {
         std::string this_package_dir = ros::package::getPath(THIS_PACKAGE);
         config.loadFromYAMLFile(this_package_dir + "/config/config.yml");
     }
 
     configure(config);
 
-    if (config.hasError()){
+    if (config.hasError())
+    {
         INFO_STREAM("Could not load configuration: " << config.error());
         return 1;
     }
@@ -216,13 +191,11 @@ int main(int argc, char** argv){
     RobotStatus AmigoStatus(AmigoConfig.getKinematicChain().getNrOfJoints(), &AmigoConfig);
     initRobotStatus(&AmigoStatus);
 
-    /* initialize node communication */
-
+    /* initialize visualization via rviz */
     visualization_publisher = n.advertise<visualization_msgs::Marker>( "visualization_marker", 100 );
-    //      marker id   0   stem
-    //      marker id   1   stem-gripper intersection
-    //      marker id   2   gripper center
-    //      marker id   3   whisker force
+    VisualizationInterface StemTrackerInRviz(&visualization_publisher, BASE_FRAME);
+
+    /* initialize node communication */
 
     if (USE_LEFTARM)
         arm_reference_publisher = n.advertise<sensor_msgs::JointState>("/amigo/left_arm/references", 0);
@@ -241,9 +214,11 @@ int main(int argc, char** argv){
     sp.initialize();
 
     /* update loop */
-    while(ros::ok()){
+    while(ros::ok())
+    {
 
-        if (config.sync()){
+        if (config.sync())
+        {
             /* config file changed */
             configure(config);
             initStem(&TomatoStem);
@@ -251,7 +226,8 @@ int main(int argc, char** argv){
             initRobotStatus(&AmigoStatus);
         }
 
-        if (!config.hasError()){
+        if (!config.hasError())
+        {
 
             /* publish linestrip marker to visualize stem */
             TomatoStem.showInRviz(&visualization_publisher, "stem");
@@ -259,94 +235,110 @@ int main(int argc, char** argv){
             /* start sample timing, for profiling */
             sp.startTimer("main");
 
-            if(initializing && AmigoStatus.isUpToDate()){
-
+            if(initializing && AmigoStatus.isUpToDate())
+            {
                 /* bring arm to initial position */
                 arm_reference_publisher.publish(AmigoConfig.getAmigoInitialPoseMsg());
                 initializing = false;
-                INFO_STREAM("==========\n\t\t\t\tInitialized");
+                INFO_STREAM("=============");
+                INFO_STREAM("Initialized");
+                INFO_STREAM("=============");
             }
 
-            if (!initializing && AmigoStatus.isUpToDate() ) {
+            if (!initializing && AmigoStatus.hasValidGripperXYZ() )
+            {
 
-                std::vector<float> gripper_xyz, stem_intersection_xyz;
-                gripper_xyz = AmigoStatus.getGripperXYZ(&AmigoConfig);
-                if(AmigoStatus.isGripperXYZvalid())
-                    stem_intersection_xyz = TomatoStem.getStemXYZatZ(gripper_xyz[2]);
+                StemTrackerInRviz.showXYZ(AmigoStatus.getGripperXYZ(), gripper_center);
 
-                if(AmigoStatus.isGripperXYZvalid() && TomatoStem.isXYZonStem(stem_intersection_xyz)){
-                    showXYZInRviz(&visualization_publisher, BASE_FRAME, stem_intersection_xyz[0], stem_intersection_xyz[1], stem_intersection_xyz[2], 0.0f, 1.0f, 0.0f, 1, "stem_intersection");
-                    showXYZInRviz(&visualization_publisher, BASE_FRAME, gripper_xyz[0], gripper_xyz[1], gripper_xyz[2], 1.0f, 0.0f, 0.0f, 2, "gripper_center");
-                    TomatoWhiskerGripper.simulateWhiskerGripper(gripper_xyz, stem_intersection_xyz);
-                    TomatoWhiskerGripper.showForceInRviz(&visualization_publisher, gripper_xyz);
+//                StemTrackController.updateError();
+//                VisualizationInterface.showWhiskerForces();
 
+//                StemTrackController.updateFeedforward();
+//                StemTrackController.updateSetpoint();
 
-                    //=========================================
+//                RobotInterface.publishJointSetpoints();
 
-                    boost::shared_ptr<KDL::ChainFkSolverPos> fksolver_;
-                    boost::shared_ptr<KDL::ChainIkSolverVel> ik_vel_solver_;
-                    boost::shared_ptr<KDL::ChainIkSolverPos> ik_solver_;
+//===================================================================================================================================
 
-                    fksolver_.reset(new KDL::ChainFkSolverPos_recursive(AmigoConfig.getKinematicChain()));
-                    ik_vel_solver_.reset(new KDL::ChainIkSolverVel_pinv(AmigoConfig.getKinematicChain()));
-                    ik_solver_.reset(new KDL::ChainIkSolverPos_NR_JL(AmigoConfig.getKinematicChain(), AmigoConfig.getJointMinima(), AmigoConfig.getJointMaxima(), *fksolver_, *ik_vel_solver_, 100) );
+//                std::vector<float> gripper_xyz, stem_intersection_xyz;
+//                gripper_xyz = AmigoStatus.getGripperXYZ();
 
-                    KDL::JntArray q_out;
+//                if(AmigoStatus.isGripperXYZvalid())
+//                    stem_intersection_xyz = TomatoStem.getStemXYZatZ(gripper_xyz[2]);
 
-                    /* check have we reached end of stem */
-                    if( (fabs(stem_intersection_xyz[2] - stemNodesZ.back()) < 0.05 && up > 0 ) || (fabs(stem_intersection_xyz[2] - stemNodesZ.front()) < 0.05 && up < 0) ) {
-                        up = -up;
-                    }
+//                if(AmigoStatus.isGripperXYZvalid() && TomatoStem.isXYZonStem(stem_intersection_xyz))
+//                {
+//                    showXYZInRviz(&visualization_publisher, BASE_FRAME, stem_intersection_xyz[0], stem_intersection_xyz[1], stem_intersection_xyz[2], 0.0f, 1.0f, 0.0f, 1, "stem_intersection");
+//                    showXYZInRviz(&visualization_publisher, BASE_FRAME, gripper_xyz[0], gripper_xyz[1], gripper_xyz[2], 1.0f, 0.0f, 0.0f, 2, "gripper_center");
+//                    TomatoWhiskerGripper.simulateWhiskerGripper(gripper_xyz, stem_intersection_xyz);
+//                    TomatoWhiskerGripper.showForceInRviz(&visualization_publisher, gripper_xyz);
 
-                    KDL::Vector stem_inters( (double)stem_intersection_xyz[0], (double)stem_intersection_xyz[1], (double)stem_intersection_xyz[2]+0.001*(double) up );
-                    KDL::Frame f_in(AmigoStatus.getGripperKDLframe(&AmigoConfig).M, stem_inters);
+//                    //=========================================
 
-                    int status = ik_solver_->CartToJnt(AmigoConfig.getJointSeeds(), f_in, q_out);
-                    if (status != 0 && DEBUG_IK){
-                        INFO_STREAM("Inverse kinematics returns " << status );
-                    }
+//                    boost::shared_ptr<KDL::ChainFkSolverPos> fksolver_;
+//                    boost::shared_ptr<KDL::ChainIkSolverVel> ik_vel_solver_;
+//                    boost::shared_ptr<KDL::ChainIkSolverPos> ik_solver_;
 
-                    std::vector<std::string> joint_names = AmigoConfig.getJointNames();
+//                    fksolver_.reset(new KDL::ChainFkSolverPos_recursive(AmigoConfig.getKinematicChain()));
+//                    ik_vel_solver_.reset(new KDL::ChainIkSolverVel_pinv(AmigoConfig.getKinematicChain()));
+//                    ik_solver_.reset(new KDL::ChainIkSolverPos_NR_JL(AmigoConfig.getKinematicChain(), AmigoConfig.getJointMinima(), AmigoConfig.getJointMaxima(), *fksolver_, *ik_vel_solver_, 100) );
 
-                    sensor_msgs::JointState arm_ref;
-                    arm_ref.header.stamp = ros::Time::now();
-                    arm_ref.position.clear();
+//                    KDL::JntArray q_out;
 
-                    for(int i = 1; i<8; ++i){
-                        arm_ref.position.push_back(q_out(i));
-                        arm_ref.name.push_back(joint_names[i]);
-                    }
+//                    /* check have we reached end of stem */
+//                    if( (fabs(stem_intersection_xyz[2] - stemNodesZ.back()) < 0.05 && up > 0 ) || (fabs(stem_intersection_xyz[2] - stemNodesZ.front()) < 0.05 && up < 0) )
+//                        up = -up;
 
-                    arm_reference_publisher.publish(arm_ref);
+//                    KDL::Vector stem_inters( (double)stem_intersection_xyz[0], (double)stem_intersection_xyz[1], (double)stem_intersection_xyz[2]+0.001*(double) up );
+//                    KDL::Frame f_in(AmigoStatus.getGripperKDLframe().M, stem_inters);
 
-                    sensor_msgs::JointState torso_ref;
-                    torso_ref.header.stamp = ros::Time::now();
-                    torso_ref.position.clear();
-                    torso_ref.position.push_back(q_out(0));
-                    torso_ref.name.push_back(joint_names[0]);
+//                    int status = ik_solver_->CartToJnt(AmigoConfig.getJointSeeds(), f_in, q_out);
 
-                    torso_references_publisher.publish(torso_ref);
+//                    if (status != 0 && DEBUG_IK)
+//                        INFO_STREAM("Inverse kinematics returns " << status );
 
-                    //=========================================
-                }
+//                    std::vector<std::string> joint_names = AmigoConfig.getJointNames();
 
+//                    sensor_msgs::JointState arm_ref;
+//                    arm_ref.header.stamp = ros::Time::now();
+//                    arm_ref.position.clear();
+
+//                    for(int i = 1; i<8; ++i)
+//                    {
+//                        arm_ref.position.push_back(q_out(i));
+//                        arm_ref.name.push_back(joint_names[i]);
+//                    }
+
+//                    arm_reference_publisher.publish(arm_ref);
+
+//                    sensor_msgs::JointState torso_ref;
+//                    torso_ref.header.stamp = ros::Time::now();
+//                    torso_ref.position.clear();
+//                    torso_ref.position.push_back(q_out(0));
+//                    torso_ref.name.push_back(joint_names[0]);
+
+//                    torso_references_publisher.publish(torso_ref);
+
+//                    //=========================================
+//                }
             }
 
-            if(!AmigoStatus.isUpToDate()){
+            if(!AmigoStatus.isUpToDate())
                 INFO_STREAM("waiting for up to date robot status information");
-            }
 
             /* stop and publish sample timing, for profiling */
             sp.stopTimer("main");
             sp.publish();
 
-        } else {
-            INFO_STREAM("error in loading config file!");
         }
+
+        else
+            INFO_STREAM("error in loading config file!");
 
         /* wait for next sample */
         r.sleep();
         ros::spinOnce();
+
     }
 
     torso_measurements_subscriber.shutdown();

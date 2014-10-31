@@ -16,7 +16,6 @@
 
 class RobotConfig
 {
-
     private:
         std::string m_name;             // name of robot instance
         urdf::Model m_urdf_model;       // urdf formatted model
@@ -32,7 +31,6 @@ class RobotConfig
 
     public:
         RobotConfig(const std::string name);
-
         bool selfCheck();
         KDL::JntArray getJointMinima();
         KDL::JntArray getJointMaxima();

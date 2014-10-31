@@ -16,7 +16,6 @@
 
 class RobotStatus
 {
-
     private:
         ros::Time m_last_update;
         KDL::JntArray m_joints_to_monitor; // order should be: torso / shoulder-jaw / shoulder-pitch / shoulder-roll / elbow-pitch / elbow-roll / wrist-pitch / wrist-yaw
@@ -24,18 +23,20 @@ class RobotStatus
         std::vector<float> m_gripper_xyz;
         double m_up_to_date_threshold;
         KDL::Frame m_gripper_kdlframe;
+        RobotConfig* m_p_robot_config;
 
     public:
         RobotStatus(int n_joints_to_monitor, RobotConfig* robot_config);
-
         bool selfCheck();
         void setUpToDateThreshold(double threshold);
         void receivedTorsoMsg(const sensor_msgs::JointState & msg);
         void receivedArmMsg(const sensor_msgs::JointState & msg);
         KDL::JntArray getJointStatus();
-        std::vector<float> getGripperXYZ(RobotConfig* robot_config);
-        KDL::Frame getGripperKDLframe(RobotConfig* robot_config);
+        std::vector<float> getGripperXYZ();
+        KDL::Frame getGripperKDLframe();
         bool isGripperXYZvalid();
+        bool hasValidGripperXYZ();
+        void updateGripperXYZ();
         ros::Time getLastUpdateTime();
         double getTimeSinceLastUpdate();
         bool isUpToDate();

@@ -10,20 +10,24 @@ WhiskerInterpreter::WhiskerInterpreter(int n_whiskers, int gripper_id, float whi
     m_status = 0;
 }
 
-int WhiskerInterpreter::getStatus(){
+int WhiskerInterpreter::getStatus()
+{
     return m_status;
 }
 
-bool WhiskerInterpreter::selfCheck(){
+bool WhiskerInterpreter::selfCheck()
+{
 
     bool IamOK = true;
 
-    if (m_n_whiskers <= 0){
+    if (m_n_whiskers <= 0)
+    {
         INFO_STREAM("In whisker gripper with id " << m_gripper_id << " number of whiskers set to zero or negative number");
         IamOK = false;
     }
 
-    if (m_whisker_length > m_gripper_radius){
+    if (m_whisker_length > m_gripper_radius)
+    {
         INFO_STREAM("in whisker gripper with id " << m_gripper_id << " length of whiskers is larger than radius of gripper");
         IamOK = false;
     }
@@ -31,7 +35,8 @@ bool WhiskerInterpreter::selfCheck(){
     return IamOK;
 }
 
-void WhiskerInterpreter::simulateWhiskerGripper(std::vector<float> gripper_center, std::vector<float> stem_center){
+void WhiskerInterpreter::simulateWhiskerGripper(std::vector<float> gripper_center, std::vector<float> stem_center)
+{
 
     /* takes two doubles (xy) as coordinates of the gripper two doubles as coordinate of
              * the stem (both are in the same z-plane).
@@ -41,13 +46,15 @@ void WhiskerInterpreter::simulateWhiskerGripper(std::vector<float> gripper_cente
 
     m_whisker_force.clear();
 
-    if(gripper_center.size() < 2 ){
+    if(gripper_center.size() < 2 )
+    {
         INFO_STREAM("in simulateWhiskerGripper gripper center xy needed!");
         m_status = 0;
         return;
     }
 
-    if(stem_center.size() < 2 ){
+    if(stem_center.size() < 2 )
+    {
         INFO_STREAM("in simulateWhiskerGripper stem center xy needed!");
         m_status = 0;
         return;
@@ -59,11 +66,16 @@ void WhiskerInterpreter::simulateWhiskerGripper(std::vector<float> gripper_cente
     float y_diff = gripper_center[1] - stem_center[1];
     float dist_gripper_to_stem = sqrt( x_diff * x_diff + y_diff * y_diff );
 
-    if( dist_gripper_to_stem > m_gripper_radius ){
+    if( dist_gripper_to_stem > m_gripper_radius )
+    {
         m_status = 1;
-    } else if (dist_gripper_to_stem < m_gripper_radius - m_whisker_length){
+    }
+    else if (dist_gripper_to_stem < m_gripper_radius - m_whisker_length)
+    {
         m_status = 3;
-    } else {
+    }
+    else
+    {
         m_status = 2;
         /* simulated force is inverse of distance to force */
         float whisker_fraction_deformed = ( dist_gripper_to_stem - (m_gripper_radius - m_whisker_length) ) / m_whisker_length;
@@ -73,11 +85,13 @@ void WhiskerInterpreter::simulateWhiskerGripper(std::vector<float> gripper_cente
 
 }
 
-std::vector<float> WhiskerInterpreter::getWhiskerForce(){
+std::vector<float> WhiskerInterpreter::getWhiskerForce()
+{
     return m_whisker_force;
 }
 
-void WhiskerInterpreter::showForceInRviz(ros::Publisher* p_vis_pub, std::vector<float> gripper_xyz){
+void WhiskerInterpreter::showForceInRviz(ros::Publisher* p_vis_pub, std::vector<float> gripper_xyz)
+{
 
     if(!selfCheck()){
         return;
@@ -127,6 +141,7 @@ void WhiskerInterpreter::showForceInRviz(ros::Publisher* p_vis_pub, std::vector<
 
 }
 
-WhiskerInterpreter::~WhiskerInterpreter(){
+WhiskerInterpreter::~WhiskerInterpreter()
+{
     //destructor
 }
