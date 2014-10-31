@@ -12,7 +12,7 @@
 
 
 
-void configure(tue::Configuration config)
+void loadConfiguration(tue::Configuration config)
 {
 
     INFO_STREAM("================");
@@ -44,16 +44,6 @@ void configure(tue::Configuration config)
     config.value("gripper_diameter", GRIPPER_DIAMETER);
 
     /* tomato stem configuration */
-    config.value("stem_thickness", STEM_THICKNESS);
-
-    if (config.readGroup("stem_rgb"))
-    {
-        config.value("r",STEM_RGB[0]);
-        config.value("g",STEM_RGB[1]);
-        config.value("b",STEM_RGB[2]);
-        config.endGroup();
-    }
-
     if (config.readArray("stem_nodes"))
     {
         float tmp;
@@ -72,10 +62,7 @@ void configure(tue::Configuration config)
 
 void initStem(StemRepresentation* stem)
 {
-    stem->setRGB(STEM_RGB[0], STEM_RGB[1], STEM_RGB[2]);
-    stem->setThickness(STEM_THICKNESS);
     stem->loadNodesXYZ(stemNodesX, stemNodesY, stemNodesZ);
-    stem->setFrame(BASE_FRAME);
     if(!USE_LEFTARM)
         stem->flipNodes();
     if(DEBUG)
@@ -160,7 +147,7 @@ int main(int argc, char** argv)
         config.loadFromYAMLFile(this_package_dir + "/config/config.yml");
     }
 
-    configure(config);
+    loadConfiguration(config);
 
     if (config.hasError())
     {
@@ -222,7 +209,7 @@ int main(int argc, char** argv)
         if (config.sync())
         {
             /* config file changed */
-            configure(config);
+            loadConfiguration(config);
             initStem(&TomatoStem);
             initRobotConfig(&AmigoConfig, n);
             initRobotStatus(&AmigoStatus);
@@ -230,8 +217,8 @@ int main(int argc, char** argv)
 
         if (!config.hasError())
         {
-            /* publish linestrip marker to visualize stem */
-            TomatoStem.showInRviz(&visualization_publisher, "stem");
+            /* visualize stem */
+            StemTrackerInRviz.showLineStrip(TomatoStem.getNodesX(), TomatoStem.getNodesY(), TomatoStem.getNodesZ(), stem);
 
             /* start sample timing, for profiling */
             sp.startTimer("main");

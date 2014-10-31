@@ -29,13 +29,6 @@ gripper_diameter:               0.2                             # diameter of gr
 # TOMATO STEM CONFIG
 #######################
 
-stem_thickness:                 0.03                            # thickness, in meters
-
-stem_rgb:                                                       # rgb color value of stem visualization in rviz
-    r: 0.05
-    g: 0.65
-    b: 0.35
-
 stem_nodes:                                                     # stem nodes, defined in root_link
     - {x: 0.55, y: 0.35, z: 0.6}
     - {x: 0.5, y: 0.35, z: 0.9}

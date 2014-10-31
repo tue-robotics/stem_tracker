@@ -35,8 +35,8 @@ bool VisualizationInterface::configureSelf(MarkerIDs marker_id)
         m_rgb.push_back(0.0f);
         m_rgb.push_back(1.0f);
         m_ros_marker_id = marker_id;
-        m_force_x = 0.01;
-        m_force_y = 0.02;
+        m_arrow_diam = 0.01;
+        m_arrowhead_diam = 0.02;
         m_name = "whisker_force";
         return true;
 
@@ -52,10 +52,61 @@ bool VisualizationInterface::configureSelf(MarkerIDs marker_id)
         m_name = "nearest_stem_intersection";
         return true;
 
+    case stem:
+
+        m_frame = m_base_frame;
+        m_rgb.clear();
+        m_rgb.push_back(0.05f);
+        m_rgb.push_back(0.65f);
+        m_rgb.push_back(0.35f);
+        m_linestrip_diam = 0.03;
+        m_ros_marker_id = marker_id;
+        m_name = "stem";
+        return true;
+
     default:
         INFO_STREAM("Unknown marker id in visualization interface!");
         return false;
     }
+}
+
+void VisualizationInterface::showLineStrip(std::vector<float> x_coordinates, std::vector<float> y_coordinates, std::vector<float> z_coordinates, MarkerIDs marker_id)
+{
+    if(configureSelf(marker_id))
+        showLineStripInRviz(x_coordinates, y_coordinates, z_coordinates);
+
+    return;
+}
+
+void VisualizationInterface::showLineStripInRviz(std::vector<float> x_coordinates, std::vector<float> y_coordinates, std::vector<float> z_coordinates)
+{
+    visualization_msgs::Marker marker;
+
+    marker.header.frame_id = m_frame;
+    marker.header.stamp = ros::Time();
+
+    marker.id = m_ros_marker_id;
+    marker.ns = m_name;
+    marker.type = visualization_msgs::Marker::LINE_STRIP;
+    marker.action = visualization_msgs::Marker::ADD;
+    marker.pose.orientation.w = 1.0;
+    marker.scale.x = m_linestrip_diam;
+    marker.color.a = 1.0f;
+    marker.color.r = m_rgb.at(0);
+    marker.color.g = m_rgb.at(1);
+    marker.color.b = m_rgb.at(2);
+
+    for(int i=0; i<x_coordinates.size(); ++i)
+    {
+        geometry_msgs::Point p;
+        p.x = x_coordinates.at(i);
+        p.y = y_coordinates.at(i);
+        p.z = z_coordinates.at(i);
+        marker.points.push_back(p);
+    }
+
+    m_p_ros_marker_pub->publish( marker );
+
 }
 
 void VisualizationInterface::showForce(std::vector<float> force, std::vector<float> origin, MarkerIDs marker_id)
@@ -89,8 +140,8 @@ void VisualizationInterface::showForceInRviz(std::vector<float> force, std::vect
     marker.action = visualization_msgs::Marker::ADD;
     marker.pose.orientation.w = 1.0;
     marker.ns = m_name;
-    marker.scale.x = m_force_x;
-    marker.scale.y = m_force_y;
+    marker.scale.x = m_arrow_diam;
+    marker.scale.y = m_arrowhead_diam;
     marker.color.a = 1.0f;
     marker.color.r = m_rgb.at(0);
     marker.color.g = m_rgb.at(1);
