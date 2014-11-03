@@ -23,24 +23,11 @@ bool RobotStatus::selfCheck()
     return IamOK;
 }
 
-void RobotStatus::receivedTorsoMsg(const sensor_msgs::JointState & msg)
+void RobotStatus::updateJointStatus(KDL::JntArray updated_joint_status)
 {
-    if(!selfCheck())
-        return;
-
+    m_joints_to_monitor = updated_joint_status;
     m_last_update = ros::Time::now();
-    m_joints_to_monitor(0) = msg.position[0];
-}
-
-void RobotStatus::receivedArmMsg(const sensor_msgs::JointState & msg)
-{
-    if(!selfCheck())
-        return;
-
-    for(int i = 1; i < 8; ++i)
-        m_joints_to_monitor(i) = msg.position[i-1];
-
-    m_last_update = ros::Time::now();
+    return;
 }
 
 ros::Time RobotStatus::getLastUpdateTime()

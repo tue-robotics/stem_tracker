@@ -29,8 +29,7 @@ class RobotStatus
         RobotStatus(int n_joints_to_monitor, RobotConfig* robot_config);
         bool selfCheck();
         void setUpToDateThreshold(double threshold);
-        void receivedTorsoMsg(const sensor_msgs::JointState & msg);
-        void receivedArmMsg(const sensor_msgs::JointState & msg);
+        void updateJointStatus(KDL::JntArray updated_joint_status);
         KDL::JntArray getJointStatus();
         std::vector<float> getGripperXYZ();
         KDL::Frame getGripperKDLframe();

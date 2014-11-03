@@ -103,13 +103,7 @@ int main(int argc, char** argv)
     bool initializing = true;
     int up = 1;
 
-    /* declare communication objects */
-
-    ros::Publisher visualization_publisher;
-    ros::Publisher arm_reference_publisher;
-    ros::Publisher torso_references_publisher;
-    ros::Subscriber arm_measurements_subscriber;
-    ros::Subscriber torso_measurements_subscriber;
+    /* initialize profiling object */
 
     StatsPublisher sp;
 
@@ -159,29 +153,16 @@ int main(int argc, char** argv)
     RobotStatus AmigoStatus(AmigoConfig.getKinematicChain().getNrOfJoints(), &AmigoConfig);
     initRobotStatus(&AmigoStatus);
 
+    /* initialize interface to robot */
+    RobotInterface AmigoInterface(n, &AmigoConfig, &AmigoStatus);
+
     /* initialize visualization via rviz */
-    visualization_publisher = n.advertise<visualization_msgs::Marker>( "visualization_marker", 100 );
-    VisualizationInterface StemTrackerInRviz(&visualization_publisher, BASE_FRAME);
-
-    /* initialize node communication */
-
-    if (USE_LEFTARM)
-        arm_reference_publisher = n.advertise<sensor_msgs::JointState>("/amigo/left_arm/references", 0);
-    else
-        arm_reference_publisher = n.advertise<sensor_msgs::JointState>("/amigo/right_arm/references", 0);
-
-    torso_measurements_subscriber = n.subscribe("/amigo/torso/measurements", 1000, &RobotStatus::receivedTorsoMsg, &AmigoStatus);
-    torso_references_publisher = n.advertise<sensor_msgs::JointState>("/amigo/torso/references", 0);
-
-    if (USE_LEFTARM)
-        arm_measurements_subscriber = n.subscribe("/amigo/left_arm/measurements", 1000, &RobotStatus::receivedArmMsg, &AmigoStatus);
-    else
-        arm_measurements_subscriber = n.subscribe("/amigo/right_arm/measurements", 1000, &RobotStatus::receivedArmMsg, &AmigoStatus);
+    VisualizationInterface RvizInterface(n, BASE_FRAME);
 
     /* initialize profiling */
     sp.initialize();
 
-    /* update loop */
+    /* main update loop */
     while(ros::ok())
     {
 
@@ -197,7 +178,7 @@ int main(int argc, char** argv)
         if (!config.hasError())
         {
             /* visualize stem */
-            StemTrackerInRviz.showLineStrip(TomatoStem.getNodesX(), TomatoStem.getNodesY(), TomatoStem.getNodesZ(), stem);
+            RvizInterface.showLineStrip(TomatoStem.getNodesX(), TomatoStem.getNodesY(), TomatoStem.getNodesZ(), stem);
 
             /* start sample timing, for profiling */
             sp.startTimer("main");
@@ -205,7 +186,7 @@ int main(int argc, char** argv)
             if(initializing && AmigoStatus.isUpToDate())
             {
                 /* bring arm to initial position */
-                arm_reference_publisher.publish(AmigoConfig.getAmigoInitialPoseMsg());
+                AmigoInterface.publishAmigoArmMessage(AmigoConfig.getAmigoInitialPoseMsg());
                 initializing = false;
                 INFO_STREAM("=============");
                 INFO_STREAM("Initialized");
@@ -216,23 +197,24 @@ int main(int argc, char** argv)
             {
 
                 /* forward kinematics */
-                StemTrackerInRviz.showXYZ(AmigoStatus.getGripperXYZ(), gripper_center);
+                RvizInterface.showXYZ(AmigoStatus.getGripperXYZ(), gripper_center);
 
-                /* nearest coordinate on stem */
-                TomatoStem.getNearestXYZonStem(AmigoStatus.getGripperXYZ());
+                /* find nearest coordinate on stem */
+                TomatoStem.updateNearestXYZ(AmigoStatus.getGripperXYZ());
 
-                /* obtain simulated whisker measurement */
-                TomatoWhiskerGripper.simulateWhiskerGripper(AmigoStatus.getGripperXYZ(), TomatoStem.getNearestXYZonStem(AmigoStatus.getGripperXYZ()) );
-                StemTrackerInRviz.showForce(TomatoWhiskerGripper.getWhiskerNetForce(), AmigoStatus.getGripperXYZ(), whisker_net_force);
+                /* simulate and show whiskers */
+                TomatoWhiskerGripper.simulateWhiskerGripper(AmigoStatus.getGripperXYZ(), TomatoStem.getNearestXYZ() );
+                RvizInterface.showForce(TomatoWhiskerGripper.getWhiskerNetForce(), AmigoStatus.getGripperXYZ(), whisker_net_force);
 
-                /* calculate new cartesian setpoint */
-                StemTrackerInRviz.showXYZ(TomatoStem.getNearestXYZonStem( AmigoStatus.getGripperXYZ() ), nearest_stem_intersection);
+                /* show nearest stem intersection */
+                RvizInterface.showXYZ(TomatoStem.getNearestXYZ(), nearest_stem_intersection);
+
+                //=====================================================================================================
 
                 //                StemTrackController.updateFeedforward();
                 //                StemTrackController.updateSetpoint();
-                //                RobotInterface.publishJointSetpoints();
 
-                //===================================================================================================================================
+                //=====================================================================================================
 
 
                 boost::shared_ptr<KDL::ChainFkSolverPos> fksolver_;
@@ -246,13 +228,11 @@ int main(int argc, char** argv)
                 KDL::JntArray q_out;
 
                 /* check have we reached end of stem */
-                if( (fabs(TomatoStem.getNearestXYZonStem(AmigoStatus.getGripperXYZ()).at(2) - TomatoStem.getNodesZ().back()) < 0.05 && up > 0 ) || \
-                        (fabs(TomatoStem.getNearestXYZonStem(AmigoStatus.getGripperXYZ()).at(2) - TomatoStem.getNodesZ().front() ) < 0.05 && up < 0) )
+                if( (fabs(TomatoStem.getNearestXYZ().at(2) - TomatoStem.getNodesZ().back()) < 0.05 && up > 0 ) || \
+                        (fabs(TomatoStem.getNearestXYZ().at(2) - TomatoStem.getNodesZ().front() ) < 0.05 && up < 0) )
                     up = -up;
 
-                KDL::Vector stem_inters( (double) TomatoStem.getNearestXYZonStem(AmigoStatus.getGripperXYZ()).at(0), \
-                        (double) TomatoStem.getNearestXYZonStem(AmigoStatus.getGripperXYZ()).at(1), \
-                        (double) TomatoStem.getNearestXYZonStem(AmigoStatus.getGripperXYZ()).at(2) + 0.005 * (double) up );
+                KDL::Vector stem_inters( (double) TomatoStem.getNearestXYZ().at(0), (double) TomatoStem.getNearestXYZ().at(1), (double) TomatoStem.getNearestXYZ().at(2) + 0.005 * (double) up );
                 KDL::Frame f_in(AmigoStatus.getGripperKDLframe().M, stem_inters);
 
                 int status = ik_solver_->CartToJnt(AmigoConfig.getJointSeeds(), f_in, q_out);
@@ -260,36 +240,18 @@ int main(int argc, char** argv)
                 if (status != 0 && DEBUG_IK)
                     INFO_STREAM("Inverse kinematics returns " << status );
 
-                std::vector<std::string> joint_names = AmigoConfig.getJointNames();
 
-                sensor_msgs::JointState arm_ref;
-                arm_ref.header.stamp = ros::Time::now();
-                arm_ref.position.clear();
+                //=====================================================================================================
 
-                for(int i = 1; i<8; ++i)
-                {
-                    arm_ref.position.push_back(q_out(i));
-                    arm_ref.name.push_back(joint_names[i]);
-                }
 
-                arm_reference_publisher.publish(arm_ref);
-
-                sensor_msgs::JointState torso_ref;
-                torso_ref.header.stamp = ros::Time::now();
-                torso_ref.position.clear();
-                torso_ref.position.push_back(q_out(0));
-                torso_ref.name.push_back(joint_names[0]);
-
-                torso_references_publisher.publish(torso_ref);
-
-                //=========================================
+                AmigoInterface.publishJointPosRefs(q_out);
 
             }
 
             if(!AmigoStatus.isUpToDate())
                 INFO_STREAM("waiting for up to date robot status information");
 
-            /* stop and publish sample timing, for profiling */
+            /* stop and publish timer */
             sp.stopTimer("main");
             sp.publish();
 
@@ -303,12 +265,6 @@ int main(int argc, char** argv)
         ros::spinOnce();
 
     }
-
-    torso_measurements_subscriber.shutdown();
-    arm_measurements_subscriber.shutdown();
-    arm_reference_publisher.shutdown();
-    visualization_publisher.shutdown();
-    torso_references_publisher.shutdown();
 
     return 0;
 };

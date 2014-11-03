@@ -19,6 +19,7 @@ class StemRepresentation
         std::vector<float> m_x_nodes;
         std::vector<float> m_y_nodes;
         std::vector<float> m_z_nodes;
+        std::vector<float> m_nearestXYZ;
 
     public:
         StemRepresentation(int stem_id);
@@ -28,7 +29,8 @@ class StemRepresentation
         std::vector<float> getNodesZ();
         bool selfCheck();
         bool isXYZonStem(std::vector<float> xyz);
-        std::vector<float> getNearestXYZonStem(std::vector<float> from_xyz);
+        void updateNearestXYZ(std::vector<float> from_xyz);
+        std::vector<float> getNearestXYZ();
         void loadNodesXYZ(std::vector<float> x, std::vector<float> y, std::vector<float> z);
         int getNumberOfNodes();
         void flipNodes();

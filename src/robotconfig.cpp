@@ -172,13 +172,13 @@ sensor_msgs::JointState RobotConfig::getAmigoInitialPoseMsg()
 
     arm_joint_msg.position.clear();
 
-    /* amigo 'give' position */
-    arm_joint_msg.position.push_back(0.0);
-    arm_joint_msg.position.push_back(0.4);
+    /* amigo 'carrying' position */
     arm_joint_msg.position.push_back(-0.1);
+    arm_joint_msg.position.push_back(-0.6);
     arm_joint_msg.position.push_back(0.0);
-    arm_joint_msg.position.push_back(1.2);
-    arm_joint_msg.position.push_back(0.0);
+    arm_joint_msg.position.push_back(1.8);
+    arm_joint_msg.position.push_back(-0.1);
+    arm_joint_msg.position.push_back(0.4);
     arm_joint_msg.position.push_back(0.0);
 
     arm_joint_msg.name.clear();

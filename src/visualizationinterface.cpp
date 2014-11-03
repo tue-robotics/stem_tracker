@@ -1,12 +1,9 @@
-#include <vector>
-#include <ros/ros.h>
-#include <visualization_msgs/Marker.h>
-
 #include "visualizationinterface.h"
 
-VisualizationInterface::VisualizationInterface(ros::Publisher* p_ros_marker_pub, std::string base_frame)
+VisualizationInterface::VisualizationInterface(ros::NodeHandle node, std::string base_frame)
 {
-    m_p_ros_marker_pub = p_ros_marker_pub;
+    m_node = node;
+    m_vis_pub = m_node.advertise<visualization_msgs::Marker>( "stem_track_markers", 100 );
     m_base_frame = base_frame;
 }
 
@@ -105,7 +102,7 @@ void VisualizationInterface::showLineStripInRviz(std::vector<float> x_coordinate
         marker.points.push_back(p);
     }
 
-    m_p_ros_marker_pub->publish( marker );
+    m_vis_pub.publish( marker );
 
 }
 
@@ -161,7 +158,7 @@ void VisualizationInterface::showForceInRviz(std::vector<float> force, std::vect
     marker.points.push_back(p_end);
 
     /* publish marker */
-    m_p_ros_marker_pub->publish( marker );
+    m_vis_pub.publish( marker );
 }
 
 void VisualizationInterface::showXYZ(std::vector<float> xyz, MarkerIDs marker_id)
@@ -206,6 +203,6 @@ void VisualizationInterface::showXYZInRviz(std::vector<float> xyz)
 
     marker.lifetime = ros::Duration();
 
-    m_p_ros_marker_pub->publish( marker );
+    m_vis_pub.publish( marker );
 
 }
