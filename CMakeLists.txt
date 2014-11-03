@@ -66,6 +66,7 @@ add_library(stem_tracker_libs
   src/debugfunctions.cpp
   src/robotinterface.cpp
   src/stemtrackcontroller.cpp
+  src/stemtrackmonitor.cpp
 )
 
 target_link_libraries(stem_tracker_libs

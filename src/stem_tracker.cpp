@@ -1,14 +1,11 @@
 #include "stem_tracker.h"
 
 // TODO:
-//- robot interface object
 //- naar beginpunt als boven of onder stem in z
 //- niet alle config globaal beschikbaar
 //- check maken voor wat er precies veranderd is ipv hele config opnieuw
 //- slimmere pose target, niet door stem heen en met helling meedraaien
 //- reageren op combinatie van whisker forces ipv naar bekende intersection
-//- stem track controller object maken
-//- stem track monitor object maken (approach -> grasp -> track -> identify sidebranch)
 
 
 
@@ -160,6 +157,9 @@ int main(int argc, char** argv)
     /* initialize stem tracking controller object */
     StemTrackController TomatoControl(MAX_Z_DOT, UPDATE_RATE, &AmigoConfig, &AmigoStatus);
 
+    /* initialize state machine and safety monitor */
+    StemTrackMonitor TomatoMonitor(&TomatoStem);
+
     /* initialize visualization object */
     VisualizationInterface RvizInterface(n, BASE_FRAME);
 
@@ -212,8 +212,7 @@ int main(int argc, char** argv)
                 RvizInterface.showForce(TomatoWhiskerGripper.getWhiskerNetForce(), AmigoStatus.getGripperXYZ(), whisker_net_force);
 
                 /* check have we reached end of stem */
-                if( (fabs(TomatoStem.getNearestXYZ().at(2) - TomatoStem.getNodesZ().back()) < 0.05 && up > 0 ) || \
-                        (fabs(TomatoStem.getNearestXYZ().at(2) - TomatoStem.getNodesZ().front() ) < 0.05 && up < 0) )
+                if (TomatoMonitor.reachedEndOfStem(up))
                     up = -up;
 
                 /* update position setpoint in cartesian space */
