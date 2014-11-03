@@ -3,7 +3,6 @@
 update_rate:                    100                             # spin rate of stem_tracking node, in hz                                                n
 debug:                          1                               # if true (1) additional information will be printed, else set to false (0)
 base_frame:                     /amigo/base_link                # frame we use to define stem and to show markers in rviz
-debug_ik:                       0                               # set to true (1) to see more information wrt inverse kinematics solution
 
 #######################
 # ROBOT CONFIG
@@ -34,3 +33,9 @@ stem_nodes:                                                     # stem nodes, de
     - {x: 0.5, y: 0.35, z: 0.9}
     - {x: 0.55, y: 0.4, z: 1.2}
     - {x: 0.5, y: 0.55, z: 1.4}
+
+##########################
+# TRACKING CONTROL CONFIG
+##########################
+
+max_z_dot:                      0.5                             # max gripper velocity in vertical direction during stem tracking (m/s)

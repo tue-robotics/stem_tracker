@@ -28,6 +28,7 @@
 #include "visualizationinterface.h"
 #include "debugfunctions.h"
 #include "robotinterface.h"
+#include "stemtrackcontroller.h"
 
 #define     INFO_STREAM     ROS_INFO_STREAM
 #define     THIS_PACKAGE    "stem_tracker"
@@ -35,7 +36,6 @@
 /* declare configurable parameters */
 
 bool DEBUG;
-bool DEBUG_IK;
 int UPDATE_RATE;
 std::string BASE_FRAME;
 
@@ -57,6 +57,8 @@ std::vector<float> stemNodesX;
 std::vector<float> stemNodesY;
 std::vector<float> stemNodesZ;
 tue::Configuration config;
+
+float MAX_Z_DOT;
 
 
 #endif // STEM_TRACKER_H

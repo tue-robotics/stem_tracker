@@ -7,6 +7,7 @@ WhiskerInterpreter::WhiskerInterpreter(int n_whiskers, int gripper_id, float whi
     m_whisker_length = whisker_length;
     m_gripper_diameter = gripper_diameter;
     m_gripper_radius = gripper_diameter / 2.0f;
+    m_max_whisker_force = 1.0;  // todo, use calibration table instead of random guess
     m_status = 0;
 }
 
@@ -42,9 +43,8 @@ void WhiskerInterpreter::simulateWhiskerGripper(std::vector<float> gripper_cente
              * the stem (both are in the same z-plane).
              * returns a force (xy) with origin at gripper center */
 
-    float max_whisker_force = 1.0;
-
     m_whisker_force.clear();
+    m_estimated_pos_error.clear();
 
     if(gripper_center.size() < 2 )
     {
@@ -61,10 +61,12 @@ void WhiskerInterpreter::simulateWhiskerGripper(std::vector<float> gripper_cente
     }
 
     m_whisker_force.assign(2,0.0);
+    m_estimated_pos_error.assign(2,0.0);
 
-    float x_diff = gripper_center[0] - stem_center[0];
-    float y_diff = gripper_center[1] - stem_center[1];
-    float dist_gripper_to_stem = sqrt( x_diff * x_diff + y_diff * y_diff );
+    m_estimated_pos_error[0] = gripper_center[0] - stem_center[0];
+    m_estimated_pos_error[1] = gripper_center[1] - stem_center[1];
+
+    float dist_gripper_to_stem = sqrt( m_estimated_pos_error[0] * m_estimated_pos_error[0] + m_estimated_pos_error[1] * m_estimated_pos_error[1] );
 
     if( dist_gripper_to_stem > m_gripper_radius )
     {
@@ -77,12 +79,19 @@ void WhiskerInterpreter::simulateWhiskerGripper(std::vector<float> gripper_cente
     else
     {
         m_status = 2;
+
         /* simulated force is inverse of distance to force */
         float whisker_fraction_deformed = ( dist_gripper_to_stem - (m_gripper_radius - m_whisker_length) ) / m_whisker_length;
-        m_whisker_force.at(0) = (x_diff / dist_gripper_to_stem) * max_whisker_force * whisker_fraction_deformed;
-        m_whisker_force.at(1) = (y_diff / dist_gripper_to_stem) * max_whisker_force * whisker_fraction_deformed;
+        m_whisker_force.at(0) = (m_estimated_pos_error[0] / dist_gripper_to_stem) * m_max_whisker_force * whisker_fraction_deformed;
+        m_whisker_force.at(1) = (m_estimated_pos_error[1] / dist_gripper_to_stem) * m_max_whisker_force * whisker_fraction_deformed;
     }
 
+}
+
+std::vector<float> WhiskerInterpreter::getXYerror()
+{
+    // to do: turn measured force/deflection into estimation of position error
+    return m_estimated_pos_error;
 }
 
 std::vector<float> WhiskerInterpreter::getWhiskerNetForce()

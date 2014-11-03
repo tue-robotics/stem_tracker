@@ -18,8 +18,10 @@ class WhiskerInterpreter
         float m_whisker_length;
         float m_gripper_diameter;
         float m_gripper_radius;
+        float m_max_whisker_force;
         int m_status; // 0 - unknown, 1 - gripper not around stem, 2 - gripper around stem but touching whiskers, 3 - gripper around stem and not touching whiskers
         std::vector<float> m_whisker_force;
+        std::vector<float> m_estimated_pos_error;
 
     public:
         WhiskerInterpreter(int n_whiskers, int gripper_id, float whisker_length, float gripper_diameter);
@@ -28,6 +30,7 @@ class WhiskerInterpreter
         void simulateWhiskerGripper(std::vector<float> gripper_center, std::vector<float> stem_center);
         std::vector<float> getWhiskerNetForce();
         void showForceInRviz(ros::Publisher* p_vis_pub, std::vector<float> gripper_xyz);
+        std::vector<float> getXYerror();
 
         ~WhiskerInterpreter();
 };

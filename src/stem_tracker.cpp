@@ -23,8 +23,6 @@ void loadConfiguration(tue::Configuration config)
     INFO_STREAM("base_frame = " << BASE_FRAME);
     config.value("debug", DEBUG);
     INFO_STREAM("debug = " << DEBUG);
-    config.value("debug_ik", DEBUG_IK);
-    INFO_STREAM("debug_ik = " << DEBUG_IK);
     config.value("update_rate", UPDATE_RATE);
     INFO_STREAM("update_rate = " << UPDATE_RATE);
 
@@ -58,6 +56,9 @@ void loadConfiguration(tue::Configuration config)
 
         config.endArray();
     }
+
+    /* stem tracking control configuration */
+    config.value("max_z_dot", MAX_Z_DOT);
 }
 
 void initStem(StemRepresentation* stem)
@@ -153,10 +154,13 @@ int main(int argc, char** argv)
     RobotStatus AmigoStatus(AmigoConfig.getKinematicChain().getNrOfJoints(), &AmigoConfig);
     initRobotStatus(&AmigoStatus);
 
-    /* initialize interface to robot */
+    /* initialize interface to robot object */
     RobotInterface AmigoInterface(n, &AmigoConfig, &AmigoStatus);
 
-    /* initialize visualization via rviz */
+    /* initialize stem tracking controller object */
+    StemTrackController TomatoControl(MAX_Z_DOT, UPDATE_RATE, &AmigoConfig, &AmigoStatus);
+
+    /* initialize visualization object */
     VisualizationInterface RvizInterface(n, BASE_FRAME);
 
     /* initialize profiling */
@@ -199,52 +203,27 @@ int main(int argc, char** argv)
                 /* forward kinematics */
                 RvizInterface.showXYZ(AmigoStatus.getGripperXYZ(), gripper_center);
 
-                /* find nearest coordinate on stem */
+                /* find and show nearest coordinate on stem */
                 TomatoStem.updateNearestXYZ(AmigoStatus.getGripperXYZ());
+                RvizInterface.showXYZ(TomatoStem.getNearestXYZ(), nearest_stem_intersection);
 
                 /* simulate and show whiskers */
                 TomatoWhiskerGripper.simulateWhiskerGripper(AmigoStatus.getGripperXYZ(), TomatoStem.getNearestXYZ() );
                 RvizInterface.showForce(TomatoWhiskerGripper.getWhiskerNetForce(), AmigoStatus.getGripperXYZ(), whisker_net_force);
-
-                /* show nearest stem intersection */
-                RvizInterface.showXYZ(TomatoStem.getNearestXYZ(), nearest_stem_intersection);
-
-                //=====================================================================================================
-
-                //                StemTrackController.updateFeedforward();
-                //                StemTrackController.updateSetpoint();
-
-                //=====================================================================================================
-
-
-                boost::shared_ptr<KDL::ChainFkSolverPos> fksolver_;
-                boost::shared_ptr<KDL::ChainIkSolverVel> ik_vel_solver_;
-                boost::shared_ptr<KDL::ChainIkSolverPos> ik_solver_;
-
-                fksolver_.reset(new KDL::ChainFkSolverPos_recursive(AmigoConfig.getKinematicChain()));
-                ik_vel_solver_.reset(new KDL::ChainIkSolverVel_pinv(AmigoConfig.getKinematicChain()));
-                ik_solver_.reset(new KDL::ChainIkSolverPos_NR_JL(AmigoConfig.getKinematicChain(), AmigoConfig.getJointMinima(), AmigoConfig.getJointMaxima(), *fksolver_, *ik_vel_solver_, 100) );
-
-                KDL::JntArray q_out;
 
                 /* check have we reached end of stem */
                 if( (fabs(TomatoStem.getNearestXYZ().at(2) - TomatoStem.getNodesZ().back()) < 0.05 && up > 0 ) || \
                         (fabs(TomatoStem.getNearestXYZ().at(2) - TomatoStem.getNodesZ().front() ) < 0.05 && up < 0) )
                     up = -up;
 
-                KDL::Vector stem_inters( (double) TomatoStem.getNearestXYZ().at(0), (double) TomatoStem.getNearestXYZ().at(1), (double) TomatoStem.getNearestXYZ().at(2) + 0.005 * (double) up );
-                KDL::Frame f_in(AmigoStatus.getGripperKDLframe().M, stem_inters);
+                /* update position setpoint in cartesian space */
+                TomatoControl.updateCartSetpoint(AmigoStatus.getGripperXYZ(), TomatoWhiskerGripper.getXYerror(), up);
 
-                int status = ik_solver_->CartToJnt(AmigoConfig.getJointSeeds(), f_in, q_out);
+                /* translate cartesian setpoint to joint coordinates */
+                TomatoControl.updateJointReferences();
 
-                if (status != 0 && DEBUG_IK)
-                    INFO_STREAM("Inverse kinematics returns " << status );
-
-
-                //=====================================================================================================
-
-
-                AmigoInterface.publishJointPosRefs(q_out);
+                /* send references to joint controllers */
+                AmigoInterface.publishJointPosRefs( TomatoControl.getJointRefs());
 
             }
 
