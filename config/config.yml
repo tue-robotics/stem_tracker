@@ -8,7 +8,7 @@ base_frame:                     /amigo/base_link                # frame we use t
 # ROBOT CONFIG
 #######################
 
-use_leftarm:                    0                               # use left arm if true (1), else use right arm                                          n
+use_leftarm:                    1                               # use left arm if true (1), else use right arm                                          n
 robot_description_rosparam:     /amigo/robot_description        # amigo urdf model gets loaded from this rosparam
 root_link:                      base_link                       # start of kinematic chain we are controlling
 left_end_link:                  grippoint_left                  # end of kinematic chain we are controlling, if use_leftarm

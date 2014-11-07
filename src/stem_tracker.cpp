@@ -74,6 +74,7 @@ int main(int argc, char** argv)
 
     /* initialize interface to robot object */
     RobotInterface AmigoInterface(n, &AmigoRepresentation, &AmigoStatus);
+    StemTrackConfigurer.configureRobotInterface(config, &AmigoInterface);
 
     /* initialize profiling */
     sp.initialize();
@@ -90,6 +91,8 @@ int main(int argc, char** argv)
             StemTrackConfigurer.configureRobotRepresentation(config, &AmigoRepresentation, n);
             StemTrackConfigurer.configureRobotStatus(config, &AmigoStatus);
             StemTrackConfigurer.configureWhiskerInterpreter(config, &TomatoWhiskerGripper);
+            StemTrackConfigurer.configureStemTrackController(config, &TomatoControl);
+            StemTrackConfigurer.configureRobotInterface(config, &AmigoInterface);
         }
 
         if (!config.hasError())

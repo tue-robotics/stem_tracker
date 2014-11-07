@@ -11,6 +11,7 @@
 #include "stemrepresentation.h"
 #include "robotrepresentation.h"
 #include "robotstatus.h"
+#include "robotinterface.h"
 #include "whiskerinterpreter.h"
 #include "stemtrackcontroller.h"
 
@@ -57,6 +58,7 @@ public:
     void configureRobotRepresentation(tue::Configuration config, RobotRepresentation* p_robot_representation, ros::NodeHandle n);
     void configureRobotStatus(tue::Configuration config, RobotStatus* p_robot_status);
     void configureWhiskerInterpreter(tue::Configuration config, WhiskerInterpreter* p_whisker_interpreter);
+    void configureRobotInterface(tue::Configuration config, RobotInterface* p_robot_interface);
     int getUpdateRate(tue::Configuration config);
     std::string getBaseFrame(tue::Configuration config);
 

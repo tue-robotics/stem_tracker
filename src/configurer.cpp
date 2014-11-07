@@ -136,6 +136,17 @@ void Configurer::configureStemTrackController(tue::Configuration config, StemTra
     config.value("update_rate", g_UPDATE_RATE);
 
     p_stem_track_controller->setUpdateRate(g_UPDATE_RATE);
+}
+
+void Configurer::configureRobotInterface(tue::Configuration config, RobotInterface* p_robot_interface)
+{
+    INFO_STREAM("=============================================");
+    INFO_STREAM("Configuring robot interface object");
+
+    config.value("use_leftarm", rr_USE_LEFTARM);
+
+    p_robot_interface->connectToAmigoArm(rr_USE_LEFTARM);
+    p_robot_interface->connectToAmigoTorso();
 
     INFO_STREAM("=============================================");
 }

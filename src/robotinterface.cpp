@@ -5,26 +5,28 @@ RobotInterface::RobotInterface(ros::NodeHandle node, RobotRepresentation* p_robo
     m_node = node;
     m_p_robot_representation = p_robot_representation;
     m_p_robot_status = p_robot_status;
+}
 
-    if (p_robot_representation->isLeftArmPreferred())
+void RobotInterface::connectToAmigoArm(bool leftArmIsPreferred)
+{
+    if (leftArmIsPreferred)
         m_arm_ref_pub = m_node.advertise<sensor_msgs::JointState>("/amigo/left_arm/references", 0);
-    else if (p_robot_representation->isRightArmPreferred())
-        m_arm_ref_pub = m_node.advertise<sensor_msgs::JointState>("/amigo/right_arm/references", 0);
     else
-        INFO_STREAM("trying to initialize robot interface without robot config properly configured");
+        m_arm_ref_pub = m_node.advertise<sensor_msgs::JointState>("/amigo/right_arm/references", 0);
 
+    if (leftArmIsPreferred)
+        m_arm_meas_sub = m_node.subscribe("/amigo/left_arm/measurements", 1000, &RobotInterface::receivedAmigoArmMsg, this);
+    else
+        m_arm_meas_sub = m_node.subscribe("/amigo/right_arm/measurements", 1000, &RobotInterface::receivedAmigoArmMsg, this);
+}
+
+
+void RobotInterface::connectToAmigoTorso()
+{
     m_torso_meas_sub = m_node.subscribe("/amigo/torso/measurements", 1000, &RobotInterface::receivedAmigoTorsoMsg, this);
 
     m_torso_ref_pub = m_node.advertise<sensor_msgs::JointState>("/amigo/torso/references", 0);
-
-    if (p_robot_representation->isLeftArmPreferred())
-        m_arm_meas_sub = m_node.subscribe("/amigo/left_arm/measurements", 1000, &RobotInterface::receivedAmigoArmMsg, this);
-    else if (p_robot_representation->isRightArmPreferred())
-        m_arm_meas_sub = m_node.subscribe("/amigo/right_arm/measurements", 1000, &RobotInterface::receivedAmigoArmMsg, this);
-    else
-        INFO_STREAM("trying to initialize robot interface without robot config properly configured");
 }
-
 
 void RobotInterface::receivedAmigoTorsoMsg(const sensor_msgs::JointState & msg)
 {
