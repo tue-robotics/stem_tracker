@@ -7,7 +7,13 @@
 #include <ros/ros.h>
 #include <visualization_msgs/Marker.h>
 
-#include "markerids.h"
+enum MarkerIDs
+{
+    stem,
+    nearest_stem_intersection,
+    gripper_center,
+    whisker_net_force,
+};
 
 class VisualizationInterface
 {
