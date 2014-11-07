@@ -23,6 +23,7 @@ class StemRepresentation
 
     public:
         StemRepresentation(int stem_id);
+        int getStemID();
         std::vector<float> getStemXYZatZ(float z);
         std::vector<float> getNodesX();
         std::vector<float> getNodesY();

@@ -1,5 +1,5 @@
-#ifndef ROBOTCONFIG_H
-#define ROBOTCONFIG_H
+#ifndef ROBOTREPRESENTATION_H
+#define ROBOTREPRESENTATION_H
 
 #define INFO_STREAM     ROS_INFO_STREAM
 
@@ -14,7 +14,7 @@
 #include <urdf/model.h>
 
 
-class RobotConfig
+class RobotRepresentation
 {
 private:
     std::string m_name;             // name of robot instance
@@ -30,7 +30,7 @@ private:
     std::string m_tip_link_name;
 
 public:
-    RobotConfig(const std::string name);
+    RobotRepresentation(const std::string name);
     bool selfCheck();
     KDL::JntArray getJointMinima();
     KDL::JntArray getJointMaxima();
@@ -51,7 +51,7 @@ public:
     sensor_msgs::JointState getAmigoInitialPoseMsg();
     void printAll();
 
-    ~RobotConfig();
+    ~RobotRepresentation();
 };
 
-#endif // ROBOTCONFIG_H
+#endif // ROBOTREPRESENTATION_H

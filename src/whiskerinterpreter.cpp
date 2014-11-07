@@ -1,14 +1,35 @@
 #include "whiskerinterpreter.h"
 
-WhiskerInterpreter::WhiskerInterpreter(int n_whiskers, int gripper_id, float whisker_length, float gripper_diameter)
+WhiskerInterpreter::WhiskerInterpreter(int gripper_id)
+{
+    m_gripper_id = gripper_id;
+    m_status = 0;
+}
+
+int WhiskerInterpreter::getGripperID()
+{
+    return m_gripper_id;
+}
+
+void WhiskerInterpreter::setNumberOfWhiskers(int n_whiskers)
 {
     m_n_whiskers = n_whiskers;
-    m_gripper_id = gripper_id;
-    m_whisker_length = whisker_length;
+}
+
+void WhiskerInterpreter::setGripperDiameter(float gripper_diameter)
+{
     m_gripper_diameter = gripper_diameter;
     m_gripper_radius = gripper_diameter / 2.0f;
-    m_max_whisker_force = 1.0;  // todo, use calibration table instead of random guess
-    m_status = 0;
+}
+
+void WhiskerInterpreter::setWhiskerLength(float whisker_length)
+{
+    m_whisker_length = whisker_length;
+}
+
+void WhiskerInterpreter::setMaxWhiskerForce(float max_whisker_force)
+{
+    m_max_whisker_force = max_whisker_force;
 }
 
 int WhiskerInterpreter::getStatus()

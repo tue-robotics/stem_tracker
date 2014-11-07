@@ -11,7 +11,7 @@
 #include <kdl/frames.hpp>
 #include <sensor_msgs/JointState.h>
 
-#include "robotconfig.h"
+#include "robotrepresentation.h"
 
 
 class RobotStatus
@@ -23,10 +23,10 @@ class RobotStatus
         std::vector<float> m_gripper_xyz;
         double m_up_to_date_threshold;
         KDL::Frame m_gripper_kdlframe;
-        RobotConfig* m_p_robot_config;
+        RobotRepresentation* m_p_robot_representation;
 
     public:
-        RobotStatus(int n_joints_to_monitor, RobotConfig* robot_config);
+        RobotStatus(RobotRepresentation* p_robot_representation);
         bool selfCheck();
         void setUpToDateThreshold(double threshold);
         void updateJointStatus(KDL::JntArray updated_joint_status);

@@ -6,6 +6,11 @@ StemRepresentation::StemRepresentation(int stem_id=-1)
     m_n_nodes = 0;
 }
 
+int StemRepresentation::getStemID()
+{
+    return m_stem_id;
+}
+
 std::vector<float> StemRepresentation::getStemXYZatZ(float z)
 {
 
@@ -164,8 +169,6 @@ std::vector<float> StemRepresentation::getNodesZ()
 void StemRepresentation::printAll()
 {
 
-    INFO_STREAM("===============");
-
     INFO_STREAM("Stem id: " << m_stem_id);
 
     INFO_STREAM("Number of nodes: " << m_n_nodes);
@@ -177,8 +180,6 @@ void StemRepresentation::printAll()
         nodes_stream << "\t\t\t\t\t" << m_x_nodes.at(i) << "\t" << m_y_nodes.at(i) << "\t" << m_z_nodes.at(i) << std::endl;
 
     INFO_STREAM(nodes_stream.str());
-
-    INFO_STREAM("===============");
 
 }
 

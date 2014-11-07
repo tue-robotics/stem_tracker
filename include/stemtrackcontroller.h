@@ -10,7 +10,7 @@
 #include <kdl/chainfksolverpos_recursive.hpp>
 #include <kdl/chainiksolvervel_pinv.hpp>
 
-#include "robotconfig.h"
+#include "robotrepresentation.h"
 #include "robotstatus.h"
 
 class StemTrackController
@@ -19,11 +19,13 @@ private:
     float m_max_z_dot;
     int m_update_rate;
     KDL::Vector m_setpoint;
-    RobotConfig* m_p_robot_config;
+    RobotRepresentation* m_p_robot_representation;
     RobotStatus* m_p_robot_status;
     KDL::JntArray m_joint_refs;
 public:
-    StemTrackController(float max_z_dot, int update_rate, RobotConfig* p_robot_config, RobotStatus* p_robot_status);
+    StemTrackController(RobotRepresentation* p_robot_representation, RobotStatus* p_robot_status);
+    void setMaxZvelocity(float max_z_dot);
+    void setUpdateRate(int update_rate);
     void updateCartSetpoint(std::vector<float> gripper_xyz, std::vector<float> xy_err,  int up);
     void updateJointReferences();
     KDL::Vector getCartSetpointKDLVect();

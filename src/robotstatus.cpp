@@ -1,13 +1,14 @@
 #include "robotstatus.h"
 
-RobotStatus::RobotStatus(int n_joints_to_monitor, RobotConfig* robot_config)
+RobotStatus::RobotStatus(RobotRepresentation* p_robot_representation)
 {
-    if(n_joints_to_monitor <= 0)
+    m_n_joints_monitoring = p_robot_representation->getKinematicChain().getNrOfJoints();
+
+    if(m_n_joints_monitoring <= 0)
         INFO_STREAM("trying to initialize robot status object with zero or negative number of joints to monitor!");
 
-    m_joints_to_monitor = KDL::JntArray(n_joints_to_monitor);
-    m_n_joints_monitoring = n_joints_to_monitor;
-    m_p_robot_config = robot_config;
+    m_joints_to_monitor = KDL::JntArray(m_n_joints_monitoring);
+    m_p_robot_representation = p_robot_representation;
 }
 
 bool RobotStatus::selfCheck()
@@ -86,7 +87,7 @@ void RobotStatus::updateGripperXYZ()
 
 KDL::Frame RobotStatus::getGripperKDLframe()
 {
-    KDL::ChainFkSolverPos_recursive forward_kinematics_solver = KDL::ChainFkSolverPos_recursive(m_p_robot_config->getKinematicChain());
+    KDL::ChainFkSolverPos_recursive forward_kinematics_solver = KDL::ChainFkSolverPos_recursive(m_p_robot_representation->getKinematicChain());
 
     int fk_ret = forward_kinematics_solver.JntToCart(getJointStatus(),m_gripper_kdlframe);
 

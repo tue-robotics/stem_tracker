@@ -1,11 +1,19 @@
 #include "stemtrackcontroller.h"
 
-StemTrackController::StemTrackController(float max_z_dot, int update_rate, RobotConfig* p_robot_config, RobotStatus* p_robot_status)
+StemTrackController::StemTrackController(RobotRepresentation* p_robot_representation, RobotStatus* p_robot_status)
+{
+    m_p_robot_representation = p_robot_representation;
+    m_p_robot_status = p_robot_status;
+}
+
+void StemTrackController::setMaxZvelocity(float max_z_dot)
 {
     m_max_z_dot = max_z_dot;
+}
+
+void StemTrackController::setUpdateRate(int update_rate)
+{
     m_update_rate = update_rate;
-    m_p_robot_config = p_robot_config;
-    m_p_robot_status = p_robot_status;
 }
 
 void StemTrackController::updateCartSetpoint(std::vector<float> gripper_xyz, std::vector<float> xy_err,  int up)
@@ -29,14 +37,14 @@ void StemTrackController::updateJointReferences()
     boost::shared_ptr<KDL::ChainIkSolverVel> ik_vel_solver_;
     boost::shared_ptr<KDL::ChainIkSolverPos> ik_solver_;
 
-    fksolver_.reset(new KDL::ChainFkSolverPos_recursive(m_p_robot_config->getKinematicChain()));
-    ik_vel_solver_.reset(new KDL::ChainIkSolverVel_pinv(m_p_robot_config->getKinematicChain()));
-    ik_solver_.reset(new KDL::ChainIkSolverPos_NR_JL(m_p_robot_config->getKinematicChain(), m_p_robot_config->getJointMinima(), m_p_robot_config->getJointMaxima(), *fksolver_, *ik_vel_solver_, 100) );
+    fksolver_.reset(new KDL::ChainFkSolverPos_recursive(m_p_robot_representation->getKinematicChain()));
+    ik_vel_solver_.reset(new KDL::ChainIkSolverVel_pinv(m_p_robot_representation->getKinematicChain()));
+    ik_solver_.reset(new KDL::ChainIkSolverPos_NR_JL(m_p_robot_representation->getKinematicChain(), m_p_robot_representation->getJointMinima(), m_p_robot_representation->getJointMaxima(), *fksolver_, *ik_vel_solver_, 100) );
 
 
     KDL::Frame f_in(m_p_robot_status->getGripperKDLframe().M, m_setpoint );
 
-    int status = ik_solver_->CartToJnt(m_p_robot_config->getJointSeeds(), f_in, m_joint_refs);
+    int status = ik_solver_->CartToJnt(m_p_robot_representation->getJointSeeds(), f_in, m_joint_refs);
 
     return;
 }

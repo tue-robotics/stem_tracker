@@ -23,43 +23,17 @@
 /* stem tracking includes */
 #include "whiskerinterpreter.h"
 #include "stemrepresentation.h"
-#include "robotconfig.h"
+#include "robotrepresentation.h"
 #include "robotstatus.h"
 #include "visualizationinterface.h"
-#include "debugfunctions.h"
 #include "robotinterface.h"
 #include "stemtrackcontroller.h"
 #include "stemtrackmonitor.h"
+#include "configurer.h"
+#include "debugfunctions.h"
 
 #define     INFO_STREAM     ROS_INFO_STREAM
 #define     THIS_PACKAGE    "stem_tracker"
-
-/* declare configurable parameters */
-
-bool DEBUG;
-int UPDATE_RATE;
-std::string BASE_FRAME;
-
-std::string ROBOT_NAME;
-std::string ROOT_LINK;
-bool USE_LEFTARM;
-std::string ROBOT_DESCRIPTION_ROSPARAM;
-std::string LEFT_END_LINK;
-std::string RIGHT_END_LINK;
-double UP_TO_DATE_THRESHOLD;
-
-int N_WHISKERS;
-float GRIPPER_DIAMETER;
-float WHISKER_LENGTH;
-
-float STEM_THICKNESS;
-float STEM_RGB[3];
-std::vector<float> stemNodesX;
-std::vector<float> stemNodesY;
-std::vector<float> stemNodesZ;
-tue::Configuration config;
-
-float MAX_Z_DOT;
 
 
 #endif // STEM_TRACKER_H

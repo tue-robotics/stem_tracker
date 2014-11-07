@@ -1,6 +1,6 @@
-#include "robotconfig.h"
+#include "robotrepresentation.h"
 
-RobotConfig::RobotConfig(const std::string name = "defaultRobot")
+RobotRepresentation::RobotRepresentation(const std::string name = "defaultRobot")
 {
     m_preferred_arm_set = false;
     m_n_joints_in_chain = -1;
@@ -8,7 +8,7 @@ RobotConfig::RobotConfig(const std::string name = "defaultRobot")
 }
 
 
-bool RobotConfig::selfCheck()
+bool RobotRepresentation::selfCheck()
 {
 
     if(!m_preferred_arm_set)
@@ -24,7 +24,7 @@ bool RobotConfig::selfCheck()
 }
 
 
-void RobotConfig::loadUrdfFromRosparam(ros::NodeHandle n, const std::string urdf_rosparam)
+void RobotRepresentation::loadUrdfFromRosparam(ros::NodeHandle n, const std::string urdf_rosparam)
 {
     /* get robot description from ros parameter server */
     std::string urdf;
@@ -40,12 +40,12 @@ void RobotConfig::loadUrdfFromRosparam(ros::NodeHandle n, const std::string urdf
         INFO_STREAM("Could not initialize urdf model from xml");
 }
 
-urdf::Model RobotConfig::getUrdfModel()
+urdf::Model RobotRepresentation::getUrdfModel()
 {
     return m_urdf_model;
 }
 
-void RobotConfig::loadKinematicTreeFromUrdf()
+void RobotRepresentation::loadKinematicTreeFromUrdf()
 {
     if (!kdl_parser::treeFromUrdfModel(m_urdf_model, m_kinematic_tree))
         INFO_STREAM("Turning urdf model into kdl tree failed!");
@@ -53,7 +53,7 @@ void RobotConfig::loadKinematicTreeFromUrdf()
         INFO_STREAM("Urdf model has been turned in kdl tree.");
 }
 
-void RobotConfig::loadKinematicChainFromTree(const std::string root_link_name, const std::string tip_link_name)
+void RobotRepresentation::loadKinematicChainFromTree(const std::string root_link_name, const std::string tip_link_name)
 {
     m_root_link_name = root_link_name;
     m_tip_link_name = tip_link_name;
@@ -70,7 +70,7 @@ void RobotConfig::loadKinematicChainFromTree(const std::string root_link_name, c
 
 }
 
-void RobotConfig::loadJointLimits()
+void RobotRepresentation::loadJointLimits()
 {
     m_q_min.resize(m_n_joints_in_chain);
     m_q_max.resize(m_n_joints_in_chain);
@@ -108,64 +108,64 @@ void RobotConfig::loadJointLimits()
     }
 }
 
-KDL::JntArray RobotConfig::getJointMinima()
+KDL::JntArray RobotRepresentation::getJointMinima()
 {
     return m_q_min;
 }
 
-std::vector<std::string> RobotConfig::getJointNames()
+std::vector<std::string> RobotRepresentation::getJointNames()
 {
     return m_q_joint_names;
 }
 
-KDL::JntArray RobotConfig::getJointMaxima()
+KDL::JntArray RobotRepresentation::getJointMaxima()
 {
     return m_q_max;
 }
 
-KDL::JntArray RobotConfig::getJointSeeds()
+KDL::JntArray RobotRepresentation::getJointSeeds()
 {
     return m_q_seed;
 }
 
-KDL::Tree RobotConfig::getKinematicTree()
+KDL::Tree RobotRepresentation::getKinematicTree()
 {
     return m_kinematic_tree;
 }
 
-KDL::Chain RobotConfig::getKinematicChain()
+KDL::Chain RobotRepresentation::getKinematicChain()
 {
     return m_kinematic_chain;
 }
 
-void RobotConfig::setLeftArmIsPreferred()
+void RobotRepresentation::setLeftArmIsPreferred()
 {
     m_prefer_left_arm = true;
     m_preferred_arm_set = true;
 }
 
-void RobotConfig::setRightArmIsPreferred()
+void RobotRepresentation::setRightArmIsPreferred()
 {
     m_prefer_left_arm = false;
     m_preferred_arm_set = true;
 }
 
-bool RobotConfig::isLeftArmPreferred()
+bool RobotRepresentation::isLeftArmPreferred()
 {
     return m_prefer_left_arm;
 }
 
-bool RobotConfig::isRightArmPreferred()
+bool RobotRepresentation::isRightArmPreferred()
 {
     return !m_prefer_left_arm;
 }
 
-const std::string RobotConfig::getName()
+const std::string RobotRepresentation::getName()
 {
     return m_name;
 }
 
-sensor_msgs::JointState RobotConfig::getAmigoInitialPoseMsg()
+sensor_msgs::JointState RobotRepresentation::getAmigoInitialPoseMsg()
 {
     sensor_msgs::JointState arm_joint_msg;
     arm_joint_msg.header.stamp = ros::Time::now();
@@ -193,11 +193,9 @@ sensor_msgs::JointState RobotConfig::getAmigoInitialPoseMsg()
 
 }
 
-void RobotConfig::printAll()
+void RobotRepresentation::printAll()
 {
     std::stringstream tmp_stream;
-
-    INFO_STREAM("===============");
 
     INFO_STREAM("Robot name: " << m_name);
 
@@ -244,10 +242,9 @@ void RobotConfig::printAll()
 
     INFO_STREAM(tmp_stream.str());
 
-    INFO_STREAM("===============");
 }
 
-RobotConfig::~RobotConfig()
+RobotRepresentation::~RobotRepresentation()
 {
     // destructor
 }

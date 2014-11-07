@@ -1,14 +1,14 @@
 #include "robotinterface.h"
 
-RobotInterface::RobotInterface(ros::NodeHandle node, RobotConfig* p_robot_config, RobotStatus* p_robot_status)
+RobotInterface::RobotInterface(ros::NodeHandle node, RobotRepresentation* p_robot_representation, RobotStatus* p_robot_status)
 {
     m_node = node;
-    m_p_robot_config = p_robot_config;
+    m_p_robot_representation = p_robot_representation;
     m_p_robot_status = p_robot_status;
 
-    if (p_robot_config->isLeftArmPreferred())
+    if (p_robot_representation->isLeftArmPreferred())
         m_arm_ref_pub = m_node.advertise<sensor_msgs::JointState>("/amigo/left_arm/references", 0);
-    else if (p_robot_config->isRightArmPreferred())
+    else if (p_robot_representation->isRightArmPreferred())
         m_arm_ref_pub = m_node.advertise<sensor_msgs::JointState>("/amigo/right_arm/references", 0);
     else
         INFO_STREAM("trying to initialize robot interface without robot config properly configured");
@@ -17,9 +17,9 @@ RobotInterface::RobotInterface(ros::NodeHandle node, RobotConfig* p_robot_config
 
     m_torso_ref_pub = m_node.advertise<sensor_msgs::JointState>("/amigo/torso/references", 0);
 
-    if (p_robot_config->isLeftArmPreferred())
+    if (p_robot_representation->isLeftArmPreferred())
         m_arm_meas_sub = m_node.subscribe("/amigo/left_arm/measurements", 1000, &RobotInterface::receivedAmigoArmMsg, this);
-    else if (p_robot_config->isRightArmPreferred())
+    else if (p_robot_representation->isRightArmPreferred())
         m_arm_meas_sub = m_node.subscribe("/amigo/right_arm/measurements", 1000, &RobotInterface::receivedAmigoArmMsg, this);
     else
         INFO_STREAM("trying to initialize robot interface without robot config properly configured");
@@ -53,7 +53,7 @@ void RobotInterface::publishJointPosRefs(KDL::JntArray q_out)
 {
     if( q_out.rows() == m_p_robot_status->getJointStatus().rows())
     {
-        std::vector<std::string> joint_names = m_p_robot_config->getJointNames();
+        std::vector<std::string> joint_names = m_p_robot_representation->getJointNames();
 
         sensor_msgs::JointState arm_ref;
 

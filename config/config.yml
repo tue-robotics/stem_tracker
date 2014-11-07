@@ -8,7 +8,6 @@ base_frame:                     /amigo/base_link                # frame we use t
 # ROBOT CONFIG
 #######################
 
-robot_name:                     amigo                           # name of robot we are using
 use_leftarm:                    0                               # use left arm if true (1), else use right arm                                          n
 robot_description_rosparam:     /amigo/robot_description        # amigo urdf model gets loaded from this rosparam
 root_link:                      base_link                       # start of kinematic chain we are controlling
@@ -23,6 +22,7 @@ up_to_date_threshold:           0.5                             # consider robot
 n_whiskers:                     10                              # total numbers of whiskers in gripper
 whisker_length:                 0.05                            # length of a single whisker, in meters
 gripper_diameter:               0.1                             # diameter of gripper at whisker-root, in meters
+max_whisker_force:              1.0                             # force applied to the stem by a fully bended (90 degrees) whisker
 
 #######################
 # TOMATO STEM CONFIG

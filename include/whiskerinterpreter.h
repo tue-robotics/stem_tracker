@@ -24,8 +24,13 @@ class WhiskerInterpreter
         std::vector<float> m_estimated_pos_error;
 
     public:
-        WhiskerInterpreter(int n_whiskers, int gripper_id, float whisker_length, float gripper_diameter);
+        WhiskerInterpreter(int gripper_id);
         bool selfCheck();
+        int getGripperID();
+        void setGripperDiameter(float gripper_diameter);
+        void setWhiskerLength(float whisker_length);
+        void setMaxWhiskerForce(float max_whisker_force);
+        void setNumberOfWhiskers(int n_whiskers);
         int getStatus();
         void simulateWhiskerGripper(std::vector<float> gripper_center, std::vector<float> stem_center);
         std::vector<float> getWhiskerNetForce();
