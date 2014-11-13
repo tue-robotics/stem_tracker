@@ -1,6 +1,5 @@
-                                                                                                                                                        # on-line tunable y/n
 
-update_rate:                    100                             # spin rate of stem_tracking node, in hz                                                n
+update_rate:                    100                             # spin rate of stem_tracking node, in hz
 debug:                          1                               # if true (1) additional information will be printed, else set to false (0)
 base_frame:                     /amigo/base_link                # frame we use to define stem and to show markers in rviz
 
@@ -8,12 +7,21 @@ base_frame:                     /amigo/base_link                # frame we use t
 # ROBOT CONFIG
 #######################
 
-use_leftarm:                    1                               # use left arm if true (1), else use right arm                                          n
+use_leftarm:                    1                               # use left arm if true (1), else use right arm
 robot_description_rosparam:     /amigo/robot_description        # amigo urdf model gets loaded from this rosparam
 root_link:                      base_link                       # start of kinematic chain we are controlling
 left_end_link:                  grippoint_left                  # end of kinematic chain we are controlling, if use_leftarm
 right_end_link:                 grippoint_right                 # end of kinematic chain we are controlling, if not use_leftarm
 up_to_date_threshold:           0.5                             # consider robot status up to date if measurement received within passed x sec
+initial_pose:                                                   # pose used as preposition, length should be equal to the number of joints in kinematic chain
+    - {q: 0.1}
+    - {q: -0.1}
+    - {q: -0.6}
+    - {q: 0.0}
+    - {q: 1.8}
+    - {q: -0.1}
+    - {q: 0.4}
+    - {q: 0.0}
 
 #######################
 # WHISKER CONFIG
@@ -39,3 +47,4 @@ stem_nodes:                                                     # stem nodes, de
 ##########################
 
 max_z_dot:                      0.5                             # max gripper velocity in vertical direction during stem tracking (m/s)
+tilt_with_stem:                 1                               # if true (1) tilt gripper based on local derivative of stem

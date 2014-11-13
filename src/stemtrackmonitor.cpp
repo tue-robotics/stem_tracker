@@ -3,6 +3,7 @@
 StemTrackMonitor::StemTrackMonitor(StemRepresentation* p_stem_representation)
 {
     m_p_stem_representation = p_stem_representation;
+    m_state = STEMTRACK_PREPOS;
 }
 
 bool StemTrackMonitor::reachedEndOfStem(int up)
@@ -18,6 +19,22 @@ bool StemTrackMonitor::reachedEndOfStem(int up)
         return true;
     else
         return false;
+}
+
+void StemTrackMonitor::updateState()
+{
+    if(m_state == STEMTRACK_PREPOS)
+    {
+        INFO_STREAM("===========================");
+        INFO_STREAM("Ready for stem tracking");
+        INFO_STREAM("===========================");
+    }
+
+}
+
+int StemTrackMonitor::getState()
+{
+    return m_state;
 }
 
 StemTrackMonitor::~StemTrackMonitor()

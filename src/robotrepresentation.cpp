@@ -4,6 +4,7 @@ RobotRepresentation::RobotRepresentation(const std::string name = "defaultRobot"
 {
     m_preferred_arm_set = false;
     m_n_joints_in_chain = -1;
+    m_initial_pose_set = false;
     m_name = name;
 }
 
@@ -165,32 +166,28 @@ const std::string RobotRepresentation::getName()
     return m_name;
 }
 
-sensor_msgs::JointState RobotRepresentation::getAmigoInitialPoseMsg()
+void RobotRepresentation::setInitialPoseJointRefs(std::vector<float> joint_refs)
 {
-    sensor_msgs::JointState arm_joint_msg;
-    arm_joint_msg.header.stamp = ros::Time::now();
-
-    arm_joint_msg.position.clear();
-
-    /* amigo 'carrying' position */
-    arm_joint_msg.position.push_back(-0.1);
-    arm_joint_msg.position.push_back(-0.6);
-    arm_joint_msg.position.push_back(0.0);
-    arm_joint_msg.position.push_back(1.8);
-    arm_joint_msg.position.push_back(-0.1);
-    arm_joint_msg.position.push_back(0.4);
-    arm_joint_msg.position.push_back(0.0);
-
-    arm_joint_msg.name.clear();
-
-    for(int i = 1; i < m_n_joints_in_chain; ++i)
+    if(joint_refs.size() != m_n_joints_in_chain)
     {
-        /* (first joint is torso) */
-        arm_joint_msg.name.push_back(m_q_joint_names.at(i));
+        INFO_STREAM("number of joints monitoring is " << m_n_joints_in_chain << ", trying to set initial pose with " << joint_refs.size() << " joints");
+        return;
     }
 
-    return arm_joint_msg;
+    m_q_initial_pose.resize(m_n_joints_in_chain);
+    for(int i = 0; i< m_n_joints_in_chain; ++i)
+    {
+        m_q_initial_pose(i) = joint_refs.at(i);
+    }
+    m_initial_pose_set = true;
+}
 
+KDL::JntArray RobotRepresentation::getInitialPoseJointRefs()
+{
+    if(!m_initial_pose_set)
+        INFO_STREAM("asking for initial pose but pose is not set yet!");
+
+    return m_q_initial_pose;
 }
 
 void RobotRepresentation::printAll()

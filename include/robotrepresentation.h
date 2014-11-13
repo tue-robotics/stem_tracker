@@ -10,7 +10,6 @@
 #include <kdl/chain.hpp>
 #include <kdl/tree.hpp>
 #include <kdl/jntarray.hpp>
-#include <sensor_msgs/JointState.h>
 #include <urdf/model.h>
 
 
@@ -24,7 +23,8 @@ private:
     KDL::Tree m_kinematic_tree;
     KDL::Chain m_kinematic_chain;
     int m_n_joints_in_chain;
-    KDL::JntArray m_q_min, m_q_max, m_q_seed;
+    bool m_initial_pose_set;
+    KDL::JntArray m_q_min, m_q_max, m_q_seed, m_q_initial_pose;
     std::vector<std::string> m_q_joint_names;
     std::string m_root_link_name;
     std::string m_tip_link_name;
@@ -48,7 +48,8 @@ public:
     bool isLeftArmPreferred();
     bool isRightArmPreferred();
     const std::string getName();
-    sensor_msgs::JointState getAmigoInitialPoseMsg();
+    void setInitialPoseJointRefs(std::vector<float> joint_refs);
+    KDL::JntArray getInitialPoseJointRefs();
     void printAll();
 
     ~RobotRepresentation();

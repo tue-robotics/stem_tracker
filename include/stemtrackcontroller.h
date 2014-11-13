@@ -11,6 +11,7 @@
 #include <kdl/chainiksolvervel_pinv.hpp>
 
 #include "robotrepresentation.h"
+#include "stemrepresentation.h"
 #include "robotstatus.h"
 
 class StemTrackController
@@ -18,15 +19,18 @@ class StemTrackController
 private:
     float m_max_z_dot;
     int m_update_rate;
+    bool m_tilt_with_stem;
     KDL::Vector m_setpoint_vector;
     KDL::Frame m_setpoint_frame;
     RobotRepresentation* m_p_robot_representation;
+    StemRepresentation* m_p_stem_representation;
     RobotStatus* m_p_robot_status;
     KDL::JntArray m_joint_refs;
 public:
-    StemTrackController(RobotRepresentation* p_robot_representation, RobotStatus* p_robot_status);
+    StemTrackController(RobotRepresentation* p_robot_representation, RobotStatus* p_robot_status, StemRepresentation* m_p_stem_representation);
     void setMaxZvelocity(float max_z_dot);
     void setUpdateRate(int update_rate);
+    void setTiltWithStem(bool tilt_with_stem);
     void updateCartSetpoint(std::vector<float> gripper_xyz, std::vector<float> xy_err,  int up);
     void updateJointReferences();
     KDL::Vector getCartSetpointKDLVect();

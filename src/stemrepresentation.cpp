@@ -56,6 +56,8 @@ std::vector<float> StemRepresentation::getStemXYZatZ(float z)
 
 }
 
+
+
 void StemRepresentation::updateNearestXYZ(std::vector<float> from_xyz)
 {
     m_nearestXYZ.clear();

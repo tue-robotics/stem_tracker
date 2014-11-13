@@ -30,6 +30,7 @@ private:
     std::string rr_ROBOT_DESCRIPTION_ROSPARAM;
     std::string rr_LEFT_END_LINK;
     std::string rr_RIGHT_END_LINK;
+    std::vector<float> rr_INITIAL_POSE;
 
     /* robot status config parameters */
     double rs_UP_TO_DATE_THRESHOLD;
@@ -49,6 +50,7 @@ private:
 
     /* stem track controller config parameters */
     float stc_MAX_Z_DOT;
+    bool stc_TILT_WITH_STEM;
 
 public:
 

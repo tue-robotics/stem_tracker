@@ -108,8 +108,21 @@ void Configurer::configureRobotRepresentation(tue::Configuration config, RobotRe
 
     p_robot_representation->loadJointLimits();
 
-    config.value("debug", g_DEBUG);
+    if (config.readArray("initial_pose"))
+    {
+        float tmp;
+        rr_INITIAL_POSE.clear();
 
+        while(config.nextArrayItem())
+        {
+            config.value("q", tmp); rr_INITIAL_POSE.push_back(tmp);
+        }
+
+        config.endArray();
+    }
+    p_robot_representation->setInitialPoseJointRefs(rr_INITIAL_POSE);
+
+    config.value("debug", g_DEBUG);
     if(g_DEBUG)
         p_robot_representation->printAll();
 }
@@ -134,8 +147,10 @@ void Configurer::configureStemTrackController(tue::Configuration config, StemTra
     p_stem_track_controller->setMaxZvelocity(stc_MAX_Z_DOT);
 
     config.value("update_rate", g_UPDATE_RATE);
-
     p_stem_track_controller->setUpdateRate(g_UPDATE_RATE);
+
+    config.value("tilt_with_stem", stc_TILT_WITH_STEM);
+    p_stem_track_controller->setTiltWithStem(stc_TILT_WITH_STEM);
 }
 
 void Configurer::configureRobotInterface(tue::Configuration config, RobotInterface* p_robot_interface)

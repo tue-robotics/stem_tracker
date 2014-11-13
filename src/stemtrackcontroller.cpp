@@ -1,8 +1,9 @@
 #include "stemtrackcontroller.h"
 
-StemTrackController::StemTrackController(RobotRepresentation* p_robot_representation, RobotStatus* p_robot_status)
+StemTrackController::StemTrackController(RobotRepresentation* p_robot_representation, RobotStatus* p_robot_status, StemRepresentation* p_stem_representation)
 {
     m_p_robot_representation = p_robot_representation;
+    m_p_stem_representation = p_stem_representation;
     m_p_robot_status = p_robot_status;
 }
 
@@ -16,13 +17,31 @@ void StemTrackController::setUpdateRate(int update_rate)
     m_update_rate = update_rate;
 }
 
+void StemTrackController::setTiltWithStem(bool tilt_with_stem)
+{
+    m_tilt_with_stem = tilt_with_stem;
+}
+
 void StemTrackController::updateCartSetpoint(std::vector<float> gripper_xyz, std::vector<float> xy_err,  int up)
 {
     if(gripper_xyz.size() != 3 || xy_err.size() != 2)
         INFO_STREAM("unexpected vector length in update cart setpoint, grippper_xyz.size() = " << gripper_xyz.size() << " xy_err.size() = " << xy_err.size() );
 
     m_setpoint_vector = KDL::Vector( (double) gripper_xyz[0] - (double) xy_err[0], (double) gripper_xyz[1] - (double) xy_err[1], (double) gripper_xyz[2] + (double) m_max_z_dot / (double) m_update_rate * (double) up );
-    m_setpoint_frame = KDL::Frame( m_p_robot_status->getGripperKDLframe().M, m_setpoint_vector );
+
+    m_setpoint_frame = KDL::Frame( KDL::Rotation::Identity(), m_setpoint_vector);
+
+    KDL::Rotation gripper_rotation = KDL::Rotation::Identity();
+
+    // assumption: 'neutral' gripping pose is not rotated wrt base frame
+
+    if(m_tilt_with_stem)
+    {
+        gripper_rotation.DoRotZ(-0.3);
+//        m_p_stem_representation->getCurrentDerivative();
+    }
+
+    m_setpoint_frame = KDL::Frame( gripper_rotation, m_setpoint_vector);
 
     return;
 }
@@ -50,7 +69,8 @@ void StemTrackController::updateJointReferences()
 
     KDL::Frame f_in(m_p_robot_status->getGripperKDLframe().M, m_setpoint_vector );
 
-    int status = ik_solver_->CartToJnt(m_p_robot_representation->getJointSeeds(), f_in, m_joint_refs);
+    int status = ik_solver_->CartToJnt(m_p_robot_representation->getJointSeeds(), m_setpoint_frame, m_joint_refs);
+    INFO_STREAM("status ik_solver: " << status);
 
     return;
 }

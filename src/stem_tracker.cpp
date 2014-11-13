@@ -67,7 +67,7 @@ int main(int argc, char** argv)
     StemTrackConfigurer.configureRobotStatus(config, &AmigoStatus);
 
     /* initialize and configure stem tracking controller object */
-    StemTrackController TomatoControl(&AmigoRepresentation, &AmigoStatus);
+    StemTrackController TomatoControl(&AmigoRepresentation, &AmigoStatus, &TomatoStem);
     StemTrackConfigurer.configureStemTrackController(config, &TomatoControl);
 
     /* initialize state machine and safety monitor */
@@ -107,17 +107,15 @@ int main(int argc, char** argv)
             /* start timer, for profiling */
             sp.startTimer("main");
 
-            if(initializing && AmigoStatus.isUpToDate())
+            if(TomatoMonitor.getState() == STEMTRACK_PREPOS && AmigoStatus.isUpToDate())
             {        
                 /* bring arm to initial position */
-                AmigoInterface.publishAmigoArmMessage(AmigoRepresentation.getAmigoInitialPoseMsg());
-                initializing = false;
-                INFO_STREAM("===========================");
-                INFO_STREAM("Ready for stem tracking");
-                INFO_STREAM("===========================");
+                AmigoInterface.publishJointPosRefs(AmigoRepresentation.getInitialPoseJointRefs());
+
+                TomatoMonitor.updateState();
             }
 
-            if (!initializing && AmigoStatus.hasValidGripperXYZ() )
+            if (TomatoMonitor.getState() == STEMTRACK_FOLLOW && AmigoStatus.hasValidGripperXYZ() )
             {
                 /* forward kinematics */
                 RvizInterface.showXYZ(AmigoStatus.getGripperXYZ(), gripper_center);
@@ -130,20 +128,16 @@ int main(int argc, char** argv)
                 TomatoWhiskerGripper.simulateWhiskerGripper(AmigoStatus.getGripperXYZ(), TomatoStem.getNearestXYZ() );
                 RvizInterface.showForce(TomatoWhiskerGripper.getWhiskerNetForce(), AmigoStatus.getGripperXYZ(), whisker_net_force);
 
-                /* check have we reached end of stem */
-                if (TomatoMonitor.reachedEndOfStem(up))
-                    up = -up;
-
                 /* update position setpoint in cartesian space */
                 TomatoControl.updateCartSetpoint(AmigoStatus.getGripperXYZ(), TomatoWhiskerGripper.getXYerror(), up);
-
-//                printKDLframe(TomatoControl.getCartSetpointKDLFrame());
 
                 /* translate cartesian setpoint to joint coordinates */
                 TomatoControl.updateJointReferences();
 
                 /* send references to joint controllers */
                 AmigoInterface.publishJointPosRefs(TomatoControl.getJointRefs());
+
+                TomatoMonitor.updateState();
             }
 
             if(!AmigoStatus.isUpToDate())
