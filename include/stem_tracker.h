@@ -21,6 +21,7 @@
 #include <tue/config/configuration.h>
 
 /* stem tracking includes */
+#include "debugfunctions.h"
 #include "whiskerinterpreter.h"
 #include "stemrepresentation.h"
 #include "robotrepresentation.h"
@@ -30,7 +31,6 @@
 #include "stemtrackcontroller.h"
 #include "stemtrackmonitor.h"
 #include "configurer.h"
-#include "debugfunctions.h"
 
 #define     INFO_STREAM     ROS_INFO_STREAM
 #define     THIS_PACKAGE    "stem_tracker"

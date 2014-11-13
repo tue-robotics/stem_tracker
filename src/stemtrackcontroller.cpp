@@ -21,14 +21,20 @@ void StemTrackController::updateCartSetpoint(std::vector<float> gripper_xyz, std
     if(gripper_xyz.size() != 3 || xy_err.size() != 2)
         INFO_STREAM("unexpected vector length in update cart setpoint, grippper_xyz.size() = " << gripper_xyz.size() << " xy_err.size() = " << xy_err.size() );
 
-    m_setpoint = KDL::Vector( (double) gripper_xyz[0] - (double) xy_err[0], (double) gripper_xyz[1] - (double) xy_err[1], (double) gripper_xyz[2] + (double) m_max_z_dot / (double) m_update_rate * (double) up );
+    m_setpoint_vector = KDL::Vector( (double) gripper_xyz[0] - (double) xy_err[0], (double) gripper_xyz[1] - (double) xy_err[1], (double) gripper_xyz[2] + (double) m_max_z_dot / (double) m_update_rate * (double) up );
+    m_setpoint_frame = KDL::Frame( m_p_robot_status->getGripperKDLframe().M, m_setpoint_vector );
 
     return;
 }
 
 KDL::Vector StemTrackController::getCartSetpointKDLVect()
 {
-    return m_setpoint;
+    return m_setpoint_vector;
+}
+
+KDL::Frame StemTrackController::getCartSetpointKDLFrame()
+{
+    return m_setpoint_frame;
 }
 
 void StemTrackController::updateJointReferences()
@@ -42,7 +48,7 @@ void StemTrackController::updateJointReferences()
     ik_solver_.reset(new KDL::ChainIkSolverPos_NR_JL(m_p_robot_representation->getKinematicChain(), m_p_robot_representation->getJointMinima(), m_p_robot_representation->getJointMaxima(), *fksolver_, *ik_vel_solver_, 100) );
 
 
-    KDL::Frame f_in(m_p_robot_status->getGripperKDLframe().M, m_setpoint );
+    KDL::Frame f_in(m_p_robot_status->getGripperKDLframe().M, m_setpoint_vector );
 
     int status = ik_solver_->CartToJnt(m_p_robot_representation->getJointSeeds(), f_in, m_joint_refs);
 

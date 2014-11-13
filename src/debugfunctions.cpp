@@ -4,6 +4,8 @@ void printKDLframe(KDL::Frame kdl_frame)
 {
     std::stringstream frame_stream;
 
+    INFO_STREAM("kdl frame:");
+
     for(int i=0; i<4; ++i)
     {
         frame_stream.str(""); frame_stream << std::scientific;

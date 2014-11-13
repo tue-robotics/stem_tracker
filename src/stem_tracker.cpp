@@ -1,11 +1,15 @@
 #include "stem_tracker.h"
 
 // TODO:
-//- load urdf from file, and make filename configurable, than n is not needed anymore in constructor of robotrepresentation
-//- slimmere pose target, niet door stem heen en met helling meedraaien
+//- slimmere pose target, met helling meedraaien
+//- alleen velocity solver in de loop ipv telkens complete positie ik
+//- preposition om te voorkomen dat door de stem heen
+//- check of preposition behaald
 //- reageren op combinatie van whisker forces ipv naar bekende intersection
-
-
+//- check voor welke objecten interface naar andere object alleen voor config nodig is (vb in robotstatus)
+//- maak een robotstatus up to date reset, bijv om na wisselen van arm opnieuw to update te wachten
+//- robotstatus up to date check voor volledige array to monitor
+//- profilen (sample rate omhoog om op amigo te testen)
 
 int main(int argc, char** argv)
 {
@@ -132,6 +136,8 @@ int main(int argc, char** argv)
 
                 /* update position setpoint in cartesian space */
                 TomatoControl.updateCartSetpoint(AmigoStatus.getGripperXYZ(), TomatoWhiskerGripper.getXYerror(), up);
+
+//                printKDLframe(TomatoControl.getCartSetpointKDLFrame());
 
                 /* translate cartesian setpoint to joint coordinates */
                 TomatoControl.updateJointReferences();

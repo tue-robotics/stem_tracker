@@ -18,7 +18,8 @@ class StemTrackController
 private:
     float m_max_z_dot;
     int m_update_rate;
-    KDL::Vector m_setpoint;
+    KDL::Vector m_setpoint_vector;
+    KDL::Frame m_setpoint_frame;
     RobotRepresentation* m_p_robot_representation;
     RobotStatus* m_p_robot_status;
     KDL::JntArray m_joint_refs;
@@ -29,6 +30,7 @@ public:
     void updateCartSetpoint(std::vector<float> gripper_xyz, std::vector<float> xy_err,  int up);
     void updateJointReferences();
     KDL::Vector getCartSetpointKDLVect();
+    KDL::Frame getCartSetpointKDLFrame();
     KDL::JntArray getJointRefs();
     ~StemTrackController();
 };
