@@ -14,6 +14,7 @@
 #include "robotinterface.h"
 #include "whiskerinterpreter.h"
 #include "stemtrackcontroller.h"
+#include "stemtrackmonitor.h"
 
 class Configurer
 {
@@ -34,6 +35,7 @@ private:
 
     /* robot status config parameters */
     double rs_UP_TO_DATE_THRESHOLD;
+    float rs_POS_REACHED_THRESHOLD;
 
     /* stem representation config parameters */
     float sr_STEM_THICKNESS;
@@ -51,6 +53,10 @@ private:
     /* stem track controller config parameters */
     float stc_MAX_Z_DOT;
     bool stc_TILT_WITH_STEM;
+    bool stc_DEBUG_IK_SOLVER;
+
+    /* stem track monitor config parameters */
+    bool stm_DEBUG_STATE_PAR;
 
 public:
 
@@ -61,6 +67,7 @@ public:
     void configureRobotStatus(tue::Configuration config, RobotStatus* p_robot_status);
     void configureWhiskerInterpreter(tue::Configuration config, WhiskerInterpreter* p_whisker_interpreter);
     void configureRobotInterface(tue::Configuration config, RobotInterface* p_robot_interface);
+    void configureStemTrackMonitor(tue::Configuration config, StemTrackMonitor* p_stemtrack_monitor);
     int getUpdateRate(tue::Configuration config);
     std::string getBaseFrame(tue::Configuration config);
 

@@ -23,11 +23,14 @@ class RobotStatus
         std::vector<float> m_gripper_xyz;
         double m_up_to_date_threshold;
         KDL::Frame m_gripper_kdlframe;
+        float m_pos_reached_threshold;
         RobotRepresentation* m_p_robot_representation;
 
     public:
         RobotStatus(RobotRepresentation* p_robot_representation);
         bool selfCheck();
+        void setPosReachedThreshold(float pos_reached_threshold);
+        bool reachedPosition(KDL::JntArray reference);
         void setUpToDateThreshold(double threshold);
         void updateJointStatus(KDL::JntArray updated_joint_status);
         KDL::JntArray getJointStatus();

@@ -5,6 +5,12 @@ StemTrackController::StemTrackController(RobotRepresentation* p_robot_representa
     m_p_robot_representation = p_robot_representation;
     m_p_stem_representation = p_stem_representation;
     m_p_robot_status = p_robot_status;
+    m_debug_ik_solver = false;
+}
+
+void StemTrackController::setDebugIKsolver(bool debug_ik_solver)
+{
+    m_debug_ik_solver = debug_ik_solver;
 }
 
 void StemTrackController::setMaxZvelocity(float max_z_dot)
@@ -70,7 +76,8 @@ void StemTrackController::updateJointReferences()
     KDL::Frame f_in(m_p_robot_status->getGripperKDLframe().M, m_setpoint_vector );
 
     int status = ik_solver_->CartToJnt(m_p_robot_representation->getJointSeeds(), m_setpoint_frame, m_joint_refs);
-    INFO_STREAM("status ik_solver: " << status);
+    if(m_debug_ik_solver)
+        INFO_STREAM("status ik_solver: " << status);
 
     return;
 }

@@ -20,6 +20,7 @@ private:
     float m_max_z_dot;
     int m_update_rate;
     bool m_tilt_with_stem;
+    bool m_debug_ik_solver;
     KDL::Vector m_setpoint_vector;
     KDL::Frame m_setpoint_frame;
     RobotRepresentation* m_p_robot_representation;
@@ -33,6 +34,7 @@ public:
     void setTiltWithStem(bool tilt_with_stem);
     void updateCartSetpoint(std::vector<float> gripper_xyz, std::vector<float> xy_err,  int up);
     void updateJointReferences();
+    void setDebugIKsolver(bool debug_ik_solver);
     KDL::Vector getCartSetpointKDLVect();
     KDL::Frame getCartSetpointKDLFrame();
     KDL::JntArray getJointRefs();

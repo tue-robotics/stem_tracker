@@ -135,6 +135,10 @@ void Configurer::configureRobotStatus(tue::Configuration config, RobotStatus* p_
     config.value("up_to_date_threshold", rs_UP_TO_DATE_THRESHOLD);
     INFO_STREAM("up_to_date_threshold = " << rs_UP_TO_DATE_THRESHOLD);
 
+    config.value("pos_reached_threshold", rs_POS_REACHED_THRESHOLD);
+    INFO_STREAM("pos_reached_threshold = " << rs_POS_REACHED_THRESHOLD);
+
+    p_robot_status->setPosReachedThreshold(rs_POS_REACHED_THRESHOLD);
     p_robot_status->setUpToDateThreshold( rs_UP_TO_DATE_THRESHOLD );
 }
 
@@ -151,6 +155,9 @@ void Configurer::configureStemTrackController(tue::Configuration config, StemTra
 
     config.value("tilt_with_stem", stc_TILT_WITH_STEM);
     p_stem_track_controller->setTiltWithStem(stc_TILT_WITH_STEM);
+
+    config.value("debug_ik_solver", stc_DEBUG_IK_SOLVER);
+    p_stem_track_controller->setDebugIKsolver(stc_DEBUG_IK_SOLVER);
 }
 
 void Configurer::configureRobotInterface(tue::Configuration config, RobotInterface* p_robot_interface)
@@ -162,6 +169,18 @@ void Configurer::configureRobotInterface(tue::Configuration config, RobotInterfa
 
     p_robot_interface->connectToAmigoArm(rr_USE_LEFTARM);
     p_robot_interface->connectToAmigoTorso();
+
+}
+
+void Configurer::configureStemTrackMonitor(tue::Configuration config, StemTrackMonitor* p_stemtrack_monitor)
+{
+    INFO_STREAM("=============================================");
+
+    INFO_STREAM("Configuring stemtrack monitor object");
+
+    config.value("debug_state_par", stm_DEBUG_STATE_PAR);
+
+    p_stemtrack_monitor->setDebugStateParameter(stm_DEBUG_STATE_PAR);
 
     INFO_STREAM("=============================================");
 }

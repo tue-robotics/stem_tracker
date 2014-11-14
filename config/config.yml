@@ -12,7 +12,8 @@ robot_description_rosparam:     /amigo/robot_description        # amigo urdf mod
 root_link:                      base_link                       # start of kinematic chain we are controlling
 left_end_link:                  grippoint_left                  # end of kinematic chain we are controlling, if use_leftarm
 right_end_link:                 grippoint_right                 # end of kinematic chain we are controlling, if not use_leftarm
-up_to_date_threshold:           0.5                             # consider robot status up to date if measurement received within passed x sec
+up_to_date_threshold:           0.05                            # consider robot status up to date if measurement received within passed x sec
+pos_reached_threshold:          0.05                            # if absolute position error for each of the joints in robot-status is below this threshold position is reached
 initial_pose:                                                   # pose used as preposition, length should be equal to the number of joints in kinematic chain
     - {q: 0.1}
     - {q: -0.1}
@@ -48,3 +49,10 @@ stem_nodes:                                                     # stem nodes, de
 
 max_z_dot:                      0.5                             # max gripper velocity in vertical direction during stem tracking (m/s)
 tilt_with_stem:                 1                               # if true (1) tilt gripper based on local derivative of stem
+debug_ik_solver:                0                               # if true (1) status of kdl ik solver will be printed
+
+##########################
+# TRACKING MONITOR CONFIG
+##########################
+
+debug_state_par:                1                               # if true (1) state will be printed every time it changes

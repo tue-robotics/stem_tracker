@@ -9,6 +9,7 @@ RobotStatus::RobotStatus(RobotRepresentation* p_robot_representation)
 
     m_joints_to_monitor = KDL::JntArray(m_n_joints_monitoring);
     m_p_robot_representation = p_robot_representation;
+    m_pos_reached_threshold = -1.0;
 }
 
 bool RobotStatus::selfCheck()
@@ -22,6 +23,34 @@ bool RobotStatus::selfCheck()
     }
 
     return IamOK;
+}
+
+void RobotStatus::setPosReachedThreshold(float pos_reached_threshold)
+{
+    m_pos_reached_threshold = pos_reached_threshold;
+}
+
+bool RobotStatus::reachedPosition(KDL::JntArray reference)
+{
+    if( reference.rows() != m_n_joints_monitoring )
+    {
+        INFO_STREAM("reachedPosition check for " << reference.rows() << " joints while robot status contains " << m_n_joints_monitoring << " joints");
+        return false;
+    }
+
+    if( m_pos_reached_threshold < 0.0)
+    {
+        INFO_STREAM("reachedPosition check while threshold was not set!");
+        return false;
+    }
+
+    for( int i = 0; i < m_n_joints_monitoring; ++i)
+    {
+        if( fabs( reference(i) - m_joints_to_monitor(i)) > m_pos_reached_threshold )
+            return false;
+    }
+
+    return true;
 }
 
 void RobotStatus::updateJointStatus(KDL::JntArray updated_joint_status)

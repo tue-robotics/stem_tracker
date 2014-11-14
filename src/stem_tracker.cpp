@@ -5,6 +5,7 @@
 //- alleen velocity solver in de loop ipv telkens complete positie ik
 //- preposition om te voorkomen dat door de stem heen
 //- check of preposition behaald
+//- lees urdf uit bestand ipv uit rosparam, dan robotrepresentation ros-onafhankelijk
 //- reageren op combinatie van whisker forces ipv naar bekende intersection
 //- check voor welke objecten interface naar andere object alleen voor config nodig is (vb in robotstatus)
 //- maak een robotstatus up to date reset, bijv om na wisselen van arm opnieuw to update te wachten
@@ -70,15 +71,16 @@ int main(int argc, char** argv)
     StemTrackController TomatoControl(&AmigoRepresentation, &AmigoStatus, &TomatoStem);
     StemTrackConfigurer.configureStemTrackController(config, &TomatoControl);
 
-    /* initialize state machine and safety monitor */
-    StemTrackMonitor TomatoMonitor(&TomatoStem);
-
-    /* initialize and configure visualization object */
-    VisualizationInterface RvizInterface(n, StemTrackConfigurer.getBaseFrame(config));
-
     /* initialize interface to robot object */
     RobotInterface AmigoInterface(n, &AmigoRepresentation, &AmigoStatus);
     StemTrackConfigurer.configureRobotInterface(config, &AmigoInterface);
+
+    /* initialize state machine and safety monitor */
+    StemTrackMonitor TomatoMonitor(&TomatoStem, &AmigoRepresentation, &AmigoStatus);
+    StemTrackConfigurer.configureStemTrackMonitor(config, &TomatoMonitor);
+
+    /* initialize and configure visualization object */
+    VisualizationInterface RvizInterface(n, StemTrackConfigurer.getBaseFrame(config));
 
     /* initialize profiling */
     sp.initialize();
@@ -97,6 +99,7 @@ int main(int argc, char** argv)
             StemTrackConfigurer.configureWhiskerInterpreter(config, &TomatoWhiskerGripper);
             StemTrackConfigurer.configureStemTrackController(config, &TomatoControl);
             StemTrackConfigurer.configureRobotInterface(config, &AmigoInterface);
+            StemTrackConfigurer.configureStemTrackMonitor(config, &TomatoMonitor);
         }
 
         if (!config.hasError())
