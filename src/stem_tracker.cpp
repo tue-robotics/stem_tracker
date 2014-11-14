@@ -3,21 +3,19 @@
 // TODO:
 //- slimmere pose target, met helling meedraaien
 //- alleen velocity solver in de loop ipv telkens complete positie ik
-//- preposition om te voorkomen dat door de stem heen
-//- check of preposition behaald
 //- lees urdf uit bestand ipv uit rosparam, dan robotrepresentation ros-onafhankelijk
 //- reageren op combinatie van whisker forces ipv naar bekende intersection
+//- orientatie base frame tov gripper frame voor 'neutrale' pose configureerbaar
 //- check voor welke objecten interface naar andere object alleen voor config nodig is (vb in robotstatus)
-//- maak een robotstatus up to date reset, bijv om na wisselen van arm opnieuw to update te wachten
-//- robotstatus up to date check voor volledige array to monitor
-//- profilen (sample rate omhoog om op amigo te testen)
+//- maak een robotstatus up to date reset, bijv om na wisselen van arm opnieuw op up to date info te wachten
+//- robotstatus up to date check voor volledige array
+//- selfchecks verbeteren of weghalen
+//- alleen maar doubles ipv soms float soms double
+//- check voor loslaten van stengel
+//- check voor tegenkomen side branch
 
 int main(int argc, char** argv)
 {
-
-    /* initialize state handling params */
-    bool initializing = true;
-    int up = 1;
 
     /* initialize profiling object */
     StatsPublisher sp;
@@ -76,7 +74,7 @@ int main(int argc, char** argv)
     StemTrackConfigurer.configureRobotInterface(config, &AmigoInterface);
 
     /* initialize state machine and safety monitor */
-    StemTrackMonitor TomatoMonitor(&TomatoStem, &AmigoRepresentation, &AmigoStatus);
+    StemTrackMonitor TomatoMonitor(&TomatoStem, &AmigoRepresentation, &AmigoStatus, &TomatoControl);
     StemTrackConfigurer.configureStemTrackMonitor(config, &TomatoMonitor);
 
     /* initialize and configure visualization object */
@@ -114,11 +112,29 @@ int main(int argc, char** argv)
             {        
                 /* bring arm to initial position */
                 AmigoInterface.publishJointPosRefs(AmigoRepresentation.getInitialPoseJointRefs());
-
                 TomatoMonitor.updateState();
             }
 
-            if (TomatoMonitor.getState() == STEMTRACK_FOLLOW && AmigoStatus.hasValidGripperXYZ() )
+            if(TomatoMonitor.getState() == STEMTRACK_GRASP  )
+            {
+                /* find and show nearest intersection with stem */
+                TomatoStem.updateNearestXYZ(AmigoStatus.getGripperXYZ());
+                RvizInterface.showXYZ(TomatoStem.getNearestXYZ(), nearest_stem_intersection);
+
+                /* set reference to nearest stem intersection */
+                TomatoControl.updateCartSetpoint(TomatoStem.getNearestXYZ());
+
+                /* translate cartesian setpoint to joint coordinates */
+                TomatoControl.updateJointReferences();
+
+                /* send references to joint controllers */
+                AmigoInterface.publishJointPosRefs(TomatoControl.getJointRefs());
+
+                /* check if reference reached */
+                TomatoMonitor.updateState();
+            }
+
+            if(TomatoMonitor.getState() == STEMTRACK_FOLLOW && AmigoStatus.hasValidGripperXYZ() )
             {
                 /* forward kinematics */
                 RvizInterface.showXYZ(AmigoStatus.getGripperXYZ(), gripper_center);
@@ -132,7 +148,7 @@ int main(int argc, char** argv)
                 RvizInterface.showForce(TomatoWhiskerGripper.getWhiskerNetForce(), AmigoStatus.getGripperXYZ(), whisker_net_force);
 
                 /* update position setpoint in cartesian space */
-                TomatoControl.updateCartSetpoint(AmigoStatus.getGripperXYZ(), TomatoWhiskerGripper.getXYerror(), up);
+                TomatoControl.updateCartSetpoint(AmigoStatus.getGripperXYZ(), TomatoWhiskerGripper.getXYerror());
 
                 /* translate cartesian setpoint to joint coordinates */
                 TomatoControl.updateJointReferences();
@@ -140,6 +156,7 @@ int main(int argc, char** argv)
                 /* send references to joint controllers */
                 AmigoInterface.publishJointPosRefs(TomatoControl.getJointRefs());
 
+                /* check if end of stem reached */
                 TomatoMonitor.updateState();
             }
 

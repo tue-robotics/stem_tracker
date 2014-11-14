@@ -32,7 +32,8 @@ public:
     void setMaxZvelocity(float max_z_dot);
     void setUpdateRate(int update_rate);
     void setTiltWithStem(bool tilt_with_stem);
-    void updateCartSetpoint(std::vector<float> gripper_xyz, std::vector<float> xy_err,  int up);
+    void updateCartSetpoint(std::vector<float> setpoint_xyz);
+    void updateCartSetpoint(std::vector<float> gripper_xyz, std::vector<float> xy_err);
     void updateJointReferences();
     void setDebugIKsolver(bool debug_ik_solver);
     KDL::Vector getCartSetpointKDLVect();

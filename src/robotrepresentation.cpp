@@ -24,21 +24,13 @@ bool RobotRepresentation::selfCheck()
     return true;
 }
 
-
-void RobotRepresentation::loadUrdfFromRosparam(ros::NodeHandle n, const std::string urdf_rosparam)
+void RobotRepresentation::loadUrdfFromFile(const std::string filename)
 {
-    /* get robot description from ros parameter server */
-    std::string urdf;
-    if (!n.getParam(urdf_rosparam, urdf))
-    {
-        INFO_STREAM("Loading of robot urdf from rosparam \"" << urdf_rosparam << "\" failed!");
-        return;
-    }
-    else
-        INFO_STREAM("Urdf xml loaded from rosparam \"" << urdf_rosparam << "\"");
+    m_urdf_model.clear();
+    if ( !m_urdf_model.initFile(filename) )
+        INFO_STREAM("Could not initialize urdf model from file: " << filename);
 
-    if (!m_urdf_model.initString(urdf))
-        INFO_STREAM("Could not initialize urdf model from xml");
+    return;
 }
 
 urdf::Model RobotRepresentation::getUrdfModel()

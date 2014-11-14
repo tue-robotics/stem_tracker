@@ -2,10 +2,10 @@
 #define ROBOTREPRESENTATION_H
 
 #define INFO_STREAM     ROS_INFO_STREAM
+#include <ros/ros.h>
 
 #include <iostream>
 #include <vector>
-#include <ros/ros.h>
 #include <kdl_parser/kdl_parser.hpp>
 #include <kdl/chain.hpp>
 #include <kdl/tree.hpp>
@@ -36,7 +36,7 @@ public:
     KDL::JntArray getJointMaxima();
     KDL::JntArray getJointSeeds();
     std::vector<std::string> getJointNames();
-    void loadUrdfFromRosparam(ros::NodeHandle n, const std::string urdf_rosparam);
+    void loadUrdfFromFile(const std::string filename);
     urdf::Model getUrdfModel();
     void loadKinematicTreeFromUrdf();
     void loadKinematicChainFromTree(const std::string root_link_name, const std::string tip_link_name);

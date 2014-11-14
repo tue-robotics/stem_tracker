@@ -28,7 +28,7 @@ private:
     /* robot representation config parameters */
     std::string rr_ROOT_LINK;
     bool rr_USE_LEFTARM;
-    std::string rr_ROBOT_DESCRIPTION_ROSPARAM;
+    std::string rr_URDF_FILENAME;
     std::string rr_LEFT_END_LINK;
     std::string rr_RIGHT_END_LINK;
     std::vector<float> rr_INITIAL_POSE;

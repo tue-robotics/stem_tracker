@@ -89,7 +89,6 @@ void Configurer::configureRobotRepresentation(tue::Configuration config, RobotRe
 
     config.value("root_link", rr_ROOT_LINK);
     config.value("use_leftarm", rr_USE_LEFTARM);
-    config.value("robot_description_rosparam", rr_ROBOT_DESCRIPTION_ROSPARAM);
     config.value("left_end_link", rr_LEFT_END_LINK);
     config.value("right_end_link", rr_RIGHT_END_LINK);
 
@@ -98,7 +97,8 @@ void Configurer::configureRobotRepresentation(tue::Configuration config, RobotRe
     else
         p_robot_representation->setRightArmIsPreferred();
 
-    p_robot_representation->loadUrdfFromRosparam(n, rr_ROBOT_DESCRIPTION_ROSPARAM);
+    config.value("robot_urdf_file", rr_URDF_FILENAME);
+    p_robot_representation->loadUrdfFromFile( rr_URDF_FILENAME);
     p_robot_representation->loadKinematicTreeFromUrdf();
 
     if(rr_USE_LEFTARM)
