@@ -85,8 +85,11 @@ void StemRepresentation::updateLocalTangent()
     updateXYZbelow();
     if(m_xyz_below.size() == 3)
     {
-        for(int i=0; i<3; ++i)
-            m_rot_xyz.at(i) = m_nearestXYZ.at(i) - m_xyz_below.at(i);
+        if(m_nearestXYZ.at(2) - m_xyz_below.at(2) > m_lin_tangent_d)
+        {
+            for(int i=0; i<3; ++i)
+                m_rot_xyz.at(i) = m_nearestXYZ.at(i) - m_xyz_below.at(i);
+        }
     }
     else
         initializeTangent();

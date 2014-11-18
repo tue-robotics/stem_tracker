@@ -56,8 +56,19 @@ void StemTrackController::updateCartSetpoint(std::vector<float> gripper_xyz, std
 
     if(m_tilt_with_stem)
     {
-        gripper_rotation.DoRotZ(-0.3);
-//        m_p_stem_representation->getCurrentDerivative();
+        //        gripper_rotation.DoRotZ(-0.3);
+
+        std::vector<float> stem_tangent = m_p_stem_representation->getCurrentTangent();
+
+        if(stem_tangent.size() == 3)
+        {
+            float len = sqrt(stem_tangent[0] * stem_tangent[0] + stem_tangent[1] * stem_tangent[1] + stem_tangent[2] * stem_tangent[2]);
+            if(len > 0.0)
+            {
+                gripper_rotation.DoRotX( asin(-stem_tangent[1]/len) );
+                gripper_rotation.DoRotY( asin(stem_tangent[0]/len) );
+            }
+        }
     }
 
     m_setpoint_frame = KDL::Frame( gripper_rotation, m_setpoint_vector);

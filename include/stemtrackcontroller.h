@@ -5,6 +5,7 @@
 
 #include <ros/ros.h>
 #include <vector>
+#include <math.h>
 
 #include <kdl/chainiksolverpos_nr_jl.hpp>
 #include <kdl/chainfksolverpos_recursive.hpp>

@@ -13,6 +13,7 @@
 //- check voor loslaten van stengel
 //- check voor tegenkomen side branch
 //- use stem length instead of distance in z for lin_tan_d
+//- smoothefier achter transformatie naar joint coordinaten (?)
 
 int main(int argc, char** argv)
 {
