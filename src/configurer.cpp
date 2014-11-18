@@ -28,6 +28,8 @@ void Configurer::configureStemRepresentation(tue::Configuration config, StemRepr
     INFO_STREAM("===================================================");
     INFO_STREAM("Configuring stem representation object for stem " << p_stem_representation->getStemID() );
 
+    config.value("lin_tan_d", sr_LIN_TAN_D);
+    p_stem_representation->setLinTangentDistance(sr_LIN_TAN_D);
 
     /* tomato stem configuration */
     if (config.readArray("stem_nodes"))

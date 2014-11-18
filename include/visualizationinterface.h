@@ -13,6 +13,7 @@ enum MarkerIDs
     nearest_stem_intersection,
     gripper_center,
     whisker_net_force,
+    stem_tangent
 };
 
 class VisualizationInterface
@@ -36,8 +37,8 @@ public:
     void showLineStripInRviz(std::vector<float> x_coordinates, std::vector<float> y_coordinates, std::vector<float> z_coordinates);
     void showXYZ(std::vector<float> xyz, MarkerIDs marker_id);
     void showXYZInRviz(std::vector<float> xyz);
-    void showForce(std::vector<float> force, std::vector<float> origin, MarkerIDs marker_id);
-    void showForceInRviz(std::vector<float> force, std::vector<float> origin);
+    void showArrow(std::vector<float> force, std::vector<float> origin, MarkerIDs marker_id);
+    void showArrowInRviz(std::vector<float> force, std::vector<float> origin);
 };
 
 #endif // VISUALIZATIONINTERFACE_H

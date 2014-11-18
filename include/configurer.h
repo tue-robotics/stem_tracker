@@ -43,6 +43,7 @@ private:
     std::vector<float> sr_stemNodesX;
     std::vector<float> sr_stemNodesY;
     std::vector<float> sr_stemNodesZ;
+    float sr_LIN_TAN_D;
 
     /* whisker interpreter config parameters */
     int wi_N_WHISKERS;

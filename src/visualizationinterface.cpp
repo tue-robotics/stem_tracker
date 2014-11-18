@@ -61,6 +61,19 @@ bool VisualizationInterface::configureSelf(MarkerIDs marker_id)
         m_name = "stem";
         return true;
 
+    case stem_tangent:
+
+        m_frame = m_base_frame;
+        m_rgb.clear();
+        m_rgb.push_back(1.0f);
+        m_rgb.push_back(0.0f);
+        m_rgb.push_back(0.0f);
+        m_ros_marker_id = marker_id;
+        m_arrow_diam = 0.01;
+        m_arrowhead_diam = 0.02;
+        m_name = "stem_tangent";
+        return true;
+
     default:
         INFO_STREAM("Unknown marker id in visualization interface!");
         return false;
@@ -106,27 +119,27 @@ void VisualizationInterface::showLineStripInRviz(std::vector<float> x_coordinate
 
 }
 
-void VisualizationInterface::showForce(std::vector<float> force, std::vector<float> origin, MarkerIDs marker_id)
+void VisualizationInterface::showArrow(std::vector<float> force, std::vector<float> origin, MarkerIDs marker_id)
 {
-    if(force.size() != 2)
+    if(force.size() != 3)
     {
-        INFO_STREAM("unknown force vector in showforce");
+        INFO_STREAM("unknown force vector in showArrow");
         return;
     }
 
     if(origin.size() != 3)
     {
-        INFO_STREAM("unknown origin vector in showforce");
+        INFO_STREAM("unknown origin vector in showArrow");
         return;
     }
 
     if(configureSelf(marker_id))
-        showForceInRviz(force, origin);
+        showArrowInRviz(force, origin);
 
     return;
 }
 
-void VisualizationInterface::showForceInRviz(std::vector<float> force, std::vector<float> origin)
+void VisualizationInterface::showArrowInRviz(std::vector<float> force, std::vector<float> origin)
 {
     /* construct line strip marker object */
     visualization_msgs::Marker marker;
@@ -149,7 +162,7 @@ void VisualizationInterface::showForceInRviz(std::vector<float> force, std::vect
 
     p_start.x = origin.at(0) - force.at(0);
     p_start.y = origin.at(1) - force.at(1);
-    p_start.z = origin.at(2);
+    p_start.z = origin.at(2) - force.at(2);
     marker.points.push_back(p_start);
 
     p_end.x = origin.at(0);

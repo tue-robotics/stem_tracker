@@ -3,7 +3,6 @@
 // TODO:
 //- slimmere pose target, met helling meedraaien
 //- alleen velocity solver in de loop ipv telkens complete positie ik
-//- lees urdf uit bestand ipv uit rosparam, dan robotrepresentation ros-onafhankelijk
 //- reageren op combinatie van whisker forces ipv naar bekende intersection
 //- orientatie base frame tov gripper frame voor 'neutrale' pose configureerbaar
 //- check voor welke objecten interface naar andere object alleen voor config nodig is (vb in robotstatus)
@@ -13,6 +12,7 @@
 //- alleen maar doubles ipv soms float soms double
 //- check voor loslaten van stengel
 //- check voor tegenkomen side branch
+//- use stem length instead of distance in z for lin_tan_d
 
 int main(int argc, char** argv)
 {
@@ -143,12 +143,14 @@ int main(int argc, char** argv)
                 TomatoStem.updateNearestXYZ(AmigoStatus.getGripperXYZ());
                 RvizInterface.showXYZ(TomatoStem.getNearestXYZ(), nearest_stem_intersection);
 
+
                 /* simulate and show whisker sensor output */
                 TomatoWhiskerGripper.simulateWhiskerGripper(AmigoStatus.getGripperXYZ(), TomatoStem.getNearestXYZ() );
-                RvizInterface.showForce(TomatoWhiskerGripper.getWhiskerNetForce(), AmigoStatus.getGripperXYZ(), whisker_net_force);
+                RvizInterface.showArrow(TomatoWhiskerGripper.getWhiskerNetForce(), AmigoStatus.getGripperXYZ(), whisker_net_force);
 
                 /* update position setpoint in cartesian space */
                 TomatoControl.updateCartSetpoint(AmigoStatus.getGripperXYZ(), TomatoWhiskerGripper.getXYerror());
+                RvizInterface.showArrow(TomatoStem.getCurrentTangent(), TomatoStem.getNearestXYZ(), stem_tangent);
 
                 /* translate cartesian setpoint to joint coordinates */
                 TomatoControl.updateJointReferences();

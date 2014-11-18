@@ -81,7 +81,7 @@ void WhiskerInterpreter::simulateWhiskerGripper(std::vector<float> gripper_cente
         return;
     }
 
-    m_whisker_force.assign(2,0.0);
+    m_whisker_force.assign(3,0.0);
     m_estimated_pos_error.assign(2,0.0);
 
     m_estimated_pos_error[0] = gripper_center[0] - stem_center[0];

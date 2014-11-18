@@ -4,6 +4,7 @@ StemRepresentation::StemRepresentation(int stem_id=-1)
 {
     m_stem_id = stem_id;
     m_n_nodes = 0;
+    initializeTangent();
 }
 
 int StemRepresentation::getStemID()
@@ -15,6 +16,7 @@ std::vector<float> StemRepresentation::getStemXYZatZ(float z)
 {
 
     std::vector<float> xyz;
+    xyz.clear();
 
     if (m_z_nodes.back() < z)
     {
@@ -56,10 +58,54 @@ std::vector<float> StemRepresentation::getStemXYZatZ(float z)
 
 }
 
+void StemRepresentation::setLinTangentDistance(float lin_tan_d)
+{
+    m_lin_tangent_d = lin_tan_d;
+}
 
+void StemRepresentation::initializeTangent()
+{
+    m_rot_xyz.clear();
+    m_rot_xyz.assign(3,0.0);
+}
+
+std::vector<float> StemRepresentation::getCurrentTangent()
+{
+    return m_rot_xyz;
+}
+
+void StemRepresentation::updateLocalTangent()
+{
+    if(m_nearestXYZ.size() != 3)
+    {
+        INFO_STREAM("trying to find tangent while nearest stem xyz is not known!");
+        return;
+    }
+
+    updateXYZbelow();
+    if(m_xyz_below.size() == 3)
+    {
+        for(int i=0; i<3; ++i)
+            m_rot_xyz.at(i) = m_nearestXYZ.at(i) - m_xyz_below.at(i);
+    }
+    else
+        initializeTangent();
+}
+
+void StemRepresentation::updateXYZbelow()
+{
+    if(m_nearestXYZ.at(2)-m_lin_tangent_d > m_z_nodes.front())
+        m_xyz_below = getStemXYZatZ(m_nearestXYZ.at(2)-m_lin_tangent_d);
+}
 
 void StemRepresentation::updateNearestXYZ(std::vector<float> from_xyz)
 {
+    if(from_xyz.size() != 3)
+    {
+        INFO_STREAM("cannot updateNearestXYZ with input of length " << from_xyz.size());
+        return;
+    }
+
     m_nearestXYZ.clear();
 
     if (m_z_nodes.back() < from_xyz.at(2))
@@ -67,6 +113,7 @@ void StemRepresentation::updateNearestXYZ(std::vector<float> from_xyz)
         m_nearestXYZ.push_back(m_x_nodes.back());
         m_nearestXYZ.push_back(m_y_nodes.back());
         m_nearestXYZ.push_back(m_z_nodes.back());
+        initializeTangent();
         return;
     }
     else if (m_z_nodes.front() > from_xyz.at(2))
@@ -74,10 +121,14 @@ void StemRepresentation::updateNearestXYZ(std::vector<float> from_xyz)
         m_nearestXYZ.push_back(m_x_nodes.front());
         m_nearestXYZ.push_back(m_y_nodes.front());
         m_nearestXYZ.push_back(m_z_nodes.front());
+        initializeTangent();
         return;
     }
     else
+    {
         m_nearestXYZ = getStemXYZatZ(from_xyz.at(2));
+        updateLocalTangent();
+    }
     return;
 }
 
