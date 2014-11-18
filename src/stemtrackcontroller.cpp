@@ -1,11 +1,17 @@
 #include "stemtrackcontroller.h"
 
+#include "robotrepresentation.h"
+#include "stemrepresentation.h"
+#include "robotstatus.h"
+
 StemTrackController::StemTrackController(RobotRepresentation* p_robot_representation, RobotStatus* p_robot_status, StemRepresentation* p_stem_representation)
+    : m_p_robot_representation(p_robot_representation), m_p_stem_representation(p_stem_representation),
+      m_p_robot_status(p_robot_status), m_debug_ik_solver(false)
 {
-    m_p_robot_representation = p_robot_representation;
-    m_p_stem_representation = p_stem_representation;
-    m_p_robot_status = p_robot_status;
-    m_debug_ik_solver = false;
+//    m_p_robot_representation = p_robot_representation;
+//    m_p_stem_representation = p_stem_representation;
+//    m_p_robot_status = p_robot_status;
+//    m_debug_ik_solver = false;
 }
 
 void StemTrackController::setDebugIKsolver(bool debug_ik_solver)

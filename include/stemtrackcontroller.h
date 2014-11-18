@@ -11,9 +11,9 @@
 #include <kdl/chainfksolverpos_recursive.hpp>
 #include <kdl/chainiksolvervel_pinv.hpp>
 
-#include "robotrepresentation.h"
-#include "stemrepresentation.h"
-#include "robotstatus.h"
+class RobotRepresentation;
+class StemRepresentation;
+class RobotStatus;
 
 class StemTrackController
 {
@@ -41,6 +41,7 @@ public:
     KDL::Frame getCartSetpointKDLFrame();
     KDL::JntArray getJointRefs();
     ~StemTrackController();
+
 };
 
 #endif // STEMTRACKCONTROLLER_H

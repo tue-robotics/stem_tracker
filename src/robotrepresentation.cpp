@@ -1,5 +1,11 @@
 #include "robotrepresentation.h"
 
+#include <ros/ros.h>
+#include <kdl_parser/kdl_parser.hpp>
+
+#define INFO_STREAM     ROS_INFO_STREAM
+
+
 RobotRepresentation::RobotRepresentation(const std::string name = "defaultRobot")
 {
     m_preferred_arm_set = false;
@@ -101,25 +107,25 @@ void RobotRepresentation::loadJointLimits()
     }
 }
 
-KDL::JntArray RobotRepresentation::getJointMinima()
-{
-    return m_q_min;
-}
+//KDL::JntArray RobotRepresentation::getJointMinima() const
+//{
+//    return m_q_min;
+//}
 
-std::vector<std::string> RobotRepresentation::getJointNames()
-{
-    return m_q_joint_names;
-}
+//std::vector<std::string> RobotRepresentation::getJointNames()
+//{
+//    return m_q_joint_names;
+//}
 
-KDL::JntArray RobotRepresentation::getJointMaxima()
-{
-    return m_q_max;
-}
+//KDL::JntArray RobotRepresentation::getJointMaxima()
+//{
+//    return m_q_max;
+//}
 
-KDL::JntArray RobotRepresentation::getJointSeeds()
-{
-    return m_q_seed;
-}
+//KDL::JntArray RobotRepresentation::getJointSeeds()
+//{
+//    return m_q_seed;
+//}
 
 KDL::Tree RobotRepresentation::getKinematicTree()
 {

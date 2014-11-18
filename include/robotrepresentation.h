@@ -1,17 +1,12 @@
 #ifndef ROBOTREPRESENTATION_H
 #define ROBOTREPRESENTATION_H
 
-#define INFO_STREAM     ROS_INFO_STREAM
-#include <ros/ros.h>
-
-#include <iostream>
+#include <string>
 #include <vector>
-#include <kdl_parser/kdl_parser.hpp>
 #include <kdl/chain.hpp>
 #include <kdl/tree.hpp>
 #include <kdl/jntarray.hpp>
 #include <urdf/model.h>
-
 
 class RobotRepresentation
 {
@@ -32,10 +27,10 @@ private:
 public:
     RobotRepresentation(const std::string name);
     bool selfCheck();
-    KDL::JntArray getJointMinima();
-    KDL::JntArray getJointMaxima();
-    KDL::JntArray getJointSeeds();
-    std::vector<std::string> getJointNames();
+    const KDL::JntArray& getJointMinima() const { return m_q_min; }
+    const KDL::JntArray& getJointMaxima() const { return m_q_max; }
+    const KDL::JntArray& getJointSeeds() const { return m_q_seed; }
+    const std::vector<std::string>& getJointNames() const { return m_q_joint_names; }
     void loadUrdfFromFile(const std::string filename);
     urdf::Model getUrdfModel();
     void loadKinematicTreeFromUrdf();
