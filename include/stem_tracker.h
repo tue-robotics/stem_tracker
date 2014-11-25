@@ -34,6 +34,5 @@
 
 #define     INFO_STREAM     ROS_INFO_STREAM
 #define     THIS_PACKAGE    "stem_tracker"
-#define     DEBUG_GPOSE     true
 
 #endif // STEM_TRACKER_H

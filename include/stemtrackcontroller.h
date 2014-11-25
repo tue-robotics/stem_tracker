@@ -11,6 +11,8 @@
 #include <kdl/chainfksolverpos_recursive.hpp>
 #include <kdl/chainiksolvervel_pinv.hpp>
 
+#include "debugfunctions.h"
+
 class RobotRepresentation;
 class StemRepresentation;
 class RobotStatus;
@@ -27,7 +29,8 @@ private:
     RobotRepresentation* m_p_robot_representation;
     StemRepresentation* m_p_stem_representation;
     RobotStatus* m_p_robot_status;
-    KDL::JntArray m_joint_refs;
+    KDL::JntArray m_joint_pos_refs;
+    KDL::JntArray m_joint_vel_refs;
 public:
     StemTrackController(RobotRepresentation* p_robot_representation, RobotStatus* p_robot_status, StemRepresentation* m_p_stem_representation);
     void setMaxZvelocity(float max_z_dot);
@@ -35,11 +38,14 @@ public:
     void setTiltWithStem(bool tilt_with_stem);
     void updateCartSetpoint(std::vector<float> setpoint_xyz);
     void updateCartSetpoint(std::vector<float> gripper_xyz, std::vector<float> xy_err);
-    void updateJointReferences();
+    void updateJointPosReferences();
+    void updateJointVelReferences();
+    void turnVelRefInPosRef();
     void setDebugIKsolver(bool debug_ik_solver);
     KDL::Vector getCartSetpointKDLVect();
     KDL::Frame getCartSetpointKDLFrame();
-    KDL::JntArray getJointRefs();
+    KDL::JntArray getJointPosRefs();
+    KDL::JntArray getJointVelRefs();
     ~StemTrackController();
 
 };

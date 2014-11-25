@@ -8,10 +8,10 @@ StemTrackController::StemTrackController(RobotRepresentation* p_robot_representa
     : m_p_robot_representation(p_robot_representation), m_p_stem_representation(p_stem_representation),
       m_p_robot_status(p_robot_status), m_debug_ik_solver(false)
 {
-//    m_p_robot_representation = p_robot_representation;
-//    m_p_stem_representation = p_stem_representation;
-//    m_p_robot_status = p_robot_status;
-//    m_debug_ik_solver = false;
+    //    m_p_robot_representation = p_robot_representation;
+    //    m_p_stem_representation = p_stem_representation;
+    //    m_p_robot_status = p_robot_status;
+    //    m_debug_ik_solver = false;
 }
 
 void StemTrackController::setDebugIKsolver(bool debug_ik_solver)
@@ -62,7 +62,6 @@ void StemTrackController::updateCartSetpoint(std::vector<float> gripper_xyz, std
 
     if(m_tilt_with_stem)
     {
-        //        gripper_rotation.DoRotZ(-0.3);
 
         std::vector<float> stem_tangent = m_p_stem_representation->getCurrentTangent();
 
@@ -92,7 +91,7 @@ KDL::Frame StemTrackController::getCartSetpointKDLFrame()
     return m_setpoint_frame;
 }
 
-void StemTrackController::updateJointReferences()
+void StemTrackController::updateJointPosReferences()
 {
     boost::shared_ptr<KDL::ChainFkSolverPos> fksolver_;
     boost::shared_ptr<KDL::ChainIkSolverVel> ik_vel_solver_;
@@ -105,17 +104,45 @@ void StemTrackController::updateJointReferences()
 
     KDL::Frame f_in(m_p_robot_status->getGripperKDLframe().M, m_setpoint_vector );
 
-    int status = ik_solver_->CartToJnt(m_p_robot_representation->getJointSeeds(), m_setpoint_frame, m_joint_refs);
+    int status = ik_solver_->CartToJnt(m_p_robot_representation->getJointSeeds(), m_setpoint_frame, m_joint_pos_refs);
     if(m_debug_ik_solver)
         INFO_STREAM("status ik_solver: " << status);
 
     return;
 }
 
-KDL::JntArray StemTrackController::getJointRefs()
+void StemTrackController::updateJointVelReferences()
 {
-    return m_joint_refs;
+    KDL::Vector vel = m_setpoint_vector - m_p_robot_status->getGripperKDLframe().p;
+    KDL::Vector rot = KDL::Vector(0.0, 0.0, 0.0);
+    KDL::Twist twist = KDL::Twist(vel, rot);
+
+    boost::shared_ptr<KDL::ChainIkSolverVel> ik_vel_solver_;
+    ik_vel_solver_.reset(new KDL::ChainIkSolverVel_pinv(m_p_robot_representation->getKinematicChain()));
+
+    m_joint_vel_refs.resize(m_p_robot_status->getNjointsMonitoring());
+    ik_vel_solver_->CartToJnt(m_p_robot_status->getJointStatus(), twist, m_joint_vel_refs);
 }
+
+void StemTrackController::turnVelRefInPosRef()
+{
+    m_joint_pos_refs.resize(m_joint_vel_refs.rows());
+    for(int i=0; i<m_joint_vel_refs.rows(); ++i)
+    {
+        m_joint_pos_refs(i) =  m_p_robot_status->getJointStatus()(i) + m_joint_vel_refs(i) * 1.0 / (double) m_update_rate;
+    }
+}
+
+KDL::JntArray StemTrackController::getJointPosRefs()
+{
+    return m_joint_pos_refs;
+}
+
+KDL::JntArray StemTrackController::getJointVelRefs()
+{
+    return m_joint_vel_refs;
+}
+
 
 StemTrackController::~StemTrackController()
 {

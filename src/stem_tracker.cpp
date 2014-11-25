@@ -1,6 +1,8 @@
 #include "stem_tracker.h"
 
 // TODO:
+//- rekening houden met joint limits als alleen ik vel solver
+//- tilt met stem fixen als alleen ik vel solver
 //- slimmere pose target, met helling meedraaien
 //- alleen velocity solver in de loop ipv telkens complete positie ik
 //- reageren op combinatie van whisker forces ipv naar bekende intersection
@@ -14,6 +16,8 @@
 //- check voor tegenkomen side branch
 //- use stem length instead of distance in z for lin_tan_d
 //- smoothefier achter transformatie naar joint coordinaten (?)
+//- waarom hangen bij hele lage snelheid
+
 
 int main(int argc, char** argv)
 {
@@ -110,7 +114,7 @@ int main(int argc, char** argv)
             sp.startTimer("main");
 
             if(TomatoMonitor.getState() == STEMTRACK_PREPOS && AmigoStatus.isUpToDate())
-            {        
+            {
                 /* bring arm to initial position */
                 AmigoInterface.publishJointPosRefs(AmigoRepresentation.getInitialPoseJointRefs());
                 TomatoMonitor.updateState();
@@ -126,10 +130,10 @@ int main(int argc, char** argv)
                 TomatoControl.updateCartSetpoint(TomatoStem.getNearestXYZ());
 
                 /* translate cartesian setpoint to joint coordinates */
-                TomatoControl.updateJointReferences();
+                TomatoControl.updateJointPosReferences();
 
                 /* send references to joint controllers */
-                AmigoInterface.publishJointPosRefs(TomatoControl.getJointRefs());
+                AmigoInterface.publishJointPosRefs(TomatoControl.getJointPosRefs());
 
                 /* check if reference reached */
                 TomatoMonitor.updateState();
@@ -154,10 +158,19 @@ int main(int argc, char** argv)
                 RvizInterface.showArrow(TomatoStem.getCurrentTangent(), TomatoStem.getNearestXYZ(), stem_tangent);
 
                 /* translate cartesian setpoint to joint coordinates */
-                TomatoControl.updateJointReferences();
+                bool ik_vel_only;
+                config.value("ik_vel_only", ik_vel_only);
+                if(ik_vel_only)
+                {
+                    TomatoControl.updateJointVelReferences();
+                    TomatoControl.turnVelRefInPosRef();
+                }
+                else
+                    TomatoControl.updateJointPosReferences();
+
 
                 /* send references to joint controllers */
-                AmigoInterface.publishJointPosRefs(TomatoControl.getJointRefs());
+                AmigoInterface.publishJointPosRefs(TomatoControl.getJointPosRefs());
 
                 /* check if end of stem reached */
                 TomatoMonitor.updateState();

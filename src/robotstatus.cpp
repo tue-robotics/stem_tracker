@@ -25,6 +25,11 @@ bool RobotStatus::selfCheck()
     return IamOK;
 }
 
+int RobotStatus::getNjointsMonitoring()
+{
+    return m_n_joints_monitoring;
+}
+
 void RobotStatus::setPosReachedThreshold(float pos_reached_threshold)
 {
     m_pos_reached_threshold = pos_reached_threshold;

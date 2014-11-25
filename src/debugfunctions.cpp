@@ -17,6 +17,49 @@ void printKDLframe(KDL::Frame kdl_frame)
     }
 }
 
+void printKDLJntArray(KDL::JntArray kdl_array)
+{
+    if( kdl_array.rows() == 0)
+    {
+        INFO_STREAM("empty kdl array");
+        return;
+    }
+
+    INFO_STREAM("kdl joint array:");
+
+    INFO_STREAM(std::scientific << kdl_array.data);
+
+}
+
+void printKDLVelframe(KDL::FrameVel kdl_vel_frame)
+{
+    std::stringstream frame_stream;
+
+    KDL::Rotation rot = kdl_vel_frame.M.R;
+
+    INFO_STREAM("kdl vel frame, Rotation:");
+    for(int i=0; i<3; ++i)
+    {
+        frame_stream.str(""); frame_stream << std::scientific;
+
+        for(int j=0; j<3; ++j)
+            frame_stream << rot(i,j) << "\t";
+
+        INFO_STREAM(frame_stream.str());
+    }
+
+    frame_stream.str(""); frame_stream << std::scientific;
+    INFO_STREAM("kdl vel frame, Translation:");
+    KDL::Vector vec = kdl_vel_frame.p.p;
+    for(int i=0; i<3; ++i)
+    {
+        frame_stream << vec(i) << "\t";
+    }
+    INFO_STREAM(frame_stream.str());
+}
+
+
+
 void printXYZvector(std::vector<float> vect)
 {
     INFO_STREAM("x = " << vect.at(0) << " y = " << vect.at(1) << " z = " << vect.at(2));

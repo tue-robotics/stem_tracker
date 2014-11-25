@@ -43,7 +43,7 @@ void StemTrackMonitor::updateState()
         break;
 
     case STEMTRACK_GRASP:
-        if( m_p_robot_status->reachedPosition( m_p_stemtrack_control->getJointRefs() ))
+        if( m_p_robot_status->reachedPosition( m_p_stemtrack_control->getJointPosRefs() ))
         {
             m_state = STEMTRACK_FOLLOW;
             INFO_STREAM("Me has tha stem, me is going to move up");

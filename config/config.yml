@@ -50,9 +50,10 @@ stem_nodes:                                                     # stem nodes, de
 # TRACKING CONTROL CONFIG
 ##########################
 
-max_z_dot:                      0.2                             # max gripper velocity in vertical direction during stem tracking (m/s)
+max_z_dot:                      0.3                             # max gripper velocity in vertical direction during stem tracking (m/s)
 tilt_with_stem:                 1                               # if true (1) tilt gripper based on local derivative of stem
 debug_ik_solver:                0                               # if true (1) status of kdl ik solver will be printed
+ik_vel_only:                    0                               # if true (1) after initialization we only use kdl ik velocity solver, no fk or ik position solvers
 
 ##########################
 # TRACKING MONITOR CONFIG

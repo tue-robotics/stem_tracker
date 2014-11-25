@@ -39,6 +39,7 @@ class RobotStatus
         bool isGripperXYZvalid();
         bool hasValidGripperXYZ();
         void updateGripperXYZ();
+        int getNjointsMonitoring();
         ros::Time getLastUpdateTime();
         double getTimeSinceLastUpdate();
         bool isUpToDate();
