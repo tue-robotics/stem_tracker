@@ -129,7 +129,13 @@ void StemTrackController::turnVelRefInPosRef()
     m_joint_pos_refs.resize(m_joint_vel_refs.rows());
     for(int i=0; i<m_joint_vel_refs.rows(); ++i)
     {
-        m_joint_pos_refs(i) =  m_p_robot_status->getJointStatus()(i) + m_joint_vel_refs(i) * 1.0 / (double) m_update_rate;
+        double tmp = m_p_robot_status->getJointStatus()(i) + m_joint_vel_refs(i) * 1.0 / (double) m_update_rate;
+        if(tmp>m_p_robot_representation->getJointMaxima()(i))
+            m_joint_pos_refs(i) = m_p_robot_representation->getJointMaxima()(i);
+        else if (tmp<m_p_robot_representation->getJointMinima()(i))
+            m_joint_pos_refs(i) = m_p_robot_representation->getJointMinima()(i);
+        else
+            m_joint_pos_refs(i) = tmp;
     }
 }
 

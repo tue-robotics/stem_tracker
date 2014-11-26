@@ -3,19 +3,17 @@
 // TODO:
 //- rekening houden met joint limits als alleen ik vel solver
 //- tilt met stem fixen als alleen ik vel solver
-//- slimmere pose target, met helling meedraaien
-//- alleen velocity solver in de loop ipv telkens complete positie ik
+//- z verplaatsing functie van error
 //- reageren op combinatie van whisker forces ipv naar bekende intersection
-//- orientatie base frame tov gripper frame voor 'neutrale' pose configureerbaar
+//- orientatie base frame tov gripper frame voor 'neutrale' pose configureerbaar maken
 //- check voor welke objecten interface naar andere object alleen voor config nodig is (vb in robotstatus)
 //- maak een robotstatus up to date reset, bijv om na wisselen van arm opnieuw op up to date info te wachten
 //- robotstatus up to date check voor volledige array
-//- selfchecks verbeteren of weghalen
-//- alleen maar doubles ipv soms float soms double
+//- selfchecks updaten of weghalen
 //- check voor loslaten van stengel
 //- check voor tegenkomen side branch
 //- use stem length instead of distance in z for lin_tan_d
-//- smoothefier achter transformatie naar joint coordinaten (?)
+//- veiligheidscheck voor verspringen joint coordinaten
 //- waarom hangen bij hele lage snelheid
 
 
