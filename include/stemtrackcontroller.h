@@ -24,6 +24,7 @@ private:
     int m_update_rate;
     bool m_tilt_with_stem;
     bool m_debug_ik_solver;
+    bool m_use_ik_velocity_solver_only;
     KDL::Vector m_setpoint_vector;
     KDL::Frame m_setpoint_frame;
     RobotRepresentation* m_p_robot_representation;
@@ -35,6 +36,7 @@ public:
     StemTrackController(RobotRepresentation* p_robot_representation, RobotStatus* p_robot_status, StemRepresentation* m_p_stem_representation);
     void setMaxZvelocity(float max_z_dot);
     void setUpdateRate(int update_rate);
+    void setUseInverseVelocitySolverOnly(bool use_ik_vel_only);
     void setTiltWithStem(bool tilt_with_stem);
     void updateCartSetpoint(std::vector<float> setpoint_xyz);
     void updateCartSetpoint(std::vector<float> gripper_xyz, std::vector<float> xy_err);

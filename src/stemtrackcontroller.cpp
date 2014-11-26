@@ -91,23 +91,34 @@ KDL::Frame StemTrackController::getCartSetpointKDLFrame()
     return m_setpoint_frame;
 }
 
+void StemTrackController::setUseInverseVelocitySolverOnly(bool use_ik_vel_only)
+{
+    m_use_ik_velocity_solver_only = use_ik_vel_only;
+}
+
 void StemTrackController::updateJointPosReferences()
 {
-    boost::shared_ptr<KDL::ChainFkSolverPos> fksolver_;
-    boost::shared_ptr<KDL::ChainIkSolverVel> ik_vel_solver_;
-    boost::shared_ptr<KDL::ChainIkSolverPos> ik_solver_;
+    if(m_use_ik_velocity_solver_only){
+        updateJointVelReferences();
+        turnVelRefInPosRef();
+    }
+    else
+    {
+        boost::shared_ptr<KDL::ChainFkSolverPos> fksolver_;
+        boost::shared_ptr<KDL::ChainIkSolverVel> ik_vel_solver_;
+        boost::shared_ptr<KDL::ChainIkSolverPos> ik_solver_;
 
-    fksolver_.reset(new KDL::ChainFkSolverPos_recursive(m_p_robot_representation->getKinematicChain()));
-    ik_vel_solver_.reset(new KDL::ChainIkSolverVel_pinv(m_p_robot_representation->getKinematicChain()));
-    ik_solver_.reset(new KDL::ChainIkSolverPos_NR_JL(m_p_robot_representation->getKinematicChain(), m_p_robot_representation->getJointMinima(), m_p_robot_representation->getJointMaxima(), *fksolver_, *ik_vel_solver_, 100) );
+        fksolver_.reset(new KDL::ChainFkSolverPos_recursive(m_p_robot_representation->getKinematicChain()));
+        ik_vel_solver_.reset(new KDL::ChainIkSolverVel_pinv(m_p_robot_representation->getKinematicChain()));
+        ik_solver_.reset(new KDL::ChainIkSolverPos_NR_JL(m_p_robot_representation->getKinematicChain(), m_p_robot_representation->getJointMinima(), m_p_robot_representation->getJointMaxima(), *fksolver_, *ik_vel_solver_, 100) );
 
 
-    KDL::Frame f_in(m_p_robot_status->getGripperKDLframe().M, m_setpoint_vector );
+        KDL::Frame f_in(m_p_robot_status->getGripperKDLframe().M, m_setpoint_vector );
 
-    int status = ik_solver_->CartToJnt(m_p_robot_representation->getJointSeeds(), m_setpoint_frame, m_joint_pos_refs);
-    if(m_debug_ik_solver)
-        INFO_STREAM("status ik_solver: " << status);
-
+        int status = ik_solver_->CartToJnt(m_p_robot_representation->getJointSeeds(), m_setpoint_frame, m_joint_pos_refs);
+        if(m_debug_ik_solver)
+            INFO_STREAM("status ik_solver: " << status);
+    }
     return;
 }
 

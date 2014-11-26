@@ -160,6 +160,9 @@ void Configurer::configureStemTrackController(tue::Configuration config, StemTra
 
     config.value("debug_ik_solver", stc_DEBUG_IK_SOLVER);
     p_stem_track_controller->setDebugIKsolver(stc_DEBUG_IK_SOLVER);
+
+    config.value("ik_vel_only", stc_IK_VEL_ONLY);
+    p_stem_track_controller->setUseInverseVelocitySolverOnly(stc_IK_VEL_ONLY);
 }
 
 void Configurer::configureRobotInterface(tue::Configuration config, RobotInterface* p_robot_interface)

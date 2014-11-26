@@ -15,6 +15,7 @@
 //- use stem length instead of distance in z for lin_tan_d
 //- veiligheidscheck voor verspringen joint coordinaten
 //- waarom hangen bij hele lage snelheid
+//- INFO STREAM niet in alle nodes, printall stringstream laten returnen
 
 
 int main(int argc, char** argv)
@@ -156,16 +157,7 @@ int main(int argc, char** argv)
                 RvizInterface.showArrow(TomatoStem.getCurrentTangent(), TomatoStem.getNearestXYZ(), stem_tangent);
 
                 /* translate cartesian setpoint to joint coordinates */
-                bool ik_vel_only;
-                config.value("ik_vel_only", ik_vel_only);
-                if(ik_vel_only)
-                {
-                    TomatoControl.updateJointVelReferences();
-                    TomatoControl.turnVelRefInPosRef();
-                }
-                else
-                    TomatoControl.updateJointPosReferences();
-
+                TomatoControl.updateJointPosReferences();
 
                 /* send references to joint controllers */
                 AmigoInterface.publishJointPosRefs(TomatoControl.getJointPosRefs());

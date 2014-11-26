@@ -55,6 +55,7 @@ private:
     float stc_MAX_Z_DOT;
     bool stc_TILT_WITH_STEM;
     bool stc_DEBUG_IK_SOLVER;
+    bool stc_IK_VEL_ONLY;
 
     /* stem track monitor config parameters */
     bool stm_DEBUG_STATE_PAR;
