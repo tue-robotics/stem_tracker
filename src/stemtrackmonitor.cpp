@@ -18,7 +18,7 @@ bool StemTrackMonitor::reachedEndOfStem()
 {
     if( m_p_stem_representation->getNearestXYZ().size() != 3)
     {
-        INFO_STREAM("trying to check for end of stem while stem-intersection is not known");
+        INFO_STREAM("trying to check for end of stem while stem-intersection is not known!");
     }
 
     if( fabs(m_p_stem_representation->getNearestXYZ().at(2) - m_p_stem_representation->getNodesZ().back()) < 0.05 )
@@ -38,15 +38,17 @@ void StemTrackMonitor::updateState()
         if( m_p_robot_status->reachedPosition( m_p_robot_representation->getInitialPoseJointRefs() ) )
         {
             m_state = STEMTRACK_GRASP;
-            INFO_STREAM("Me is going to grasp some stem, hihaa");
+            INFO_STREAM("=============================================");
+            INFO_STREAM("==> I am going to grasp the stem, hihaa");
         }
         break;
 
     case STEMTRACK_GRASP:
-        if( m_p_robot_status->reachedPosition( m_p_stemtrack_control->getJointPosRefs() ))
+        if( m_p_robot_status->reachedPosition(m_p_stem_representation->getNearestXYZ()) )
         {
             m_state = STEMTRACK_FOLLOW;
-            INFO_STREAM("Me has tha stem, me is going to move up");
+            INFO_STREAM("=============================================");
+            INFO_STREAM("==> I have the stem, going to move up now");
         }
         break;
 
@@ -54,7 +56,8 @@ void StemTrackMonitor::updateState()
         if( reachedEndOfStem() )
         {
             m_state = STEMTRACK_END;
-            INFO_STREAM("Me is done with my task");
+            INFO_STREAM("=============================================");
+            INFO_STREAM("==> I am done with my task");
         }
         break;
     }

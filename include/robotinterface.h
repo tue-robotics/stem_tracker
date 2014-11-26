@@ -16,10 +16,10 @@ private:
     RobotRepresentation* m_p_robot_representation;
     RobotStatus* m_p_robot_status;
     ros::NodeHandle m_node;
-    ros::Publisher m_arm_ref_pub;       // arm reference publisher
-    ros::Publisher m_torso_ref_pub;     // torso reference publisher
-    ros::Subscriber m_arm_meas_sub;     // arm measurements subscriber
-    ros::Subscriber m_torso_meas_sub;   // torso measurements subscriber
+    ros::Publisher m_arm_ref_pub;
+    ros::Publisher m_torso_ref_pub;
+    ros::Subscriber m_arm_meas_sub;
+    ros::Subscriber m_torso_meas_sub;
 public:
     RobotInterface(ros::NodeHandle node, RobotRepresentation* p_robot_representation, RobotStatus* p_robot_status);
     void connectToAmigoArm(bool leftArmIsPreferred);

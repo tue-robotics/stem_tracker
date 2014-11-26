@@ -36,6 +36,7 @@ private:
     /* robot status config parameters */
     double rs_UP_TO_DATE_THRESHOLD;
     float rs_POS_REACHED_THRESHOLD;
+    double rs_XYZ_REACHED_THRESHOLD;
 
     /* stem representation config parameters */
     float sr_STEM_THICKNESS;

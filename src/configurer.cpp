@@ -142,6 +142,9 @@ void Configurer::configureRobotStatus(tue::Configuration config, RobotStatus* p_
 
     p_robot_status->setPosReachedThreshold(rs_POS_REACHED_THRESHOLD);
     p_robot_status->setUpToDateThreshold( rs_UP_TO_DATE_THRESHOLD );
+
+    config.value("xyz_reached_threshold",rs_XYZ_REACHED_THRESHOLD);
+    p_robot_status->setXYZreachedThreshold(rs_XYZ_REACHED_THRESHOLD);
 }
 
 void Configurer::configureStemTrackController(tue::Configuration config, StemTrackController* p_stem_track_controller)

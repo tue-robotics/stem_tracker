@@ -14,7 +14,6 @@ root_link:                      base_link                       # start of kinem
 left_end_link:                  grippoint_left                  # end of kinematic chain we are controlling, if use_leftarm
 right_end_link:                 grippoint_right                 # end of kinematic chain we are controlling, if not use_leftarm
 up_to_date_threshold:           0.05                            # consider robot status up to date if measurement received within passed x sec
-pos_reached_threshold:          0.05                            # if absolute position error for each of the joints in robot-status is below this threshold position is reached
 initial_pose:                                                   # pose used as preposition, length should be equal to the number of joints in kinematic chain
     - {q: 0.1}
     - {q: -0.1}
@@ -50,10 +49,12 @@ stem_nodes:                                                     # stem nodes, de
 # TRACKING CONTROL CONFIG
 ##########################
 
-max_z_dot:                      50                               # max gripper velocity in vertical direction during stem tracking (m/s)
+max_z_dot:                      0.2                               # max gripper velocity in vertical direction during stem tracking (m/s)
 tilt_with_stem:                 1                               # if true (1) tilt gripper based on local derivative of stem
 debug_ik_solver:                0                               # if true (1) status of kdl ik solver will be printed
-ik_vel_only:                    1                               # if true (1) after initialization we only use kdl ik velocity solver, no fk or ik position solvers
+ik_vel_only:                    0                               # if true (1) after initialization we only use kdl ik velocity solver, no fk or ik position solvers
+xyz_reached_threshold:          0.01                            # if cartesian position error of the gripper in robot-status is below this threshold position is considered reached
+pos_reached_threshold:          0.05                            # if absolute position error for each of the joints in robot-status is below this threshold position is considered reached
 
 ##########################
 # TRACKING MONITOR CONFIG

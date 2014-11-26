@@ -4,15 +4,6 @@
 #include "stemrepresentation.h"
 #include "robotstatus.h"
 
-StemTrackController::StemTrackController(RobotRepresentation* p_robot_representation, RobotStatus* p_robot_status, StemRepresentation* p_stem_representation)
-    : m_p_robot_representation(p_robot_representation), m_p_stem_representation(p_stem_representation),
-      m_p_robot_status(p_robot_status), m_debug_ik_solver(false)
-{
-    //    m_p_robot_representation = p_robot_representation;
-    //    m_p_stem_representation = p_stem_representation;
-    //    m_p_robot_status = p_robot_status;
-    //    m_debug_ik_solver = false;
-}
 
 void StemTrackController::setDebugIKsolver(bool debug_ik_solver)
 {
@@ -54,15 +45,10 @@ void StemTrackController::updateCartSetpoint(std::vector<float> gripper_xyz, std
 
     m_setpoint_vector = KDL::Vector( gripper_xyz[0] - xy_err[0], gripper_xyz[1] - xy_err[1], gripper_xyz[2] + m_max_z_dot / (double) m_update_rate );
 
-    m_setpoint_frame = KDL::Frame( KDL::Rotation::Identity(), m_setpoint_vector);
-
     KDL::Rotation gripper_rotation = KDL::Rotation::Identity();
-
-    // assumption: 'neutral' gripping pose is not rotated wrt base frame
 
     if(m_tilt_with_stem)
     {
-
         std::vector<float> stem_tangent = m_p_stem_representation->getCurrentTangent();
 
         if(stem_tangent.size() == 3)
@@ -125,7 +111,7 @@ void StemTrackController::updateJointPosReferences()
 void StemTrackController::updateJointVelReferences()
 {
     KDL::Vector vel = m_setpoint_vector - m_p_robot_status->getGripperKDLframe().p;
-    KDL::Vector rot = KDL::Vector(0.0, 0.0, 0.0);
+    KDL::Vector rot = m_setpoint_frame.M.GetRot();
     KDL::Twist twist = KDL::Twist(vel, rot);
 
     boost::shared_ptr<KDL::ChainIkSolverVel> ik_vel_solver_;

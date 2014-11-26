@@ -1,9 +1,10 @@
 #include "stem_tracker.h"
 
 // TODO:
-//- rekening houden met joint limits als alleen ik vel solver
+//- rekening houden met joint limits als alleen ik vel solver, nulruimte term toevoegen
 //- tilt met stem fixen als alleen ik vel solver
 //- z verplaatsing functie van error
+//- use z rotation of setpoint to increase reachable space
 //- reageren op combinatie van whisker forces ipv naar bekende intersection
 //- orientatie base frame tov gripper frame voor 'neutrale' pose configureerbaar maken
 //- check voor welke objecten interface naar andere object alleen voor config nodig is (vb in robotstatus)
@@ -146,7 +147,6 @@ int main(int argc, char** argv)
                 /* find and show nearest intersection with stem */
                 TomatoStem.updateNearestXYZ(AmigoStatus.getGripperXYZ());
                 RvizInterface.showXYZ(TomatoStem.getNearestXYZ(), nearest_stem_intersection);
-
 
                 /* simulate and show whisker sensor output */
                 TomatoWhiskerGripper.simulateWhiskerGripper(AmigoStatus.getGripperXYZ(), TomatoStem.getNearestXYZ() );

@@ -6,11 +6,10 @@
 #define INFO_STREAM     ROS_INFO_STREAM
 
 
-RobotRepresentation::RobotRepresentation(const std::string name = "defaultRobot")
+RobotRepresentation::RobotRepresentation(const std::string& name = "defaultRobot")
 {
     m_preferred_arm_set = false;
     m_n_joints_in_chain = -1;
-    m_initial_pose_set = false;
     m_name = name;
 }
 
@@ -30,18 +29,13 @@ bool RobotRepresentation::selfCheck()
     return true;
 }
 
-void RobotRepresentation::loadUrdfFromFile(const std::string filename)
+void RobotRepresentation::loadUrdfFromFile(const std::string& filename)
 {
     m_urdf_model.clear();
     if ( !m_urdf_model.initFile(filename) )
         INFO_STREAM("Could not initialize urdf model from file: " << filename);
 
     return;
-}
-
-urdf::Model RobotRepresentation::getUrdfModel()
-{
-    return m_urdf_model;
 }
 
 void RobotRepresentation::loadKinematicTreeFromUrdf()
@@ -52,7 +46,7 @@ void RobotRepresentation::loadKinematicTreeFromUrdf()
         INFO_STREAM("Urdf model has been turned in kdl tree.");
 }
 
-void RobotRepresentation::loadKinematicChainFromTree(const std::string root_link_name, const std::string tip_link_name)
+void RobotRepresentation::loadKinematicChainFromTree(const std::string& root_link_name, const std::string& tip_link_name)
 {
     m_root_link_name = root_link_name;
     m_tip_link_name = tip_link_name;
@@ -107,36 +101,6 @@ void RobotRepresentation::loadJointLimits()
     }
 }
 
-//KDL::JntArray RobotRepresentation::getJointMinima() const
-//{
-//    return m_q_min;
-//}
-
-//std::vector<std::string> RobotRepresentation::getJointNames()
-//{
-//    return m_q_joint_names;
-//}
-
-//KDL::JntArray RobotRepresentation::getJointMaxima()
-//{
-//    return m_q_max;
-//}
-
-//KDL::JntArray RobotRepresentation::getJointSeeds()
-//{
-//    return m_q_seed;
-//}
-
-KDL::Tree RobotRepresentation::getKinematicTree()
-{
-    return m_kinematic_tree;
-}
-
-KDL::Chain RobotRepresentation::getKinematicChain()
-{
-    return m_kinematic_chain;
-}
-
 void RobotRepresentation::setLeftArmIsPreferred()
 {
     m_prefer_left_arm = true;
@@ -159,11 +123,6 @@ bool RobotRepresentation::isRightArmPreferred()
     return !m_prefer_left_arm;
 }
 
-const std::string RobotRepresentation::getName()
-{
-    return m_name;
-}
-
 void RobotRepresentation::setInitialPoseJointRefs(std::vector<float> joint_refs)
 {
     if(joint_refs.size() != m_n_joints_in_chain)
@@ -173,19 +132,9 @@ void RobotRepresentation::setInitialPoseJointRefs(std::vector<float> joint_refs)
     }
 
     m_q_initial_pose.resize(m_n_joints_in_chain);
+
     for(int i = 0; i< m_n_joints_in_chain; ++i)
-    {
         m_q_initial_pose(i) = joint_refs.at(i);
-    }
-    m_initial_pose_set = true;
-}
-
-KDL::JntArray RobotRepresentation::getInitialPoseJointRefs()
-{
-    if(!m_initial_pose_set)
-        INFO_STREAM("asking for initial pose but pose is not set yet!");
-
-    return m_q_initial_pose;
 }
 
 void RobotRepresentation::printAll()

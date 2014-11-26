@@ -10,6 +10,7 @@ RobotStatus::RobotStatus(RobotRepresentation* p_robot_representation)
     m_joints_to_monitor = KDL::JntArray(m_n_joints_monitoring);
     m_p_robot_representation = p_robot_representation;
     m_pos_reached_threshold = -1.0;
+    m_xyz_reached_threshold = -1.0;
 }
 
 bool RobotStatus::selfCheck()
@@ -56,6 +57,40 @@ bool RobotStatus::reachedPosition(KDL::JntArray reference)
     }
 
     return true;
+}
+
+double RobotStatus::setXYZreachedThreshold(double xyz_reached_threshold)
+{
+    m_xyz_reached_threshold = xyz_reached_threshold;
+}
+
+bool RobotStatus::reachedPosition(std::vector<float> reference)
+{
+    if( reference.size() != 3)
+    {
+        INFO_STREAM("reachedPosition check for vector with " << reference.size() << " elements. I need xyz");
+        return false;
+    }
+
+    if( m_xyz_reached_threshold < 0.0)
+    {
+        INFO_STREAM("reachedPosition check while threshold was not set!");
+        return false;
+    }
+
+    if( getGripperXYZ().size() != 3)
+    {
+        INFO_STREAM("reachedPosition check while gripperxyz is not known!");
+        return false;
+    }
+
+    double diff[3] = {getGripperXYZ()[0] - reference[0], getGripperXYZ()[1] - reference[1], getGripperXYZ()[2] - reference[2]};
+
+    if( diff[0] * diff[0] + diff[1] * diff[1] + diff[2] * diff[2] > m_xyz_reached_threshold * m_xyz_reached_threshold)
+        return false;
+    else
+        return true;
+
 }
 
 void RobotStatus::updateJointStatus(KDL::JntArray updated_joint_status)

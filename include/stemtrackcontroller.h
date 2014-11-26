@@ -33,7 +33,8 @@ private:
     KDL::JntArray m_joint_pos_refs;
     KDL::JntArray m_joint_vel_refs;
 public:
-    StemTrackController(RobotRepresentation* p_robot_representation, RobotStatus* p_robot_status, StemRepresentation* m_p_stem_representation);
+    StemTrackController(RobotRepresentation* p_robot_representation, RobotStatus* p_robot_status, StemRepresentation* p_stem_representation)
+        : m_p_robot_representation(p_robot_representation), m_p_stem_representation(p_stem_representation), m_p_robot_status(p_robot_status), m_debug_ik_solver(false) {}
     void setMaxZvelocity(float max_z_dot);
     void setUpdateRate(int update_rate);
     void setUseInverseVelocitySolverOnly(bool use_ik_vel_only);
