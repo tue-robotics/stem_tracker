@@ -1,80 +1,48 @@
 #ifndef CONFIGURER_H
 #define CONFIGURER_H
 
-#define     INFO_STREAM     ROS_INFO_STREAM
-
 #include <string>
 #include <vector>
 
 #include <tue/config/configuration.h>
 
-#include "stemrepresentation.h"
-#include "robotrepresentation.h"
-#include "robotstatus.h"
-#include "robotinterface.h"
-#include "whiskerinterpreter.h"
-#include "stemtrackcontroller.h"
-#include "stemtrackmonitor.h"
+/* forward declaration */
+class StemRepresentation;
+class RobotRepresentation;
+class RobotStatus;
+class RobotInterface;
+class WhiskerInterpreter;
+class StemTrackController;
+class StemTrackMonitor;
 
 class Configurer
 {
+
 private:
 
-    /* global config parameters */
-    bool g_DEBUG;
-    int g_UPDATE_RATE;
-    std::string g_BASE_FRAME;
-
-    /* robot representation config parameters */
-    std::string rr_ROOT_LINK;
-    bool rr_USE_LEFTARM;
-    std::string rr_URDF_FILENAME;
-    std::string rr_LEFT_END_LINK;
-    std::string rr_RIGHT_END_LINK;
-    std::vector<float> rr_INITIAL_POSE;
-
-    /* robot status config parameters */
-    double rs_UP_TO_DATE_THRESHOLD;
-    float rs_POS_REACHED_THRESHOLD;
-    double rs_XYZ_REACHED_THRESHOLD;
-
-    /* stem representation config parameters */
-    float sr_STEM_THICKNESS;
-    float sr_STEM_RGB[3];
-    std::vector<float> sr_stemNodesX;
-    std::vector<float> sr_stemNodesY;
-    std::vector<float> sr_stemNodesZ;
-    float sr_LIN_TAN_D;
-
-    /* whisker interpreter config parameters */
-    int wi_N_WHISKERS;
-    float wi_GRIPPER_DIAMETER;
-    float wi_WHISKER_LENGTH;
-    float wi_MAX_WHISKER_FORCE;
-
-    /* stem track controller config parameters */
-    float stc_MAX_Z_DOT;
-    bool stc_TILT_WITH_STEM;
-    bool stc_DEBUG_IK_SOLVER;
-    bool stc_IK_VEL_ONLY;
-
-    /* stem track monitor config parameters */
-    bool stm_DEBUG_STATE_PAR;
+    const double extractDouble(const tue::Configuration& config, const std::string& name);
+    const float extractFloat(const tue::Configuration& config, const std::string& name);
+    const int extractInt(const tue::Configuration& config, const std::string& name);
+    const bool extractBool(const tue::Configuration& config, const std::string& name);
+    const std::string extractString(const tue::Configuration& config, const std::string& name);
 
 public:
 
-    void loadGlobalConfig(tue::Configuration config);
-    void configureStemTrackController(tue::Configuration config, StemTrackController* p_stem_track_controller);
-    void configureStemRepresentation(tue::Configuration config, StemRepresentation* p_stem);
-    void configureRobotRepresentation(tue::Configuration config, RobotRepresentation* p_robot_representation, ros::NodeHandle n);
-    void configureRobotStatus(tue::Configuration config, RobotStatus* p_robot_status);
-    void configureWhiskerInterpreter(tue::Configuration config, WhiskerInterpreter* p_whisker_interpreter);
-    void configureRobotInterface(tue::Configuration config, RobotInterface* p_robot_interface);
-    void configureStemTrackMonitor(tue::Configuration config, StemTrackMonitor* p_stemtrack_monitor);
-    int getUpdateRate(tue::Configuration config);
-    std::string getBaseFrame(tue::Configuration config);
+    void configureStemTrackController(const tue::Configuration& config, StemTrackController& stem_track_controller);
+    void configureStemRepresentation(tue::Configuration& config, StemRepresentation& stem);
+    void configureRobotRepresentation(tue::Configuration& config, RobotRepresentation& robot_representation);
+    void configureRobotStatus(const tue::Configuration& config, RobotStatus& robot_status);
+    void configureWhiskerInterpreter(const tue::Configuration& config, WhiskerInterpreter& whisker_interpreter);
+    void configureRobotInterface(const tue::Configuration& config, RobotInterface& robot_interface);
+    void configureStemTrackMonitor(const tue::Configuration& config, StemTrackMonitor& stemtrack_monitor);
+
+    const int getUpdateRate(const tue::Configuration& config);
+    const std::string getBaseFrame(const tue::Configuration& config);
+    const int getLoglevel(const tue::Configuration& config);
+    const bool getUseLeft(const tue::Configuration& config);
 
     ~Configurer();
+
 };
 
 #endif // CONFIGURER_H

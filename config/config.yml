@@ -1,6 +1,6 @@
 
 update_rate:                    100                             # spin rate of stem_tracking node, in hz
-debug:                          1                               # if true (1) additional information will be printed, else set to false (0)
+loglevel:                       1                               # if larger than zero additional information will be printed (currently only one loglevel implemented)
 base_frame:                     /amigo/base_link                # frame we use to define stem and to show markers in rviz
 
 #######################

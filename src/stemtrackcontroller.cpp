@@ -1,5 +1,6 @@
 #include "stemtrackcontroller.h"
 
+#include "debugfunctions.h"
 #include "robotrepresentation.h"
 #include "stemrepresentation.h"
 #include "robotstatus.h"

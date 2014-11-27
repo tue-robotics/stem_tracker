@@ -1,196 +1,200 @@
 #include "configurer.h"
 
-void Configurer::loadGlobalConfig(tue::Configuration config)
+#include "stemrepresentation.h"
+#include "robotrepresentation.h"
+#include "robotstatus.h"
+#include "robotinterface.h"
+#include "whiskerinterpreter.h"
+#include "stemtrackcontroller.h"
+#include "stemtrackmonitor.h"
+
+#include "ros/ros.h"  /* Only for ROS_ROS_INFO_STREAM */
+
+const double Configurer::extractDouble(const tue::Configuration& config, const std::string& name)
 {
-
-    INFO_STREAM("=========================================");
-    INFO_STREAM("Configuring global config parameters");
-
-    /* general configuration */
-    config.value("base_frame", g_BASE_FRAME);
-    INFO_STREAM("base_frame = " << g_BASE_FRAME);
-    config.value("debug", g_DEBUG);
-    INFO_STREAM("debug = " << g_DEBUG);
-    config.value("update_rate", g_UPDATE_RATE);
-    INFO_STREAM("update_rate = " << g_UPDATE_RATE);
-
+    double tmp;
+    config.value(name, tmp);
+    return tmp;
 }
 
-std::string Configurer::getBaseFrame(tue::Configuration config)
+const float Configurer::extractFloat(const tue::Configuration& config, const std::string& name)
 {
-    config.value("base_frame", g_BASE_FRAME);
-    return g_BASE_FRAME;
+    float tmp;
+    config.value(name, tmp);
+    return tmp;
 }
 
-void Configurer::configureStemRepresentation(tue::Configuration config, StemRepresentation* p_stem_representation)
+const int Configurer::extractInt(const tue::Configuration& config, const std::string& name)
 {
+    int tmp;
+    config.value(name, tmp);
+    return tmp;
+}
 
-    INFO_STREAM("===================================================");
-    INFO_STREAM("Configuring stem representation object for stem " << p_stem_representation->getStemID() );
+const bool Configurer::extractBool(const tue::Configuration& config, const std::string& name)
+{
+    bool tmp;
+    config.value(name, tmp);
+    return tmp;
+}
 
-    config.value("lin_tan_d", sr_LIN_TAN_D);
-    p_stem_representation->setLinTangentDistance(sr_LIN_TAN_D);
+const std::string Configurer::extractString(const tue::Configuration& config, const std::string& name)
+{
+    std::string tmp;
+    config.value(name, tmp);
+    return tmp;
+}
 
-    /* tomato stem configuration */
+const std::string Configurer::getBaseFrame(const tue::Configuration& config)
+{
+    return extractString(config, "base_frame");
+}
+
+const int Configurer::getUpdateRate(const tue::Configuration& config)
+{
+    return extractInt(config, "update_rate");
+}
+
+const int Configurer::getLoglevel(const tue::Configuration& config)
+{
+    return extractInt(config,"loglevel");
+}
+
+const bool Configurer::getUseLeft(const tue::Configuration& config)
+{
+    return extractBool(config, "use_leftarm");
+}
+
+void Configurer::configureStemRepresentation(tue::Configuration& config, StemRepresentation& stem_representation)
+{
+    stem_representation.setLinTangentDistance( extractFloat(config, "lin_tan_d") );
+
+    std::vector<float> stemNodesX, stemNodesY, stemNodesZ;
+
     if (config.readArray("stem_nodes"))
     {
-        float tmp;
-        sr_stemNodesX.clear(); sr_stemNodesY.clear(); sr_stemNodesZ.clear();
-
         while(config.nextArrayItem())
         {
-            config.value("x", tmp); sr_stemNodesX.push_back(tmp);
-            config.value("y", tmp); sr_stemNodesY.push_back(tmp);
-            config.value("z", tmp); sr_stemNodesZ.push_back(tmp);
+            stemNodesX.push_back( extractFloat(config, "x") );
+            stemNodesY.push_back( extractFloat(config, "y") );
+            stemNodesZ.push_back( extractFloat(config, "z") );
         }
 
         config.endArray();
     }
 
-    p_stem_representation->loadNodesXYZ(sr_stemNodesX, sr_stemNodesY, sr_stemNodesZ);
+    stem_representation.loadNodesXYZ( stemNodesX, stemNodesY, stemNodesZ);
 
-    config.value("use_leftarm", rr_USE_LEFTARM);
+    if( !getUseLeft(config) )
+        stem_representation.flipNodes();
 
-    if(!rr_USE_LEFTARM)
-        p_stem_representation->flipNodes();
-
-    config.value("debug", g_DEBUG);
-
-    if(g_DEBUG)
-        p_stem_representation->printAll();
+    if( getLoglevel(config) > 0 )
+    {
+        ROS_INFO_STREAM("===================================================");
+        ROS_INFO_STREAM("Configured stem representation object for stem " << stem_representation.getStemID() );
+        stem_representation.printAll();
+    }
 }
 
-int Configurer::getUpdateRate(tue::Configuration config)
+void Configurer::configureWhiskerInterpreter(const tue::Configuration& config, WhiskerInterpreter& whisker_interpreter)
 {
-    config.value("update_rate", g_UPDATE_RATE);
-    return g_UPDATE_RATE;
+    whisker_interpreter.setNumberOfWhiskers( extractInt(config, "n_whiskers") );
+    whisker_interpreter.setWhiskerLength( extractFloat(config, "whisker_length") );
+    whisker_interpreter.setGripperDiameter( extractFloat(config, "gripper_diameter") );
+    whisker_interpreter.setMaxWhiskerForce( extractFloat(config, "max_whisker_force") );
+
+    if( getLoglevel(config) > 0 )
+    {
+        ROS_INFO_STREAM("=====================================================");
+        ROS_INFO_STREAM("Configured whisker interpreter object for gripper " << whisker_interpreter.getGripperID() );
+    }
 }
 
-void Configurer::configureWhiskerInterpreter(tue::Configuration config, WhiskerInterpreter* p_whisker_interpreter)
+void Configurer::configureRobotRepresentation(tue::Configuration& config, RobotRepresentation& robot_representation)
 {
-    INFO_STREAM("=====================================================");
-    INFO_STREAM("Configuring whisker interpreter object for gripper " << p_whisker_interpreter->getGripperID() );
-
-    config.value("n_whiskers", wi_N_WHISKERS);
-    config.value("whisker_length", wi_WHISKER_LENGTH);
-    config.value("gripper_diameter", wi_GRIPPER_DIAMETER);
-    config.value("max_whisker_force", wi_MAX_WHISKER_FORCE);
-
-    p_whisker_interpreter->setGripperDiameter(wi_GRIPPER_DIAMETER);
-    p_whisker_interpreter->setNumberOfWhiskers(wi_N_WHISKERS);
-    p_whisker_interpreter->setWhiskerLength(wi_WHISKER_LENGTH);
-    p_whisker_interpreter->setMaxWhiskerForce(wi_MAX_WHISKER_FORCE);
-
-}
-
-void Configurer::configureRobotRepresentation(tue::Configuration config, RobotRepresentation* p_robot_representation, ros::NodeHandle n)
-{
-
-    INFO_STREAM("====================================================");
-    INFO_STREAM("Configuring robot representation object of robot " << p_robot_representation->getName().c_str() );
-
-    config.value("root_link", rr_ROOT_LINK);
-    config.value("use_leftarm", rr_USE_LEFTARM);
-    config.value("left_end_link", rr_LEFT_END_LINK);
-    config.value("right_end_link", rr_RIGHT_END_LINK);
-
-    if(rr_USE_LEFTARM)
-        p_robot_representation->setLeftArmIsPreferred();
+    if( getUseLeft(config) )
+        robot_representation.setLeftArmIsPreferred();
     else
-        p_robot_representation->setRightArmIsPreferred();
+        robot_representation.setRightArmIsPreferred();
 
-    config.value("robot_urdf_file", rr_URDF_FILENAME);
-    p_robot_representation->loadUrdfFromFile( rr_URDF_FILENAME);
-    p_robot_representation->loadKinematicTreeFromUrdf();
+    robot_representation.loadUrdfFromFile( extractString(config, "robot_urdf_file") );
+    robot_representation.loadKinematicTreeFromUrdf();
 
-    if(rr_USE_LEFTARM)
-        p_robot_representation->loadKinematicChainFromTree(rr_ROOT_LINK, rr_LEFT_END_LINK);
+    if( getUseLeft(config) )
+        robot_representation.loadKinematicChainFromTree( extractString(config, "root_link"), extractString(config, "left_end_link") );
     else
-        p_robot_representation->loadKinematicChainFromTree(rr_ROOT_LINK, rr_RIGHT_END_LINK);
+        robot_representation.loadKinematicChainFromTree( extractString(config, "root_link"), extractString(config, "right_end_link") );
 
-    p_robot_representation->loadJointLimits();
+    robot_representation.loadJointLimits();
 
+    std::vector<float> tmp;
     if (config.readArray("initial_pose"))
     {
-        float tmp;
-        rr_INITIAL_POSE.clear();
-
         while(config.nextArrayItem())
-        {
-            config.value("q", tmp); rr_INITIAL_POSE.push_back(tmp);
-        }
+            tmp.push_back( extractFloat(config, "q") );
 
         config.endArray();
     }
-    p_robot_representation->setInitialPoseJointRefs(rr_INITIAL_POSE);
+    robot_representation.setInitialPoseJointRefs( tmp );
 
-    config.value("debug", g_DEBUG);
-    if(g_DEBUG)
-        p_robot_representation->printAll();
+    if( getLoglevel(config) > 0 )
+    {
+        ROS_INFO_STREAM("====================================================");
+        ROS_INFO_STREAM("Configured robot representation object of robot " << robot_representation.getName().c_str() );
+        robot_representation.printAll();
+    }
 }
 
-void Configurer::configureRobotStatus(tue::Configuration config, RobotStatus* p_robot_status)
+void Configurer::configureRobotStatus(const tue::Configuration& config, RobotStatus& robot_status)
 {
-    INFO_STREAM("=====================================");
-    INFO_STREAM("Configuring robot status object");
+    robot_status.setXYZreachedThreshold( extractDouble(config, "xyz_reached_threshold") );
+    robot_status.setUpToDateThreshold( extractDouble(config, "up_to_date_threshold") );
+    robot_status.setPosReachedThreshold( extractFloat(config, "pos_reached_threshold") );
 
-    config.value("up_to_date_threshold", rs_UP_TO_DATE_THRESHOLD);
-    INFO_STREAM("up_to_date_threshold = " << rs_UP_TO_DATE_THRESHOLD);
-
-    config.value("pos_reached_threshold", rs_POS_REACHED_THRESHOLD);
-    INFO_STREAM("pos_reached_threshold = " << rs_POS_REACHED_THRESHOLD);
-
-    p_robot_status->setPosReachedThreshold(rs_POS_REACHED_THRESHOLD);
-    p_robot_status->setUpToDateThreshold( rs_UP_TO_DATE_THRESHOLD );
-
-    config.value("xyz_reached_threshold",rs_XYZ_REACHED_THRESHOLD);
-    p_robot_status->setXYZreachedThreshold(rs_XYZ_REACHED_THRESHOLD);
+    if( getLoglevel(config) > 0 )
+    {
+        ROS_INFO_STREAM("=====================================");
+        ROS_INFO_STREAM("Configured robot status object");
+    }
 }
 
-void Configurer::configureStemTrackController(tue::Configuration config, StemTrackController* p_stem_track_controller)
+void Configurer::configureStemTrackController(const tue::Configuration& config, StemTrackController& stem_track_controller)
 {
-    INFO_STREAM("=============================================");
-    INFO_STREAM("Configuring stem track controller object");
+    stem_track_controller.setMaxZvelocity( extractFloat(config, "max_z_dot") );
+    stem_track_controller.setUpdateRate( extractInt(config, "update_rate") );
+    stem_track_controller.setTiltWithStem( extractBool(config, "tilt_with_stem") );
+    stem_track_controller.setDebugIKsolver( extractBool(config, "debug_ik_solver") );
+    stem_track_controller.setUseInverseVelocitySolverOnly( extractBool(config, "ik_vel_only") );
 
-    config.value("max_z_dot", stc_MAX_Z_DOT);
-    p_stem_track_controller->setMaxZvelocity(stc_MAX_Z_DOT);
-
-    config.value("update_rate", g_UPDATE_RATE);
-    p_stem_track_controller->setUpdateRate(g_UPDATE_RATE);
-
-    config.value("tilt_with_stem", stc_TILT_WITH_STEM);
-    p_stem_track_controller->setTiltWithStem(stc_TILT_WITH_STEM);
-
-    config.value("debug_ik_solver", stc_DEBUG_IK_SOLVER);
-    p_stem_track_controller->setDebugIKsolver(stc_DEBUG_IK_SOLVER);
-
-    config.value("ik_vel_only", stc_IK_VEL_ONLY);
-    p_stem_track_controller->setUseInverseVelocitySolverOnly(stc_IK_VEL_ONLY);
+    if( getLoglevel(config) > 0 )
+    {
+        ROS_INFO_STREAM("=============================================");
+        ROS_INFO_STREAM("Configured stem track controller object");
+    }
 }
 
-void Configurer::configureRobotInterface(tue::Configuration config, RobotInterface* p_robot_interface)
+void Configurer::configureRobotInterface(const tue::Configuration& config, RobotInterface& robot_interface)
 {
-    INFO_STREAM("=============================================");
-    INFO_STREAM("Configuring robot interface object");
+    robot_interface.connectToAmigoArm( getUseLeft(config) );
+    robot_interface.connectToAmigoTorso();
 
-    config.value("use_leftarm", rr_USE_LEFTARM);
-
-    p_robot_interface->connectToAmigoArm(rr_USE_LEFTARM);
-    p_robot_interface->connectToAmigoTorso();
-
+    if( getLoglevel(config) > 0 )
+    {
+        ROS_INFO_STREAM("=============================================");
+        ROS_INFO_STREAM("Configured robot interface object");
+    }
 }
 
-void Configurer::configureStemTrackMonitor(tue::Configuration config, StemTrackMonitor* p_stemtrack_monitor)
+void Configurer::configureStemTrackMonitor(const tue::Configuration& config, StemTrackMonitor& stemtrack_monitor)
 {
-    INFO_STREAM("=============================================");
+    stemtrack_monitor.setDebugStateParameter( extractBool(config, "debug_state_par") );
 
-    INFO_STREAM("Configuring stemtrack monitor object");
-
-    config.value("debug_state_par", stm_DEBUG_STATE_PAR);
-
-    p_stemtrack_monitor->setDebugStateParameter(stm_DEBUG_STATE_PAR);
-
-    INFO_STREAM("=============================================");
+    if( getLoglevel(config) > 0 )
+    {
+        ROS_INFO_STREAM("=============================================");
+        ROS_INFO_STREAM("Configured stemtrack monitor object");
+        ROS_INFO_STREAM("=============================================");
+    }
 }
 
 Configurer::~Configurer()
