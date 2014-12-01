@@ -3,6 +3,7 @@
 // TODO:
 //- rekening houden met joint limits als alleen ik vel solver, nulruimte term toevoegen
 //- tilt met stem fixen als alleen ik vel solver
+//- template ipv extractFloat, extractDouble etc
 //- z verplaatsing functie van error
 //- use z rotation of setpoint to increase reachable space
 //- reageren op combinatie van whisker forces ipv naar bekende intersection
@@ -43,7 +44,7 @@ int main(int argc, char** argv)
 
     if (config.hasError())
     {
-        INFO_STREAM("Could not load configuration: " << config.error());
+        ROS_INFO_STREAM("Could not load configuration: " << config.error());
         return 1;
     }
 
@@ -82,6 +83,7 @@ int main(int argc, char** argv)
 
     /* initialize and configure visualization object */
     VisualizationInterface RvizInterface(n, StemTrackConfigurer.getBaseFrame(config));
+    StemTrackConfigurer.configureVisualizationInterface(config, RvizInterface);
 
     /* initialize profiling */
     sp.initialize();
@@ -100,6 +102,7 @@ int main(int argc, char** argv)
             StemTrackConfigurer.configureStemTrackController(config, TomatoControl);
             StemTrackConfigurer.configureRobotInterface(config, AmigoInterface);
             StemTrackConfigurer.configureStemTrackMonitor(config, TomatoMonitor);
+            StemTrackConfigurer.configureVisualizationInterface(config, RvizInterface);
         }
 
         if (!config.hasError())
@@ -164,7 +167,7 @@ int main(int argc, char** argv)
             }
 
             if(!AmigoStatus.isUpToDate())
-                INFO_STREAM("waiting for up to date robot status information");
+                ROS_INFO_STREAM("waiting for up to date robot status information");
 
             /* stop and publish timer */
             sp.stopTimer("main");
@@ -173,7 +176,7 @@ int main(int argc, char** argv)
         }
 
         else
-            INFO_STREAM("error in loading config file!");
+            ROS_INFO_STREAM("error in loading config file!");
 
         /* wait for next sample */
         r.sleep();

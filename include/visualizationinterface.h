@@ -1,11 +1,10 @@
 #ifndef VISUALIZATIONINTERFACE_H
 #define VISUALIZATIONINTERFACE_H
 
-#define INFO_STREAM     ROS_INFO_STREAM
-
 #include <vector>
+#include <string>
+
 #include <ros/ros.h>
-#include <visualization_msgs/Marker.h>
 
 enum MarkerIDs
 {
@@ -31,14 +30,18 @@ private:
     float m_arrow_diam;        // arrow diameter, in meters
     float m_arrowhead_diam;    // arow head diameter, in meters
 public:
-    VisualizationInterface(ros::NodeHandle node, std::string base_frame);
-    bool configureSelf(MarkerIDs marker_id);
-    void showLineStrip(std::vector<float> x_coordinates, std::vector<float> y_coordinates, std::vector<float> z_coordinates, MarkerIDs marker_id);
-    void showLineStripInRviz(std::vector<float> x_coordinates, std::vector<float> y_coordinates, std::vector<float> z_coordinates);
-    void showXYZ(std::vector<float> xyz, MarkerIDs marker_id);
-    void showXYZInRviz(std::vector<float> xyz);
-    void showArrow(std::vector<float> force, std::vector<float> origin, MarkerIDs marker_id);
-    void showArrowInRviz(std::vector<float> force, std::vector<float> origin);
+    VisualizationInterface(ros::NodeHandle node, std::string base_frame) : m_node(node), m_base_frame(base_frame) {}
+
+    void connectToRos(const std::string& topic_name, const int& buffer_size);
+    bool configureSelf(const MarkerIDs& marker_id);
+    void showLineStrip(const std::vector<float>& x_coordinates, const std::vector<float>& y_coordinates, const std::vector<float>& z_coordinates, const MarkerIDs& marker_id);
+    void showLineStripInRviz(const std::vector<float>& x_coordinates, const std::vector<float>& y_coordinates, const std::vector<float>& z_coordinates);
+    void showXYZ(const std::vector<float>& xyz, const MarkerIDs& marker_id);
+    void showXYZInRviz(const std::vector<float>& xyz);
+    void showArrow(const std::vector<float>& force, const std::vector<float>& origin, const MarkerIDs& marker_id);
+    void showArrowInRviz(const std::vector<float>& force, const std::vector<float>& origin);
+
+    virtual ~VisualizationInterface();
 };
 
 #endif // VISUALIZATIONINTERFACE_H

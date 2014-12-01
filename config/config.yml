@@ -61,3 +61,10 @@ pos_reached_threshold:          0.05                            # if absolute po
 ##########################
 
 debug_state_par:                1                               # if true (1) state will be printed every time it changes
+
+##########################
+# VISUALIZATION CONFIG
+##########################
+
+topic_name:                     stem_track_markers              # name of topic through which rviz markers are published
+buffer_size:                    100                             # buffer size for rviz marker topic

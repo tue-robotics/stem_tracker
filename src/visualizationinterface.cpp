@@ -1,13 +1,12 @@
 #include "visualizationinterface.h"
+#include <visualization_msgs/Marker.h>
 
-VisualizationInterface::VisualizationInterface(ros::NodeHandle node, std::string base_frame)
+void VisualizationInterface::connectToRos(const std::string &topic_name, const int &buffer_size)
 {
-    m_node = node;
-    m_vis_pub = m_node.advertise<visualization_msgs::Marker>( "stem_track_markers", 100 );
-    m_base_frame = base_frame;
+        m_vis_pub = m_node.advertise<visualization_msgs::Marker>( topic_name, buffer_size );
 }
 
-bool VisualizationInterface::configureSelf(MarkerIDs marker_id)
+bool VisualizationInterface::configureSelf(const MarkerIDs& marker_id)
 {
 
     switch(marker_id)
@@ -75,12 +74,12 @@ bool VisualizationInterface::configureSelf(MarkerIDs marker_id)
         return true;
 
     default:
-        INFO_STREAM("Unknown marker id in visualization interface!");
+        ROS_INFO_STREAM("Unknown marker id in visualization interface!");
         return false;
     }
 }
 
-void VisualizationInterface::showLineStrip(std::vector<float> x_coordinates, std::vector<float> y_coordinates, std::vector<float> z_coordinates, MarkerIDs marker_id)
+void VisualizationInterface::showLineStrip(const std::vector<float>& x_coordinates, const std::vector<float>& y_coordinates, const std::vector<float>& z_coordinates, const MarkerIDs& marker_id)
 {
     if(configureSelf(marker_id))
         showLineStripInRviz(x_coordinates, y_coordinates, z_coordinates);
@@ -88,7 +87,7 @@ void VisualizationInterface::showLineStrip(std::vector<float> x_coordinates, std
     return;
 }
 
-void VisualizationInterface::showLineStripInRviz(std::vector<float> x_coordinates, std::vector<float> y_coordinates, std::vector<float> z_coordinates)
+void VisualizationInterface::showLineStripInRviz(const std::vector<float>& x_coordinates, const std::vector<float>& y_coordinates, const std::vector<float>& z_coordinates)
 {
     visualization_msgs::Marker marker;
 
@@ -119,17 +118,17 @@ void VisualizationInterface::showLineStripInRviz(std::vector<float> x_coordinate
 
 }
 
-void VisualizationInterface::showArrow(std::vector<float> force, std::vector<float> origin, MarkerIDs marker_id)
+void VisualizationInterface::showArrow(const std::vector<float>& force, const std::vector<float>& origin, const MarkerIDs& marker_id)
 {
     if(force.size() != 3)
     {
-        INFO_STREAM("unknown force vector in showArrow");
+        ROS_INFO_STREAM("unknown force vector in showArrow");
         return;
     }
 
     if(origin.size() != 3)
     {
-        INFO_STREAM("unknown origin vector in showArrow");
+        ROS_INFO_STREAM("unknown origin vector in showArrow");
         return;
     }
 
@@ -139,7 +138,7 @@ void VisualizationInterface::showArrow(std::vector<float> force, std::vector<flo
     return;
 }
 
-void VisualizationInterface::showArrowInRviz(std::vector<float> force, std::vector<float> origin)
+void VisualizationInterface::showArrowInRviz(const std::vector<float>& force, const std::vector<float>& origin)
 {
     /* construct line strip marker object */
     visualization_msgs::Marker marker;
@@ -174,7 +173,7 @@ void VisualizationInterface::showArrowInRviz(std::vector<float> force, std::vect
     m_vis_pub.publish( marker );
 }
 
-void VisualizationInterface::showXYZ(std::vector<float> xyz, MarkerIDs marker_id)
+void VisualizationInterface::showXYZ(const std::vector<float>& xyz, const MarkerIDs& marker_id)
 {
     if(configureSelf(marker_id))
         showXYZInRviz(xyz);
@@ -182,7 +181,7 @@ void VisualizationInterface::showXYZ(std::vector<float> xyz, MarkerIDs marker_id
     return;
 }
 
-void VisualizationInterface::showXYZInRviz(std::vector<float> xyz)
+void VisualizationInterface::showXYZInRviz(const std::vector<float>& xyz)
 {
 
     visualization_msgs::Marker marker;
@@ -218,4 +217,9 @@ void VisualizationInterface::showXYZInRviz(std::vector<float> xyz)
 
     m_vis_pub.publish( marker );
 
+}
+
+VisualizationInterface::~VisualizationInterface()
+{
+    m_vis_pub.shutdown();
 }

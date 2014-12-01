@@ -1,6 +1,6 @@
 #include "whiskerinterpreter.h"
 #include <cmath>
-#include "ros/ros.h"  /* Only for ROS_ROS_INFO_STREAM */
+#include <ros/ros.h>  /* Only for ROS_ROS_INFO_STREAM */
 
 
 void WhiskerInterpreter::setNumberOfWhiskers(const int& n_whiskers)

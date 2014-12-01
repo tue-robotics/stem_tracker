@@ -14,6 +14,7 @@ class RobotInterface;
 class WhiskerInterpreter;
 class StemTrackController;
 class StemTrackMonitor;
+class VisualizationInterface;
 
 class Configurer
 {
@@ -35,6 +36,7 @@ public:
     void configureWhiskerInterpreter(const tue::Configuration& config, WhiskerInterpreter& whisker_interpreter);
     void configureRobotInterface(const tue::Configuration& config, RobotInterface& robot_interface);
     void configureStemTrackMonitor(const tue::Configuration& config, StemTrackMonitor& stemtrack_monitor);
+    void configureVisualizationInterface(const tue::Configuration& config, VisualizationInterface& visualization_interface);
 
     const int getUpdateRate(const tue::Configuration& config);
     const std::string getBaseFrame(const tue::Configuration& config);

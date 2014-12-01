@@ -7,8 +7,10 @@
 #include "whiskerinterpreter.h"
 #include "stemtrackcontroller.h"
 #include "stemtrackmonitor.h"
+#include "visualizationinterface.h"
 
-#include "ros/ros.h"  /* Only for ROS_ROS_INFO_STREAM */
+
+#include "ros/ros.h"  /* Only for ROS_INFO_STREAM */
 
 const double Configurer::extractDouble(const tue::Configuration& config, const std::string& name)
 {
@@ -193,7 +195,19 @@ void Configurer::configureStemTrackMonitor(const tue::Configuration& config, Ste
     {
         ROS_INFO_STREAM("=============================================");
         ROS_INFO_STREAM("Configured stemtrack monitor object");
+    }
+}
+
+void Configurer::configureVisualizationInterface(const tue::Configuration& config, VisualizationInterface& visualization_interface)
+{
+    visualization_interface.connectToRos( extractString(config, "topic_name"), extractInt(config, "buffer_size") );
+
+    if( getLoglevel(config) > 0 )
+    {
         ROS_INFO_STREAM("=============================================");
+        ROS_INFO_STREAM("Configured visualization object");
+        ROS_INFO_STREAM("=============================================");
+
     }
 }
 

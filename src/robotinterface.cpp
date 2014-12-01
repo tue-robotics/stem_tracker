@@ -7,7 +7,7 @@ RobotInterface::RobotInterface(ros::NodeHandle node, RobotRepresentation* p_robo
     m_p_robot_status = p_robot_status;
 }
 
-void RobotInterface::connectToAmigoArm(bool leftArmIsPreferred)
+void RobotInterface::connectToAmigoArm(const bool leftArmIsPreferred)
 {
     if (leftArmIsPreferred)
         m_arm_ref_pub = m_node.advertise<sensor_msgs::JointState>("/amigo/left_arm/references", 0);

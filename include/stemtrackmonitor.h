@@ -29,9 +29,12 @@ public:
     StemTrackMonitor(StemRepresentation* p_stem_representation, RobotRepresentation* p_robot_representation, RobotStatus* p_robot_status , StemTrackController* p_stemtrack_control);
     bool reachedEndOfStem();
     void updateState();
+
     int getState();
+
     void setDebugStateParameter(bool debug_state_par);
-    ~StemTrackMonitor();
+
+    virtual ~StemTrackMonitor();
 };
 
 #endif // STEMTRACKMONITOR_H

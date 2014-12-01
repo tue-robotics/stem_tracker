@@ -7,14 +7,7 @@
 
 /* ros includes */
 #include <ros/ros.h>
-#include <visualization_msgs/Marker.h>
-#include <sensor_msgs/JointState.h>
-#include <ros/package.h> // used in config loading
-
-#include <kdl/chainiksolverpos_nr_jl.hpp>
-#include <kdl/chainfksolverpos_recursive.hpp>
-#include <kdl/chainiksolvervel_pinv.hpp>
-
+#include <ros/package.h>
 
 /* amigo includes */
 #include <profiling/StatsPublisher.h>
@@ -32,7 +25,6 @@
 #include "stemtrackmonitor.h"
 #include "configurer.h"
 
-#define     INFO_STREAM     ROS_INFO_STREAM
 #define     THIS_PACKAGE    "stem_tracker"
 
 #endif // STEM_TRACKER_H

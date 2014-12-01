@@ -36,14 +36,14 @@ public:
     void setMaxWhiskerForce(const float& max_whisker_force);
     void setNumberOfWhiskers(const int& n_whiskers);
 
-    const int& getGripperID() const { return m_gripper_id; }
-    const int& getStatus() const { return m_status; }
-    const std::vector<float>& getWhiskerNetForce() const { return m_whisker_force; }
-    const std::vector<float>& getXYerror() const { return m_estimated_pos_error; }
+    inline const int& getGripperID() const { return m_gripper_id; }
+    inline const int& getStatus() const { return m_status; }
+    inline const std::vector<float>& getWhiskerNetForce() const { return m_whisker_force; }
+    inline const std::vector<float>& getXYerror() const { return m_estimated_pos_error; }
 
     void simulateWhiskerGripper(const std::vector<float>& gripper_center, const std::vector<float>& stem_center);
 
-    ~WhiskerInterpreter();
+    virtual ~WhiskerInterpreter();
 };
 
 #endif // WHISKERINTERPRETER_H

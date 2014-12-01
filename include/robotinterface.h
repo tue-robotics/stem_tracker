@@ -22,10 +22,10 @@ private:
     ros::Subscriber m_torso_meas_sub;
 public:
     RobotInterface(ros::NodeHandle node, RobotRepresentation* p_robot_representation, RobotStatus* p_robot_status);
-    void connectToAmigoArm(bool leftArmIsPreferred);
+    void connectToAmigoArm(const bool leftArmIsPreferred);
     void connectToAmigoTorso();
-    void receivedAmigoTorsoMsg(const sensor_msgs::JointState & msg);
-    void receivedAmigoArmMsg(const sensor_msgs::JointState & msg);
+    void receivedAmigoTorsoMsg(const sensor_msgs::JointState& msg);
+    void receivedAmigoArmMsg(const sensor_msgs::JointState& msg);
     void publishAmigoArmMessage(sensor_msgs::JointState arm_message);
     void publishJointPosRefs(KDL::JntArray joint_array);
     ~RobotInterface();
