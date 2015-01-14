@@ -21,27 +21,27 @@ class Configurer
 
 private:
 
-    const double extractDouble(const tue::Configuration& config, const std::string& name);
-    const float extractFloat(const tue::Configuration& config, const std::string& name);
-    const int extractInt(const tue::Configuration& config, const std::string& name);
-    const bool extractBool(const tue::Configuration& config, const std::string& name);
-    const std::string extractString(const tue::Configuration& config, const std::string& name);
+    const double extractDouble(tue::Configuration& config, const std::string& name);
+    const float extractFloat(tue::Configuration& config, const std::string& name);
+    const int extractInt(tue::Configuration& config, const std::string& name);
+    const bool extractBool(tue::Configuration& config, const std::string& name);
+    const std::string extractString(tue::Configuration& config, const std::string& name);
 
 public:
 
-    void configureStemTrackController(const tue::Configuration& config, StemTrackController& stem_track_controller);
+    void configureStemTrackController(tue::Configuration& config, StemTrackController& stem_track_controller);
     void configureStemRepresentation(tue::Configuration& config, StemRepresentation& stem);
     void configureRobotRepresentation(tue::Configuration& config, RobotRepresentation& robot_representation);
-    void configureRobotStatus(const tue::Configuration& config, RobotStatus& robot_status);
-    void configureWhiskerInterpreter(const tue::Configuration& config, WhiskerInterpreter& whisker_interpreter);
-    void configureRobotInterface(const tue::Configuration& config, RobotInterface& robot_interface);
-    void configureStemTrackMonitor(const tue::Configuration& config, StemTrackMonitor& stemtrack_monitor);
-    void configureVisualizationInterface(const tue::Configuration& config, VisualizationInterface& visualization_interface);
+    void configureRobotStatus(tue::Configuration& config, RobotStatus& robot_status);
+    void configureWhiskerInterpreter(tue::Configuration& config, WhiskerInterpreter& whisker_interpreter);
+    void configureRobotInterface(tue::Configuration& config, RobotInterface& robot_interface);
+    void configureStemTrackMonitor(tue::Configuration& config, StemTrackMonitor& stemtrack_monitor);
+    void configureVisualizationInterface(tue::Configuration& config, VisualizationInterface& visualization_interface);
 
-    const int getUpdateRate(const tue::Configuration& config);
-    const std::string getBaseFrame(const tue::Configuration& config);
-    const int getLoglevel(const tue::Configuration& config);
-    const bool getUseLeft(const tue::Configuration& config);
+    const int getUpdateRate(tue::Configuration& config);
+    const std::string getBaseFrame(tue::Configuration& config);
+    const int getLoglevel(tue::Configuration& config);
+    const bool getUseLeft(tue::Configuration& config);
 
     ~Configurer();
 
