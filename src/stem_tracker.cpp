@@ -62,7 +62,7 @@ int main(int argc, char** argv)
     StemTrackConfigurer.configureRobotRepresentation(config, AmigoRepresentation);
 
     /* initialize and configure whisker interpretation object */
-    WhiskerInterpreter TomatoWhiskerGripper(1);
+    WhiskerInterpreter TomatoWhiskerGripper(1, &AmigoRepresentation);
     StemTrackConfigurer.configureWhiskerInterpreter(config, TomatoWhiskerGripper);
 
     /* initialize and configure robot status object */
@@ -88,6 +88,8 @@ int main(int argc, char** argv)
     /* initialize profiling */
     sp.initialize();
 
+
+
     /* main update loop */
     while(ros::ok())
     {
@@ -112,6 +114,7 @@ int main(int argc, char** argv)
 
             /* start timer, for profiling */
             sp.startTimer("main");
+
 
             if(TomatoMonitor.getState() == STEMTRACK_PREPOS && AmigoStatus.isUpToDate())
             {
@@ -150,7 +153,7 @@ int main(int argc, char** argv)
 
                 /* simulate and show whisker sensor output */
                 TomatoWhiskerGripper.simulateWhiskerGripper(AmigoStatus.getGripperXYZ(), TomatoStem.getNearestXYZ() );
-                RvizInterface.showArrow(TomatoWhiskerGripper.getWhiskerNetForce(), AmigoStatus.getGripperXYZ(), whisker_net_force);
+//                RvizInterface.showArrow(TomatoWhiskerGripper.getWhiskerNetForce(), AmigoStatus.getGripperXYZ(), whisker_net_force);
 
                 /* update position setpoint in cartesian space */
                 TomatoControl.updateCartSetpoint(AmigoStatus.getGripperXYZ(), TomatoWhiskerGripper.getXYerror());
@@ -164,6 +167,12 @@ int main(int argc, char** argv)
 
                 /* check if end of stem reached */
                 TomatoMonitor.updateState();
+            }
+
+            if(TomatoMonitor.getState() == STEMTRACK_END)
+            {
+                TomatoWhiskerGripper.readWhiskers();
+                RvizInterface.showArrow(TomatoWhiskerGripper.getWhiskerNetForce(), AmigoStatus.getGripperXYZ(), whisker_net_force);
             }
 
             if(!AmigoStatus.isUpToDate())

@@ -179,6 +179,7 @@ void Configurer::configureRobotInterface(tue::Configuration& config, RobotInterf
 {
     robot_interface.connectToAmigoArm( getUseLeft(config) );
     robot_interface.connectToAmigoTorso();
+    robot_interface.connectToWhiskers();
 
     if( getLoglevel(config) > 0 )
     {

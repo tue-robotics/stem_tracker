@@ -4,6 +4,8 @@
 #include <vector>
 #include <string>
 
+#include "robotrepresentation.h"
+
 /* Status:
  * 0 - unknown
  * 1 - gripper not around stem
@@ -24,10 +26,11 @@ private:
     int m_status;
     std::vector<float> m_whisker_force;
     std::vector<float> m_estimated_pos_error;
+    RobotRepresentation* m_p_robot_representation;
 
 public:
 
-    WhiskerInterpreter(int gripper_id) : m_gripper_id(gripper_id), m_status(0) {}
+    WhiskerInterpreter(int gripper_id, RobotRepresentation* p_robot_representation) : m_gripper_id(gripper_id), m_p_robot_representation(p_robot_representation), m_status(0) {}
 
     bool selfCheck() const;
 
@@ -35,6 +38,7 @@ public:
     void setWhiskerLength(const float& whisker_length);
     void setMaxWhiskerForce(const float& max_whisker_force);
     void setNumberOfWhiskers(const int& n_whiskers);
+    void readWhiskers();
 
     inline const int& getGripperID() const { return m_gripper_id; }
     inline const int& getStatus() const { return m_status; }

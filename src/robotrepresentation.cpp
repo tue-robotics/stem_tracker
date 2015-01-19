@@ -11,8 +11,16 @@ RobotRepresentation::RobotRepresentation(const std::string& name = "defaultRobot
     m_preferred_arm_set = false;
     m_n_joints_in_chain = -1;
     m_name = name;
+    m_whisker_state.assign(8,0.0);
 }
 
+void RobotRepresentation::setWhiskerState(std::vector<float> whisker_state)
+{
+    for(int i=0; i<8; ++i)
+    {
+        m_whisker_state[i] = whisker_state[i];
+    }
+}
 
 bool RobotRepresentation::selfCheck()
 {
