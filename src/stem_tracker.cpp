@@ -1,23 +1,24 @@
 #include "stem_tracker.h"
 
 // TODO:
+//- enkele rostopic met start flag ipv aparte ros topic per whisker
 //- rekening houden met joint limits als alleen ik vel solver, nulruimte term toevoegen
 //- tilt met stem fixen als alleen ik vel solver
 //- template ipv extractFloat, extractDouble etc
 //- z verplaatsing functie van error
-//- use z rotation of setpoint to increase reachable space
 //- reageren op combinatie van whisker forces ipv naar bekende intersection
-//- orientatie base frame tov gripper frame voor 'neutrale' pose configureerbaar maken
 //- check voor welke objecten interface naar andere object alleen voor config nodig is (vb in robotstatus)
 //- maak een robotstatus up to date reset, bijv om na wisselen van arm opnieuw op up to date info te wachten
 //- robotstatus up to date check voor volledige array
 //- selfchecks updaten of weghalen
-//- check voor loslaten van stengel
-//- check voor tegenkomen side branch
 //- use stem length instead of distance in z for lin_tan_d
 //- veiligheidscheck voor verspringen joint coordinaten
-//- waarom hangen bij hele lage snelheid
 //- INFO STREAM niet in alle nodes, printall stringstream laten returnen
+//- use z rotation of setpoint to increase reachable space
+//- orientatie base frame tov gripper frame voor 'neutrale' pose configureerbaar maken
+
+// KNOWN-BUGS
+//- hangen bij hele lage z-snelheid ref
 
 
 int main(int argc, char** argv)
