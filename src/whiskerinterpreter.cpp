@@ -102,10 +102,10 @@ void WhiskerInterpreter::readWhiskers()
 
     std::vector<float> whisker_state = m_p_robot_representation->getWhiskerState();
 
-//    for(int i = 0; i<8; ++i)
-//    {
-//        ROS_INFO_STREAM("whisker " << i << " has value " << whisker_state[i]);
-//    }
+    for(int i = 0; i<8; ++i)
+    {
+        ROS_INFO_STREAM("whisker " << i << " has value " << whisker_state[i]);
+    }
 
     // going counter clockwise, start righthandside closest to amigo, skipped first one
     if( fabs(2.93) - whisker_state[2] > 0.1 )
@@ -152,13 +152,6 @@ void WhiskerInterpreter::readWhiskers()
         m_whisker_force[0] = 0.05;
         m_whisker_force[1] = -0.1;
     }
-
-
-//    m_estimated_pos_error[0] = gripper_center[0] - stem_center[0];
-//    m_estimated_pos_error[1] = gripper_center[1] - stem_center[1];
-
-
-
 }
 
 WhiskerInterpreter::~WhiskerInterpreter()

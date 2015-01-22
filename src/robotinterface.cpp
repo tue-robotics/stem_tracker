@@ -10,72 +10,13 @@ RobotInterface::RobotInterface(ros::NodeHandle node, RobotRepresentation* p_robo
 
 void RobotInterface::connectToWhiskers()
 {
-    m_whisker_pub_18 = m_node.subscribe("/amigo/whiskergripper/measurements18", 1000, &RobotInterface::receivedWhisker18Msg, this);
-    m_whisker_pub_17 = m_node.subscribe("/amigo/whiskergripper/measurements17", 1000, &RobotInterface::receivedWhisker17Msg, this);
-    m_whisker_pub_16 = m_node.subscribe("/amigo/whiskergripper/measurements16", 1000, &RobotInterface::receivedWhisker16Msg, this);
-    m_whisker_pub_15 = m_node.subscribe("/amigo/whiskergripper/measurements15", 1000, &RobotInterface::receivedWhisker15Msg, this);
-    m_whisker_pub_14 = m_node.subscribe("/amigo/whiskergripper/measurements14", 1000, &RobotInterface::receivedWhisker14Msg, this);
-    m_whisker_pub_13 = m_node.subscribe("/amigo/whiskergripper/measurements13", 1000, &RobotInterface::receivedWhisker13Msg, this);
-    m_whisker_pub_12 = m_node.subscribe("/amigo/whiskergripper/measurements12", 1000, &RobotInterface::receivedWhisker12Msg, this);
-    m_whisker_pub_11 = m_node.subscribe("/amigo/whiskergripper/measurements11", 1000, &RobotInterface::receivedWhisker11Msg, this);
+    m_whisker_sub = m_node.subscribe("/amigo/whiskergripper/measurements", 1000, &RobotInterface::receivedWhiskerMsg, this);
 }
 
-void RobotInterface::receivedWhisker18Msg(const std_msgs::Float32 & msg)
+void RobotInterface::receivedWhiskerMsg(const std_msgs::Float32MultiArray & msg)
 {
-    std::vector<float> whisker_state = m_p_robot_representation->getWhiskerState();
-    whisker_state[3] = msg.data;
-    m_p_robot_representation->setWhiskerState(whisker_state);
+    m_p_robot_representation->setWhiskerState(msg.data);
 }
-
-void RobotInterface::receivedWhisker17Msg(const std_msgs::Float32 & msg)
-{
-    std::vector<float> whisker_state = m_p_robot_representation->getWhiskerState();
-    whisker_state[5] = msg.data;
-    m_p_robot_representation->setWhiskerState(whisker_state);
-}
-
-void RobotInterface::receivedWhisker16Msg(const std_msgs::Float32 & msg)
-{
-    std::vector<float> whisker_state = m_p_robot_representation->getWhiskerState();
-    whisker_state[7] = msg.data;
-    m_p_robot_representation->setWhiskerState(whisker_state);
-}
-
-void RobotInterface::receivedWhisker15Msg(const std_msgs::Float32 & msg)
-{
-    std::vector<float> whisker_state = m_p_robot_representation->getWhiskerState();
-    whisker_state[2] = msg.data;
-    m_p_robot_representation->setWhiskerState(whisker_state);
-}
-
-void RobotInterface::receivedWhisker14Msg(const std_msgs::Float32 & msg)
-{
-    std::vector<float> whisker_state = m_p_robot_representation->getWhiskerState();
-    whisker_state[4] = msg.data;
-    m_p_robot_representation->setWhiskerState(whisker_state);
-}
-
-void RobotInterface::receivedWhisker13Msg(const std_msgs::Float32 & msg)
-{
-    std::vector<float> whisker_state = m_p_robot_representation->getWhiskerState();
-    whisker_state[6] = msg.data;
-    m_p_robot_representation->setWhiskerState(whisker_state);
-}
-
-void RobotInterface::receivedWhisker12Msg(const std_msgs::Float32 & msg)
-{
-    std::vector<float> whisker_state = m_p_robot_representation->getWhiskerState();
-    whisker_state[0] = msg.data;
-    m_p_robot_representation->setWhiskerState(whisker_state);
-}
-
-void RobotInterface::receivedWhisker11Msg(const std_msgs::Float32 & msg)
-{
-    std::vector<float> whisker_state = m_p_robot_representation->getWhiskerState();
-    whisker_state[1] = msg.data;
-    m_p_robot_representation->setWhiskerState(whisker_state);
-}
-
 
 void RobotInterface::connectToAmigoArm(const bool leftArmIsPreferred)
 {
