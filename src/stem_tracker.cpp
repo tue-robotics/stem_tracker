@@ -63,7 +63,7 @@ int main(int argc, char** argv)
     StemTrackConfigurer.configureRobotRepresentation(config, AmigoRepresentation);
 
     /* initialize and configure whisker interpretation object */
-    WhiskerInterpreter TomatoWhiskerGripper(1, &AmigoRepresentation);
+    WhiskerInterpreter TomatoWhiskerGripper(&AmigoRepresentation);
     StemTrackConfigurer.configureWhiskerInterpreter(config, TomatoWhiskerGripper);
 
     /* initialize and configure robot status object */
@@ -157,7 +157,7 @@ int main(int argc, char** argv)
 //                RvizInterface.showArrow(TomatoWhiskerGripper.getWhiskerNetForce(), AmigoStatus.getGripperXYZ(), whisker_net_force);
 
                 /* update position setpoint in cartesian space */
-                TomatoControl.updateCartSetpoint(AmigoStatus.getGripperXYZ(), TomatoWhiskerGripper.getXYerror());
+                TomatoControl.updateCartSetpoint(AmigoStatus.getGripperXYZ(), TomatoWhiskerGripper.getEstimatedPosError());
                 RvizInterface.showArrow(TomatoStem.getCurrentTangent(), TomatoStem.getNearestXYZ(), stem_tangent);
 
                 /* translate cartesian setpoint to joint coordinates */
@@ -173,7 +173,7 @@ int main(int argc, char** argv)
             if(TomatoMonitor.getState() == STEMTRACK_END)
             {
                 TomatoWhiskerGripper.readWhiskers();
-                RvizInterface.showArrow(TomatoWhiskerGripper.getWhiskerNetForce(), AmigoStatus.getGripperXYZ(), whisker_net_force);
+                RvizInterface.showArrow(TomatoWhiskerGripper.getEstimatedPosError(), AmigoStatus.getGripperXYZ(), whisker_net_force);
             }
 
             if(!AmigoStatus.isUpToDate())

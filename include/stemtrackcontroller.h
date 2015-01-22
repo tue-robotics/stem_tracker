@@ -45,7 +45,7 @@ public:
     void setTiltWithStem(bool tilt_with_stem);
 
     void updateCartSetpoint(std::vector<float> setpoint_xyz);
-    void updateCartSetpoint(std::vector<float> gripper_xyz, std::vector<float> xy_err);
+    void updateCartSetpoint(std::vector<float> gripper_xyz, std::vector<float> xyz_err);
     void updateJointPosReferences();
     void updateJointVelReferences();
     void turnVelRefInPosRef();

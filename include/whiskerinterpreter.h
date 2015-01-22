@@ -18,21 +18,19 @@ class WhiskerInterpreter
 private:
 
     int m_n_whiskers;
-    int m_gripper_id;
     float m_whisker_length;
     float m_gripper_diameter;
     float m_gripper_radius;
     float m_max_whisker_force;
     int m_status;
-    std::vector<float> m_whisker_force;
-    std::vector<float> m_estimated_pos_error;
+    std::vector< std::vector<float> > m_whisker_forces;
+    std::vector<float> m_estimated_pos;
+
     RobotRepresentation* m_p_robot_representation;
 
 public:
 
-    WhiskerInterpreter(int gripper_id, RobotRepresentation* p_robot_representation) : m_gripper_id(gripper_id), m_p_robot_representation(p_robot_representation), m_status(0) {}
-
-    bool selfCheck() const;
+    WhiskerInterpreter(RobotRepresentation* p_robot_representation) : m_p_robot_representation(p_robot_representation), m_status(0) {}
 
     void setGripperDiameter(const float& gripper_diameter);
     void setWhiskerLength(const float& whisker_length);
@@ -40,11 +38,9 @@ public:
     void setNumberOfWhiskers(const int& n_whiskers);
     void readWhiskers();
 
-    inline const int& getGripperID() const { return m_gripper_id; }
     inline const int& getStatus() const { return m_status; }
-    inline const std::vector<float>& getWhiskerNetForce() const { return m_whisker_force; }
-    inline const std::vector<float>& getXYerror() const { return m_estimated_pos_error; }
-
+    inline const std::vector< std::vector<float> >& getWhiskerForces() const { return m_whisker_forces; }
+    inline const std::vector<float>& getEstimatedPosError() const { return m_estimated_pos; } //estimated relative position gripper vs stem, assuming gripper is in horizontal plane!
     void simulateWhiskerGripper(const std::vector<float>& gripper_center, const std::vector<float>& stem_center);
 
     virtual ~WhiskerInterpreter();

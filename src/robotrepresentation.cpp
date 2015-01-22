@@ -14,7 +14,7 @@ RobotRepresentation::RobotRepresentation(const std::string& name = "defaultRobot
     m_whisker_state.assign(8,0.0);
 }
 
-void RobotRepresentation::setWhiskerState(std::vector<float> whisker_state)
+void RobotRepresentation::setWhiskersState(std::vector<float> whisker_state)
 {
     for(int i=0; i<8; ++i)
     {

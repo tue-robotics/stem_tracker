@@ -108,7 +108,7 @@ void Configurer::configureWhiskerInterpreter(tue::Configuration& config, Whisker
     if( getLoglevel(config) > 0 )
     {
         ROS_INFO_STREAM("=====================================================");
-        ROS_INFO_STREAM("Configured whisker interpreter object for gripper " << whisker_interpreter.getGripperID() );
+        ROS_INFO_STREAM("Configured whisker interpreter object" );
     }
 }
 

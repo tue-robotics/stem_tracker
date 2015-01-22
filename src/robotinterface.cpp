@@ -15,7 +15,7 @@ void RobotInterface::connectToWhiskers()
 
 void RobotInterface::receivedWhiskerMsg(const std_msgs::Float32MultiArray & msg)
 {
-    m_p_robot_representation->setWhiskerState(msg.data);
+    m_p_robot_representation->setWhiskersState(msg.data);
 }
 
 void RobotInterface::connectToAmigoArm(const bool leftArmIsPreferred)

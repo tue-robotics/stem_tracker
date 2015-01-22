@@ -33,7 +33,7 @@ public:
     void setInitialPoseJointRefs(const std::vector<float> joint_refs);
     void setLeftArmIsPreferred();
     void setRightArmIsPreferred();
-    void setWhiskerState(std::vector<float> whisker_state);
+    void setWhiskersState(std::vector<float> whisker_state);
 
     bool isLeftArmPreferred();
     bool isRightArmPreferred();
@@ -47,7 +47,7 @@ public:
     const KDL::Chain& getKinematicChain() const { return m_kinematic_chain; }
     const std::string& getName() const { return m_name; }
     const KDL::JntArray& getInitialPoseJointRefs() const { return m_q_initial_pose; }
-    const std::vector<float> getWhiskerState() const { return m_whisker_state; }
+    const std::vector<float> getWhiskersState() const { return m_whisker_state; }
 
     void loadUrdfFromFile(const std::string& filename);
     void loadKinematicTreeFromUrdf();

@@ -28,7 +28,7 @@ initial_pose:                                                   # pose used as p
 # WHISKER CONFIG
 #######################
 
-n_whiskers:                     10                              # total numbers of whiskers in gripper
+n_whiskers:                     8                               # total numbers of whiskers in gripper
 whisker_length:                 0.05                            # length of a single whisker, in meters
 gripper_diameter:               0.1                             # diameter of gripper at whisker-root, in meters
 max_whisker_force:              1.0                             # force applied to the stem by a fully bended (90 degrees) whisker
