@@ -23,7 +23,8 @@
 #include "robotinterface.h"
 #include "stemtrackcontroller.h"
 #include "stemtrackmonitor.h"
-#include "configurer.h"
+#include "stemtrackconfigurer.h"
+#include "logginginterface.h"
 
 #define     THIS_PACKAGE    "stem_tracker"
 

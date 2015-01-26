@@ -1,7 +1,6 @@
 #include "stem_tracker.h"
 
 // TODO:
-//- enkele rostopic met start flag ipv aparte ros topic per whisker
 //- rekening houden met joint limits als alleen ik vel solver, nulruimte term toevoegen
 //- tilt met stem fixen als alleen ik vel solver
 //- template ipv extractFloat, extractDouble etc
@@ -29,7 +28,7 @@ int main(int argc, char** argv)
 
     /* initialize configuration */
     tue::Configuration config;
-    Configurer StemTrackConfigurer;
+    StemTrackConfigurer TomatoConfigurer;
 
     /* load configuration */
     if (argc >= 2)
@@ -52,39 +51,39 @@ int main(int argc, char** argv)
     /* initialize node */
     ros::init(argc, argv, THIS_PACKAGE);
     ros::NodeHandle n;
-    ros::Rate r(StemTrackConfigurer.getUpdateRate(config));
+    ros::Rate r(TomatoConfigurer.getUpdateRate(config));
 
     /* initialize and configure stem represenation object */
     StemRepresentation TomatoStem(1);
-    StemTrackConfigurer.configureStemRepresentation(config, TomatoStem);
+    TomatoConfigurer.configureStemRepresentation(config, TomatoStem);
 
     /* initialize and configure robot representation object */
     RobotRepresentation AmigoRepresentation("amigo");
-    StemTrackConfigurer.configureRobotRepresentation(config, AmigoRepresentation);
+    TomatoConfigurer.configureRobotRepresentation(config, AmigoRepresentation);
 
     /* initialize and configure whisker interpretation object */
     WhiskerInterpreter TomatoWhiskerGripper(&AmigoRepresentation);
-    StemTrackConfigurer.configureWhiskerInterpreter(config, TomatoWhiskerGripper);
+    TomatoConfigurer.configureWhiskerInterpreter(config, TomatoWhiskerGripper);
 
     /* initialize and configure robot status object */
     RobotStatus AmigoStatus(&AmigoRepresentation);
-    StemTrackConfigurer.configureRobotStatus(config, AmigoStatus);
+    TomatoConfigurer.configureRobotStatus(config, AmigoStatus);
 
     /* initialize and configure stem tracking controller object */
     StemTrackController TomatoControl(&AmigoRepresentation, &AmigoStatus, &TomatoStem);
-    StemTrackConfigurer.configureStemTrackController(config, TomatoControl);
+    TomatoConfigurer.configureStemTrackController(config, TomatoControl);
 
     /* initialize interface to robot object */
     RobotInterface AmigoInterface(n, &AmigoRepresentation, &AmigoStatus);
-    StemTrackConfigurer.configureRobotInterface(config, AmigoInterface);
+    TomatoConfigurer.configureRobotInterface(config, AmigoInterface);
 
     /* initialize state machine and safety monitor */
     StemTrackMonitor TomatoMonitor(&TomatoStem, &AmigoRepresentation, &AmigoStatus, &TomatoControl);
-    StemTrackConfigurer.configureStemTrackMonitor(config, TomatoMonitor);
+    TomatoConfigurer.configureStemTrackMonitor(config, TomatoMonitor);
 
     /* initialize and configure visualization object */
-    VisualizationInterface RvizInterface(n, StemTrackConfigurer.getBaseFrame(config));
-    StemTrackConfigurer.configureVisualizationInterface(config, RvizInterface);
+    VisualizationInterface RvizInterface(n, TomatoConfigurer.getBaseFrame(config));
+    TomatoConfigurer.configureVisualizationInterface(config, RvizInterface);
 
     /* initialize profiling */
     sp.initialize();
@@ -98,14 +97,14 @@ int main(int argc, char** argv)
         if (config.sync())
         {
             /* config file changed */
-            StemTrackConfigurer.configureStemRepresentation(config, TomatoStem);
-            StemTrackConfigurer.configureRobotRepresentation(config, AmigoRepresentation);
-            StemTrackConfigurer.configureRobotStatus(config, AmigoStatus);
-            StemTrackConfigurer.configureWhiskerInterpreter(config, TomatoWhiskerGripper);
-            StemTrackConfigurer.configureStemTrackController(config, TomatoControl);
-            StemTrackConfigurer.configureRobotInterface(config, AmigoInterface);
-            StemTrackConfigurer.configureStemTrackMonitor(config, TomatoMonitor);
-            StemTrackConfigurer.configureVisualizationInterface(config, RvizInterface);
+            TomatoConfigurer.configureStemRepresentation(config, TomatoStem);
+            TomatoConfigurer.configureRobotRepresentation(config, AmigoRepresentation);
+            TomatoConfigurer.configureRobotStatus(config, AmigoStatus);
+            TomatoConfigurer.configureWhiskerInterpreter(config, TomatoWhiskerGripper);
+            TomatoConfigurer.configureStemTrackController(config, TomatoControl);
+            TomatoConfigurer.configureRobotInterface(config, AmigoInterface);
+            TomatoConfigurer.configureStemTrackMonitor(config, TomatoMonitor);
+            TomatoConfigurer.configureVisualizationInterface(config, RvizInterface);
         }
 
         if (!config.hasError())

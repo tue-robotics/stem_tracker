@@ -95,50 +95,6 @@ void WhiskerInterpreter::readWhiskers()
     for(int i = 0; i<m_n_whiskers; ++i)
         ROS_INFO_STREAM("whisker " << i << " has value " << whiskers_state[i]);
 
-//    if( fabs(2.93) - whiskers_state[2] > 0.1 )
-//    {
-//        ROS_INFO_STREAM("touch 1");
-//        m_whisker_force[0] = 0.05;
-//        m_whisker_force[1] = 0.1;
-
-//    }
-//    else if( fabs(1.91) - whisker_state[1] > 0.1 && fabs(3.24) - whisker_state[3] <= 0.03)
-//    {
-//        ROS_INFO_STREAM("touch 2");
-//        m_whisker_force[0] = 0.0;
-//        m_whisker_force[1] = 0.13;
-//    }
-//    else if( fabs(1.91) - whisker_state[1] > 0.1 && fabs(3.24) - whisker_state[3] > 0.03)
-//    {
-//        ROS_INFO_STREAM("touch 3");
-//        m_whisker_force[0] = -0.05;
-//        m_whisker_force[1] = 0.1;
-//    }
-//    else if( fabs(2.67) - whisker_state[4] > 0.08 && fabs(2.93) - whisker_state[6] >= 0.1)
-//    {
-//        ROS_INFO_STREAM("touch 4");
-//        m_whisker_force[0] = -0.05;
-//        m_whisker_force[1] = -0.1;
-//    }
-//    else if( fabs(2.67) - whisker_state[4] > 0.08 && fabs(2.93) - whisker_state[6] < 0.1)
-//    {
-//        ROS_INFO_STREAM("touch 5");
-//        m_whisker_force[0] = 0.0;
-//        m_whisker_force[1] = 0.1;
-
-//    }
-//    else if( fabs(2.17) - whisker_state[5] > 0.1 && fabs(1.95) - whisker_state[7] > 0.1)
-//    {
-//        ROS_INFO_STREAM("touch 6");
-//        m_whisker_force[0] = 0.05;
-//        m_whisker_force[1] = -0.1;
-//    }
-//    else if( fabs(2.17) - whisker_state[5] <= 0.1 && fabs(1.95) - whisker_state[7] > 0.1)
-//    {
-//        ROS_INFO_STREAM("touch 7");
-//        m_whisker_force[0] = 0.05;
-//        m_whisker_force[1] = -0.1;
-//    }
     for(uint i = 0; i < m_whisker_forces.size(); ++i)
     {
         m_estimated_pos[0] += m_whisker_forces[i][0];
