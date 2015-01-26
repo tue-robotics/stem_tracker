@@ -1,4 +1,5 @@
 #include "stemrepresentation.h"
+#include "loggingmacros.h"
 
 StemRepresentation::StemRepresentation(int stem_id=-1)
 {

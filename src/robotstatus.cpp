@@ -1,4 +1,5 @@
 #include "robotstatus.h"
+#include "loggingmacros.h"
 
 RobotStatus::RobotStatus(RobotRepresentation* p_robot_representation)
 {

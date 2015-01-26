@@ -8,9 +8,7 @@
 #include "stemtrackcontroller.h"
 #include "stemtrackmonitor.h"
 #include "visualizationinterface.h"
-
-
-#include "ros/ros.h"  /* Only for ROS_INFO_STREAM */
+#include "loggingmacros.h"
 
 const double StemTrackConfigurer::extractDouble(tue::Configuration& config, const std::string& name)
 {
@@ -92,8 +90,8 @@ void StemTrackConfigurer::configureStemRepresentation(tue::Configuration& config
 
     if( getLoglevel(config) > 0 )
     {
-        ROS_INFO_STREAM("===================================================");
-        ROS_INFO_STREAM("Configured stem representation object for stem " << stem_representation.getStemID() );
+        INFO_STREAM("===================================================");
+        INFO_STREAM("Configured stem representation object for stem " << stem_representation.getStemID() );
         stem_representation.printAll();
     }
 }
@@ -107,8 +105,8 @@ void StemTrackConfigurer::configureWhiskerInterpreter(tue::Configuration& config
 
     if( getLoglevel(config) > 0 )
     {
-        ROS_INFO_STREAM("=====================================================");
-        ROS_INFO_STREAM("Configured whisker interpreter object" );
+        INFO_STREAM("=====================================================");
+        INFO_STREAM("Configured whisker interpreter object" );
     }
 }
 
@@ -141,8 +139,8 @@ void StemTrackConfigurer::configureRobotRepresentation(tue::Configuration& confi
 
     if( getLoglevel(config) > 0 )
     {
-        ROS_INFO_STREAM("====================================================");
-        ROS_INFO_STREAM("Configured robot representation object of robot " << robot_representation.getName().c_str() );
+        INFO_STREAM("====================================================");
+        INFO_STREAM("Configured robot representation object of robot " << robot_representation.getName().c_str() );
         robot_representation.printAll();
     }
 }
@@ -155,8 +153,8 @@ void StemTrackConfigurer::configureRobotStatus(tue::Configuration& config, Robot
 
     if( getLoglevel(config) > 0 )
     {
-        ROS_INFO_STREAM("=====================================");
-        ROS_INFO_STREAM("Configured robot status object");
+        INFO_STREAM("=====================================");
+        INFO_STREAM("Configured robot status object");
     }
 }
 
@@ -170,8 +168,8 @@ void StemTrackConfigurer::configureStemTrackController(tue::Configuration& confi
 
     if( getLoglevel(config) > 0 )
     {
-        ROS_INFO_STREAM("=============================================");
-        ROS_INFO_STREAM("Configured stem track controller object");
+        INFO_STREAM("=============================================");
+        INFO_STREAM("Configured stem track controller object");
     }
 }
 
@@ -183,8 +181,8 @@ void StemTrackConfigurer::configureRobotInterface(tue::Configuration& config, Ro
 
     if( getLoglevel(config) > 0 )
     {
-        ROS_INFO_STREAM("=============================================");
-        ROS_INFO_STREAM("Configured robot interface object");
+        INFO_STREAM("=============================================");
+        INFO_STREAM("Configured robot interface object");
     }
 }
 
@@ -194,8 +192,8 @@ void StemTrackConfigurer::configureStemTrackMonitor(tue::Configuration& config, 
 
     if( getLoglevel(config) > 0 )
     {
-        ROS_INFO_STREAM("=============================================");
-        ROS_INFO_STREAM("Configured stemtrack monitor object");
+        INFO_STREAM("=============================================");
+        INFO_STREAM("Configured stemtrack monitor object");
     }
 }
 
@@ -205,9 +203,9 @@ void StemTrackConfigurer::configureVisualizationInterface(tue::Configuration& co
 
     if( getLoglevel(config) > 0 )
     {
-        ROS_INFO_STREAM("=============================================");
-        ROS_INFO_STREAM("Configured visualization object");
-        ROS_INFO_STREAM("=============================================");
+        INFO_STREAM("=============================================");
+        INFO_STREAM("Configured visualization object");
+        INFO_STREAM("=============================================");
 
     }
 }

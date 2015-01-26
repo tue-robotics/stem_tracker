@@ -1,8 +1,6 @@
 #ifndef ROBOTINTERFACE_H
 #define ROBOTINTERFACE_H
 
-#define INFO_STREAM     ROS_INFO_STREAM
-
 #include <ros/ros.h>
 #include <sensor_msgs/JointState.h>
 #include <std_msgs/Float32MultiArray.h>

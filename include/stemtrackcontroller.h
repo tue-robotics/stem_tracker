@@ -1,8 +1,6 @@
 #ifndef STEMTRACKCONTROLLER_H
 #define STEMTRACKCONTROLLER_H
 
-#define     INFO_STREAM     ROS_INFO_STREAM
-
 #include <ros/ros.h>
 #include <vector>
 #include <math.h>

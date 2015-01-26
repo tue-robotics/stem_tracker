@@ -6,8 +6,6 @@
 #include <kdl/jntarray.hpp>
 #include <ros/ros.h>
 
-#define INFO_STREAM     ROS_INFO_STREAM
-
 void printKDLframe(KDL::Frame kdl_frame);
 void printXYZvector(std::vector<float> vect);
 void printKDLVelframe(KDL::FrameVel kdl_vel_frame);

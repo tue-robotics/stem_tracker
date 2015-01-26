@@ -1,4 +1,5 @@
 #include "robotinterface.h"
+#include "loggingmacros.h"
 
 RobotInterface::RobotInterface(ros::NodeHandle node, RobotRepresentation* p_robot_representation, RobotStatus* p_robot_status)
 {

@@ -1,5 +1,7 @@
 #include "debugfunctions.h"
 
+#include "loggingmacros.h"
+
 void printKDLframe(KDL::Frame kdl_frame)
 {
     std::stringstream frame_stream;

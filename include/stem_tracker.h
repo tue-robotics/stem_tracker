@@ -24,7 +24,7 @@
 #include "stemtrackcontroller.h"
 #include "stemtrackmonitor.h"
 #include "stemtrackconfigurer.h"
-#include "logginginterface.h"
+#include "loggingmacros.h"
 
 #define     THIS_PACKAGE    "stem_tracker"
 

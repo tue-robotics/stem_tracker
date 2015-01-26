@@ -1,6 +1,6 @@
 #include "whiskerinterpreter.h"
+#include "loggingmacros.h"
 #include <cmath>
-#include <ros/ros.h>  /* Only for ROS_ROS_INFO_STREAM */
 
 
 void WhiskerInterpreter::setNumberOfWhiskers(const int& n_whiskers)
@@ -31,14 +31,14 @@ void WhiskerInterpreter::simulateWhiskerGripper(const std::vector<float>& grippe
 
     if(gripper_center.size() < 2 )
     {
-        ROS_INFO_STREAM("in simulateWhiskerGripper gripper center xy needed!");
+        INFO_STREAM("in simulateWhiskerGripper gripper center xy needed!");
         m_status = 0;
         return;
     }
 
     if(stem_center.size() < 2 )
     {
-        ROS_INFO_STREAM("in simulateWhiskerGripper stem center xy needed!");
+        INFO_STREAM("in simulateWhiskerGripper stem center xy needed!");
         m_status = 0;
         return;
     }
@@ -70,7 +70,7 @@ void WhiskerInterpreter::simulateWhiskerGripper(const std::vector<float>& grippe
         tmp_force.at(0) = (m_estimated_pos[0] / dist_gripper_to_stem) * m_max_whisker_force * whisker_fraction_deformed;
         tmp_force.at(1) = (m_estimated_pos[1] / dist_gripper_to_stem) * m_max_whisker_force * whisker_fraction_deformed;
     }
-    ROS_INFO_STREAM("forces: x = " << tmp_force[0] << " y = " << tmp_force[1] );
+    INFO_STREAM("forces: x = " << tmp_force[0] << " y = " << tmp_force[1] );
     m_whisker_forces.push_back(tmp_force);
 }
 
@@ -88,12 +88,12 @@ void WhiskerInterpreter::readWhiskers()
 
     if( whiskers_state.size() != m_n_whiskers)
     {
-        ROS_ERROR_STREAM("readWhiskers in WhiskerInterpreter expects " << m_n_whiskers << " whiskers while RobotInterface provides " << whiskers_state.size() );
+        ERROR_STREAM("readWhiskers in WhiskerInterpreter expects " << m_n_whiskers << " whiskers while RobotInterface provides " << whiskers_state.size() );
         return;
     }
 
     for(int i = 0; i<m_n_whiskers; ++i)
-        ROS_INFO_STREAM("whisker " << i << " has value " << whiskers_state[i]);
+        INFO_STREAM("whisker " << i << " has value " << whiskers_state[i]);
 
     for(uint i = 0; i < m_whisker_forces.size(); ++i)
     {

@@ -1,4 +1,6 @@
 #include "visualizationinterface.h"
+#include "loggingmacros.h"
+
 #include <visualization_msgs/Marker.h>
 
 void VisualizationInterface::connectToRos(const std::string &topic_name, const int &buffer_size)
@@ -74,7 +76,7 @@ bool VisualizationInterface::configureSelf(const MarkerIDs& marker_id)
         return true;
 
     default:
-        ROS_INFO_STREAM("Unknown marker id in visualization interface!");
+        INFO_STREAM("Unknown marker id in visualization interface!");
         return false;
     }
 }
@@ -122,13 +124,13 @@ void VisualizationInterface::showArrow(const std::vector<float>& force, const st
 {
     if(force.size() != 3)
     {
-        ROS_INFO_STREAM("unknown force vector in showArrow");
+        INFO_STREAM("unknown force vector in showArrow");
         return;
     }
 
     if(origin.size() != 3)
     {
-        ROS_INFO_STREAM("unknown origin vector in showArrow");
+        INFO_STREAM("unknown origin vector in showArrow");
         return;
     }
 

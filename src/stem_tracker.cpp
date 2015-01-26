@@ -12,7 +12,6 @@
 //- selfchecks updaten of weghalen
 //- use stem length instead of distance in z for lin_tan_d
 //- veiligheidscheck voor verspringen joint coordinaten
-//- INFO STREAM niet in alle nodes, printall stringstream laten returnen
 //- use z rotation of setpoint to increase reachable space
 //- orientatie base frame tov gripper frame voor 'neutrale' pose configureerbaar maken
 
@@ -25,9 +24,6 @@ int main(int argc, char** argv)
 
     /* initialize profiling */
     StatsPublisher sp;
-
-    /* initialize logging */
-    LoggingInterface TomatoLog;
 
     /* initialize configuration */
     tue::Configuration config;
@@ -47,8 +43,7 @@ int main(int argc, char** argv)
 
     if (config.hasError())
     {
-        std::ostream stream;
-        TomatoLog.logStream(stream << "Could not load configuration: " << config.error());
+        INFO_STREAM("Could not load configuration: " << config.error());
         return 1;
     }
 
@@ -120,14 +115,14 @@ int main(int argc, char** argv)
             sp.startTimer("main");
 
 
-            if(TomatoMonitor.getState() == STEMTRACK_PREPOS && AmigoStatus.isUpToDate())
+            if(TomatoMonitor.getState() == STEMTRACK_STATE_PREPOS && AmigoStatus.isUpToDate())
             {
                 /* bring arm to initial position */
                 AmigoInterface.publishJointPosRefs(AmigoRepresentation.getInitialPoseJointRefs());
                 TomatoMonitor.updateState();
             }
 
-            if(TomatoMonitor.getState() == STEMTRACK_GRASP  )
+            if(TomatoMonitor.getState() == STEMTRACK_STATE_GRASP  )
             {
                 /* find and show nearest intersection with stem */
                 TomatoStem.updateNearestXYZ(AmigoStatus.getGripperXYZ());
@@ -146,7 +141,7 @@ int main(int argc, char** argv)
                 TomatoMonitor.updateState();
             }
 
-            if(TomatoMonitor.getState() == STEMTRACK_FOLLOW && AmigoStatus.hasValidGripperXYZ() )
+            if(TomatoMonitor.getState() == STEMTRACK_STATE_FOLLOW && AmigoStatus.hasValidGripperXYZ() )
             {
                 /* forward kinematics */
                 RvizInterface.showXYZ(AmigoStatus.getGripperXYZ(), gripper_center);
@@ -173,14 +168,14 @@ int main(int argc, char** argv)
                 TomatoMonitor.updateState();
             }
 
-            if(TomatoMonitor.getState() == STEMTRACK_END)
+            if(TomatoMonitor.getState() == STEMTRACK_STATE_END)
             {
                 TomatoWhiskerGripper.readWhiskers();
                 RvizInterface.showArrow(TomatoWhiskerGripper.getEstimatedPosError(), AmigoStatus.getGripperXYZ(), whisker_net_force);
             }
 
             if(!AmigoStatus.isUpToDate())
-                ROS_INFO_STREAM("waiting for up to date robot status information");
+                INFO_STREAM("waiting for up to date robot status information");
 
             /* stop and publish timer */
             sp.stopTimer("main");
@@ -189,7 +184,7 @@ int main(int argc, char** argv)
         }
 
         else
-            ROS_INFO_STREAM("error in loading config file!");
+            ERROR_STREAM("error in loading config file!");
 
         /* wait for next sample */
         r.sleep();

@@ -1,8 +1,6 @@
 #ifndef ROBOTSTATUS_H
 #define ROBOTSTATUS_H
 
-#define INFO_STREAM     ROS_INFO_STREAM
-
 #include <vector>
 #include <iostream>
 #include <ros/ros.h>

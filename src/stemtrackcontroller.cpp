@@ -4,7 +4,7 @@
 #include "robotrepresentation.h"
 #include "stemrepresentation.h"
 #include "robotstatus.h"
-
+#include "loggingmacros.h"
 
 void StemTrackController::setDebugIKsolver(bool debug_ik_solver)
 {

@@ -1,4 +1,5 @@
 #include "stemtrackmonitor.h"
+#include "loggingmacros.h"
 
 StemTrackMonitor::StemTrackMonitor(StemRepresentation* p_stem_representation, RobotRepresentation* p_robot_representation, RobotStatus* p_robot_status, StemTrackController* p_stemtrack_control)
 {
@@ -6,7 +7,7 @@ StemTrackMonitor::StemTrackMonitor(StemRepresentation* p_stem_representation, Ro
     m_p_stem_representation = p_stem_representation;
     m_p_stemtrack_control = p_stemtrack_control;
     m_p_robot_status = p_robot_status;
-    m_state = STEMTRACK_PREPOS;
+    m_state = STEMTRACK_STATE_PREPOS;
 }
 
 void StemTrackMonitor::setDebugStateParameter(bool debug_state_par)
@@ -34,28 +35,28 @@ void StemTrackMonitor::updateState()
     switch (m_state)
     {
 
-    case STEMTRACK_PREPOS:
+    case STEMTRACK_STATE_PREPOS:
         if( m_p_robot_status->reachedPosition( m_p_robot_representation->getInitialPoseJointRefs() ) )
         {
-            m_state = STEMTRACK_GRASP;
+            m_state = STEMTRACK_STATE_GRASP;
             INFO_STREAM("=============================================");
             INFO_STREAM("==> I am going to grasp the stem, hihaa");
         }
         break;
 
-    case STEMTRACK_GRASP:
+    case STEMTRACK_STATE_GRASP:
         if( m_p_robot_status->reachedPosition(m_p_stem_representation->getNearestXYZ()) )
         {
-            m_state = STEMTRACK_FOLLOW;
+            m_state = STEMTRACK_STATE_FOLLOW;
             INFO_STREAM("=============================================");
             INFO_STREAM("==> I have the stem, going to move up now");
         }
         break;
 
-    case STEMTRACK_FOLLOW:
+    case STEMTRACK_STATE_FOLLOW:
         if( reachedEndOfStem() )
         {
-            m_state = STEMTRACK_END;
+            m_state = STEMTRACK_STATE_END;
             INFO_STREAM("=============================================");
             INFO_STREAM("==> I am done with my task");
         }

@@ -2,8 +2,7 @@
 
 #include <ros/ros.h>
 #include <kdl_parser/kdl_parser.hpp>
-
-#define INFO_STREAM     ROS_INFO_STREAM
+#include "loggingmacros.h"
 
 
 RobotRepresentation::RobotRepresentation(const std::string& name = "defaultRobot")

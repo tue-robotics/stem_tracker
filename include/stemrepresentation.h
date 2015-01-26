@@ -5,7 +5,6 @@
 #include <iostream>
 
 #include <ros/ros.h>
-#define INFO_STREAM     ROS_INFO_STREAM
 
 //Assumption: stem derivative is always positive
 
