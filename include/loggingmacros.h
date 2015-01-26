@@ -1,0 +1,9 @@
+#ifndef LOGGINGINTERFACE_H
+#define LOGGINGINTERFACE_H
+
+#include <ros/ros.h>
+
+#define     STEMTRACK_LOG_STREAM    ROS_INFO_STREAM
+#define     STEMTRACK_ERROR         ROS_ERROR
+
+#endif // LOGGINGINTERFACE_H

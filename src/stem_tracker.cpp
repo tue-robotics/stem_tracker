@@ -23,8 +23,11 @@
 int main(int argc, char** argv)
 {
 
-    /* initialize profiling object */
+    /* initialize profiling */
     StatsPublisher sp;
+
+    /* initialize logging */
+    LoggingInterface TomatoLog;
 
     /* initialize configuration */
     tue::Configuration config;
@@ -44,7 +47,8 @@ int main(int argc, char** argv)
 
     if (config.hasError())
     {
-        ROS_INFO_STREAM("Could not load configuration: " << config.error());
+        std::ostream stream;
+        TomatoLog.logStream(stream << "Could not load configuration: " << config.error());
         return 1;
     }
 
