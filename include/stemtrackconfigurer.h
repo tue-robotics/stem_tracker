@@ -16,7 +16,7 @@ class StemTrackController;
 class StemTrackMonitor;
 class VisualizationInterface;
 
-class Configurer
+class StemTrackConfigurer
 {
 
 private:
@@ -43,7 +43,7 @@ public:
     const int getLoglevel(tue::Configuration& config);
     const bool getUseLeft(tue::Configuration& config);
 
-    ~Configurer();
+    ~StemTrackConfigurer();
 
 };
 

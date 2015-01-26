@@ -1,4 +1,4 @@
-#include "configurer.h"
+#include "stemtrackconfigurer.h"
 
 #include "stemrepresentation.h"
 #include "robotrepresentation.h"
@@ -12,62 +12,62 @@
 
 #include "ros/ros.h"  /* Only for ROS_INFO_STREAM */
 
-const double Configurer::extractDouble(tue::Configuration& config, const std::string& name)
+const double StemTrackConfigurer::extractDouble(tue::Configuration& config, const std::string& name)
 {
     double tmp;
     config.value(name, tmp);
     return tmp;
 }
 
-const float Configurer::extractFloat(tue::Configuration& config, const std::string& name)
+const float StemTrackConfigurer::extractFloat(tue::Configuration& config, const std::string& name)
 {
     float tmp;
     config.value(name, tmp);
     return tmp;
 }
 
-const int Configurer::extractInt(tue::Configuration& config, const std::string& name)
+const int StemTrackConfigurer::extractInt(tue::Configuration& config, const std::string& name)
 {
     int tmp;
     config.value(name, tmp);
     return tmp;
 }
 
-const bool Configurer::extractBool(tue::Configuration& config, const std::string& name)
+const bool StemTrackConfigurer::extractBool(tue::Configuration& config, const std::string& name)
 {
     bool tmp;
     config.value(name, tmp);
     return tmp;
 }
 
-const std::string Configurer::extractString(tue::Configuration& config, const std::string& name)
+const std::string StemTrackConfigurer::extractString(tue::Configuration& config, const std::string& name)
 {
     std::string tmp;
     config.value(name, tmp);
     return tmp;
 }
 
-const std::string Configurer::getBaseFrame(tue::Configuration& config)
+const std::string StemTrackConfigurer::getBaseFrame(tue::Configuration& config)
 {
     return extractString(config, "base_frame");
 }
 
-const int Configurer::getUpdateRate(tue::Configuration& config)
+const int StemTrackConfigurer::getUpdateRate(tue::Configuration& config)
 {
     return extractInt(config, "update_rate");
 }
 
-const int Configurer::getLoglevel(tue::Configuration& config)
+const int StemTrackConfigurer::getLoglevel(tue::Configuration& config)
 {
     return extractInt(config,"loglevel");
 }
 
-const bool Configurer::getUseLeft(tue::Configuration& config)
+const bool StemTrackConfigurer::getUseLeft(tue::Configuration& config)
 {
     return extractBool(config, "use_leftarm");
 }
 
-void Configurer::configureStemRepresentation(tue::Configuration& config, StemRepresentation& stem_representation)
+void StemTrackConfigurer::configureStemRepresentation(tue::Configuration& config, StemRepresentation& stem_representation)
 {
     stem_representation.setLinTangentDistance( extractFloat(config, "lin_tan_d") );
 
@@ -98,7 +98,7 @@ void Configurer::configureStemRepresentation(tue::Configuration& config, StemRep
     }
 }
 
-void Configurer::configureWhiskerInterpreter(tue::Configuration& config, WhiskerInterpreter& whisker_interpreter)
+void StemTrackConfigurer::configureWhiskerInterpreter(tue::Configuration& config, WhiskerInterpreter& whisker_interpreter)
 {
     whisker_interpreter.setNumberOfWhiskers( extractInt(config, "n_whiskers") );
     whisker_interpreter.setWhiskerLength( extractFloat(config, "whisker_length") );
@@ -112,7 +112,7 @@ void Configurer::configureWhiskerInterpreter(tue::Configuration& config, Whisker
     }
 }
 
-void Configurer::configureRobotRepresentation(tue::Configuration& config, RobotRepresentation& robot_representation)
+void StemTrackConfigurer::configureRobotRepresentation(tue::Configuration& config, RobotRepresentation& robot_representation)
 {
     if( getUseLeft(config) )
         robot_representation.setLeftArmIsPreferred();
@@ -147,7 +147,7 @@ void Configurer::configureRobotRepresentation(tue::Configuration& config, RobotR
     }
 }
 
-void Configurer::configureRobotStatus(tue::Configuration& config, RobotStatus& robot_status)
+void StemTrackConfigurer::configureRobotStatus(tue::Configuration& config, RobotStatus& robot_status)
 {
     robot_status.setXYZreachedThreshold( extractDouble(config, "xyz_reached_threshold") );
     robot_status.setUpToDateThreshold( extractDouble(config, "up_to_date_threshold") );
@@ -160,7 +160,7 @@ void Configurer::configureRobotStatus(tue::Configuration& config, RobotStatus& r
     }
 }
 
-void Configurer::configureStemTrackController(tue::Configuration& config, StemTrackController& stem_track_controller)
+void StemTrackConfigurer::configureStemTrackController(tue::Configuration& config, StemTrackController& stem_track_controller)
 {
     stem_track_controller.setMaxZvelocity( extractFloat(config, "max_z_dot") );
     stem_track_controller.setUpdateRate( extractInt(config, "update_rate") );
@@ -175,7 +175,7 @@ void Configurer::configureStemTrackController(tue::Configuration& config, StemTr
     }
 }
 
-void Configurer::configureRobotInterface(tue::Configuration& config, RobotInterface& robot_interface)
+void StemTrackConfigurer::configureRobotInterface(tue::Configuration& config, RobotInterface& robot_interface)
 {
     robot_interface.connectToAmigoArm( getUseLeft(config) );
     robot_interface.connectToAmigoTorso();
@@ -188,7 +188,7 @@ void Configurer::configureRobotInterface(tue::Configuration& config, RobotInterf
     }
 }
 
-void Configurer::configureStemTrackMonitor(tue::Configuration& config, StemTrackMonitor& stemtrack_monitor)
+void StemTrackConfigurer::configureStemTrackMonitor(tue::Configuration& config, StemTrackMonitor& stemtrack_monitor)
 {
     stemtrack_monitor.setDebugStateParameter( extractBool(config, "debug_state_par") );
 
@@ -199,7 +199,7 @@ void Configurer::configureStemTrackMonitor(tue::Configuration& config, StemTrack
     }
 }
 
-void Configurer::configureVisualizationInterface(tue::Configuration& config, VisualizationInterface& visualization_interface)
+void StemTrackConfigurer::configureVisualizationInterface(tue::Configuration& config, VisualizationInterface& visualization_interface)
 {
     visualization_interface.connectToRos( extractString(config, "topic_name"), extractInt(config, "buffer_size") );
 
@@ -212,7 +212,7 @@ void Configurer::configureVisualizationInterface(tue::Configuration& config, Vis
     }
 }
 
-Configurer::~Configurer()
+StemTrackConfigurer::~StemTrackConfigurer()
 {
     //destructor
 }
