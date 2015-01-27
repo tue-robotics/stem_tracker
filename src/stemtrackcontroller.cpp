@@ -29,7 +29,7 @@ void StemTrackController::setTiltWithStem(bool tilt_with_stem)
 void StemTrackController::updateCartSetpoint(std::vector<float> setpoint_xyz)
 {
     if(setpoint_xyz.size() != 3)
-        INFO_STREAM("unexpected vector length in update cart setpoint, setpoint_xyz.size() = " << setpoint_xyz.size() );
+        ERROR_STREAM("Unexpected vector length in update cart setpoint, setpoint_xyz.size() = " << setpoint_xyz.size() << ".");
 
     m_setpoint_vector = KDL::Vector( setpoint_xyz[0], setpoint_xyz[1], setpoint_xyz[2]);
     m_setpoint_frame = KDL::Frame( KDL::Rotation::Identity(), m_setpoint_vector);
@@ -42,7 +42,7 @@ void StemTrackController::updateCartSetpoint(std::vector<float> setpoint_xyz)
 void StemTrackController::updateCartSetpoint(std::vector<float> gripper_xyz, std::vector<float> xyz_err)
 {
     if(gripper_xyz.size() != 3 || xyz_err.size() != 3)
-        INFO_STREAM("unexpected vector length in update cart setpoint, grippper_xyz.size() = " << gripper_xyz.size() << " xyz_err.size() = " << xyz_err.size() );
+        ERROR_STREAM("Unexpected vector length in update cart setpoint, grippper_xyz.size() = " << gripper_xyz.size() << " xyz_err.size() = " << xyz_err.size() << ".");
 
     m_setpoint_vector = KDL::Vector( gripper_xyz[0] - xyz_err[0], gripper_xyz[1] - xyz_err[1], gripper_xyz[2] + m_max_z_dot / (double) m_update_rate );
 
@@ -104,7 +104,7 @@ void StemTrackController::updateJointPosReferences()
 
         int status = ik_solver_->CartToJnt(m_p_robot_representation->getJointSeeds(), m_setpoint_frame, m_joint_pos_refs);
         if(m_debug_ik_solver)
-            INFO_STREAM("status ik_solver: " << status);
+            INFO_STREAM("Status ik_solver: " << status);
     }
     return;
 }

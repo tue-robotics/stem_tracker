@@ -43,7 +43,7 @@ int main(int argc, char** argv)
 
     if (config.hasError())
     {
-        INFO_STREAM("Could not load configuration: " << config.error());
+        ERROR_STREAM("Could not load configuration: " << config.error());
         return 1;
     }
 

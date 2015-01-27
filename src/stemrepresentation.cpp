@@ -21,7 +21,7 @@ std::vector<float> StemRepresentation::getStemXYZatZ(float z)
 
     if (m_z_nodes.back() < z)
     {
-        INFO_STREAM("z above stem length!");
+        WARNING_STREAM("Z above stem length!");
         return xyz;
     }
 
@@ -29,21 +29,19 @@ std::vector<float> StemRepresentation::getStemXYZatZ(float z)
     for( index_first_above=0; index_first_above<m_z_nodes.size(); ++index_first_above)
     {
         if(m_z_nodes.at(index_first_above) > z)
-        {
             break;
-        }
     }
 
     if (index_first_above < 1)
     {
-        INFO_STREAM("z below stem start or not enough nodes to calc xy for stem at z!");
+        WARNING_STREAM("Z below stem start or not enough nodes to calc xy for stem at z!");
         return xyz;
     }
 
     float atFraction;
     if(m_z_nodes.at(index_first_above) - m_z_nodes.at(index_first_above-1) <= 0.0)
     {
-        INFO_STREAM("stem bends down or goes horizontally, we don't support that. sorry");
+        ERROR_STREAM("stem bends down or goes horizontally, we don't support that. sorry");
         atFraction = 0.0;
     }
     else
@@ -79,7 +77,7 @@ void StemRepresentation::updateLocalTangent()
 {
     if(m_nearestXYZ.size() != 3)
     {
-        INFO_STREAM("trying to find tangent while nearest stem xyz is not known!");
+        ERROR_STREAM("Trying to find tangent while nearest stem xyz is not known!");
         return;
     }
 
@@ -106,7 +104,7 @@ void StemRepresentation::updateNearestXYZ(std::vector<float> from_xyz)
 {
     if(from_xyz.size() != 3)
     {
-        INFO_STREAM("cannot updateNearestXYZ with input of length " << from_xyz.size());
+        WARNING_STREAM("Cannot updateNearestXYZ with input of length " << from_xyz.size() << ". I need xyz.");
         return;
     }
 
@@ -148,8 +146,8 @@ bool StemRepresentation::selfCheck()
 
     if( !( ( m_x_nodes.size() == m_y_nodes.size() ) && ( m_y_nodes.size() == m_z_nodes.size() ) ) )
     {
-        INFO_STREAM("in stem with id " << m_stem_id << ", vectors with node coordinates not of equal length!");
-        INFO_STREAM("\t x_nodes.size() = " << m_x_nodes.size() << " y_nodes.size() = " << m_y_nodes.size() << " z_nodes.size() = " << m_z_nodes.size() << std::endl);
+        ERROR_STREAM("In stem with id " << m_stem_id << ", vectors with node coordinates not of equal length!");
+        ERROR_STREAM("\t x_nodes.size() = " << m_x_nodes.size() << " y_nodes.size() = " << m_y_nodes.size() << " z_nodes.size() = " << m_z_nodes.size() << std::endl);
         IamOK = false;
     }
 

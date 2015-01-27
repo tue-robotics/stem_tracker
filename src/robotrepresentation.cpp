@@ -26,12 +26,12 @@ bool RobotRepresentation::selfCheck()
 
     if(!m_preferred_arm_set)
     {
-        INFO_STREAM("In RobotConfig of " << m_name << " preferred arm was not set");
+        ERROR_STREAM("In RobotConfig of " << m_name << " preferred arm was not set");
         return false;
     }
 
     if(m_n_joints_in_chain <= 0)
-        INFO_STREAM("In RobotConfig of " << m_name << " kinematic chain contains no joints");
+        ERROR_STREAM("In RobotConfig of " << m_name << " kinematic chain contains no joints");
 
     return true;
 }
@@ -40,7 +40,7 @@ void RobotRepresentation::loadUrdfFromFile(const std::string& filename)
 {
     m_urdf_model.clear();
     if ( !m_urdf_model.initFile(filename) )
-        INFO_STREAM("Could not initialize urdf model from file: " << filename);
+        ERROR_STREAM("Could not initialize urdf model from file: " << filename);
 
     return;
 }
@@ -48,7 +48,7 @@ void RobotRepresentation::loadUrdfFromFile(const std::string& filename)
 void RobotRepresentation::loadKinematicTreeFromUrdf()
 {
     if (!kdl_parser::treeFromUrdfModel(m_urdf_model, m_kinematic_tree))
-        INFO_STREAM("Turning urdf model into kdl tree failed!");
+        ERROR_STREAM("Turning urdf model into kdl tree failed!");
     else
         INFO_STREAM("Urdf model has been turned in kdl tree.");
 }
@@ -60,7 +60,7 @@ void RobotRepresentation::loadKinematicChainFromTree(const std::string& root_lin
 
     if (!m_kinematic_tree.getChain(root_link_name, tip_link_name, m_kinematic_chain))
     {
-        INFO_STREAM("Could not initialize chain object");
+        ERROR_STREAM("Could not initialize chain object");
         return;
     }
 
@@ -134,7 +134,7 @@ void RobotRepresentation::setInitialPoseJointRefs(std::vector<float> joint_refs)
 {
     if(joint_refs.size() != m_n_joints_in_chain)
     {
-        INFO_STREAM("number of joints monitoring is " << m_n_joints_in_chain << ", trying to set initial pose with " << joint_refs.size() << " joints");
+        ERROR_STREAM("Trying to set an initial pose with " << joint_refs.size() << " joints while the number of joints we are monitoring is " << m_n_joints_in_chain << "!");
         return;
     }
 
@@ -155,7 +155,7 @@ void RobotRepresentation::printAll()
     else if (m_preferred_arm_set && !m_prefer_left_arm)
         INFO_STREAM("Preferred arm is set to right arm.");
     else
-        INFO_STREAM("Preferred arm was not set!");
+        ERROR_STREAM("Preferred arm was not set!");
 
     INFO_STREAM("KDL tree:");
 

@@ -19,7 +19,7 @@ bool StemTrackMonitor::reachedEndOfStem()
 {
     if( m_p_stem_representation->getNearestXYZ().size() != 3)
     {
-        INFO_STREAM("trying to check for end of stem while stem-intersection is not known!");
+        ERROR_STREAM("Trying to check for end of stem while stem-intersection is not known!");
     }
 
     if( fabs(m_p_stem_representation->getNearestXYZ().at(2) - m_p_stem_representation->getNodesZ().back()) < 0.05 )
@@ -64,7 +64,7 @@ void StemTrackMonitor::updateState()
     }
 
     if(m_debug_state_par && m_state != state_prev)
-        INFO_STREAM("in stemtrack monitor, state was: " << state_prev << " now set to: " << m_state);
+        INFO_STREAM("In stemtrack monitor, state was: " << state_prev << " now set to: " << m_state << ".");
 }
 
 int StemTrackMonitor::getState()

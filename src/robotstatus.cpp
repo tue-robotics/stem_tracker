@@ -6,7 +6,7 @@ RobotStatus::RobotStatus(RobotRepresentation* p_robot_representation)
     m_n_joints_monitoring = p_robot_representation->getKinematicChain().getNrOfJoints();
 
     if(m_n_joints_monitoring <= 0)
-        INFO_STREAM("trying to initialize robot status object with zero or negative number of joints to monitor!");
+        ERROR_STREAM("Trying to initialize RobotStatus object with zero or a negative number of joints to monitor!");
 
     m_joints_to_monitor = KDL::JntArray(m_n_joints_monitoring);
     m_p_robot_representation = p_robot_representation;
@@ -20,7 +20,7 @@ bool RobotStatus::selfCheck()
 
     if(m_n_joints_monitoring <= 0)
     {
-        INFO_STREAM("trying to use robot status object while number of joints to monitor is zero or negative!");
+        ERROR_STREAM("Trying to use RobotStatus object while number of joints to monitor is zero or negative!");
         IamOK = false;
     }
 
@@ -41,13 +41,13 @@ bool RobotStatus::reachedPosition(KDL::JntArray reference)
 {
     if( reference.rows() != m_n_joints_monitoring )
     {
-        INFO_STREAM("reachedPosition check for " << reference.rows() << " joints while robot status contains " << m_n_joints_monitoring << " joints");
+        ERROR_STREAM("reachedPosition check for " << reference.rows() << " joints while robot status contains " << m_n_joints_monitoring << " joints");
         return false;
     }
 
     if( m_pos_reached_threshold < 0.0)
     {
-        INFO_STREAM("reachedPosition check while threshold was not set!");
+        ERROR_STREAM("Check for reachedPosition check while threshold was not set!");
         return false;
     }
 
@@ -69,19 +69,19 @@ bool RobotStatus::reachedPosition(std::vector<float> reference)
 {
     if( reference.size() != 3)
     {
-        INFO_STREAM("reachedPosition check for vector with " << reference.size() << " elements. I need xyz");
+        ERROR_STREAM("Check for reachedPosition with vector of " << reference.size() << " elements. I need xyz.");
         return false;
     }
 
     if( m_xyz_reached_threshold < 0.0)
     {
-        INFO_STREAM("reachedPosition check while threshold was not set!");
+        ERROR_STREAM("Check for reachedPosition while threshold was not set!");
         return false;
     }
 
     if( getGripperXYZ().size() != 3)
     {
-        INFO_STREAM("reachedPosition check while gripperxyz is not known!");
+        ERROR_STREAM("Check for reachedPosition while gripperxyz is not known!");
         return false;
     }
 
@@ -162,7 +162,7 @@ KDL::Frame RobotStatus::getGripperKDLframe()
     int fk_ret = forward_kinematics_solver.JntToCart(getJointStatus(),m_gripper_kdlframe);
 
     if( fk_ret < 0 )
-        INFO_STREAM("Warning: something wrong in solving forward kinematics in getGripperKDLframe");
+        WARNING_STREAM("Something wrong in solving forward kinematics in getGripperKDLframe.");
 
     return m_gripper_kdlframe;
 }

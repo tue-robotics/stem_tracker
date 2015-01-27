@@ -93,7 +93,7 @@ void RobotInterface::publishJointPosRefs(KDL::JntArray q_out)
         m_torso_ref_pub.publish(torso_ref);
     }
     else
-        INFO_STREAM("trying to publish a number of joint position references not equal to the number of joints in robot status");
+        ERROR_STREAM("Publishing a number of joint position references not equal to the number of joints known in RobotStatus!");
 
     return;
 }

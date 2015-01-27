@@ -76,7 +76,7 @@ bool VisualizationInterface::configureSelf(const MarkerIDs& marker_id)
         return true;
 
     default:
-        INFO_STREAM("Unknown marker id in visualization interface!");
+        WARNING_STREAM("Unknown marker id in visualization interface!");
         return false;
     }
 }
@@ -124,13 +124,13 @@ void VisualizationInterface::showArrow(const std::vector<float>& force, const st
 {
     if(force.size() != 3)
     {
-        INFO_STREAM("unknown force vector in showArrow");
+        WARNING_STREAM("Unknown force vector in showArrow!");
         return;
     }
 
     if(origin.size() != 3)
     {
-        INFO_STREAM("unknown origin vector in showArrow");
+        WARNING_STREAM("Unknown origin vector in showArrow!");
         return;
     }
 

@@ -23,7 +23,7 @@ void printKDLJntArray(KDL::JntArray kdl_array)
 {
     if( kdl_array.rows() == 0)
     {
-        INFO_STREAM("empty kdl array");
+        WARNING_STREAM("Trying to print empty kdl array!");
         return;
     }
 

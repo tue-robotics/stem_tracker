@@ -31,14 +31,14 @@ void WhiskerInterpreter::simulateWhiskerGripper(const std::vector<float>& grippe
 
     if(gripper_center.size() < 2 )
     {
-        INFO_STREAM("in simulateWhiskerGripper gripper center xy needed!");
+        ERROR_STREAM("In simulateWhiskerGripper, gripper center xy needed!");
         m_status = 0;
         return;
     }
 
     if(stem_center.size() < 2 )
     {
-        INFO_STREAM("in simulateWhiskerGripper stem center xy needed!");
+        ERROR_STREAM("In simulateWhiskerGripper, stem center xy needed!");
         m_status = 0;
         return;
     }
@@ -70,7 +70,9 @@ void WhiskerInterpreter::simulateWhiskerGripper(const std::vector<float>& grippe
         tmp_force.at(0) = (m_estimated_pos[0] / dist_gripper_to_stem) * m_max_whisker_force * whisker_fraction_deformed;
         tmp_force.at(1) = (m_estimated_pos[1] / dist_gripper_to_stem) * m_max_whisker_force * whisker_fraction_deformed;
     }
-    INFO_STREAM("forces: x = " << tmp_force[0] << " y = " << tmp_force[1] );
+
+    INFO_STREAM("Forces: x = " << tmp_force[0] << " y = " << tmp_force[1] );
+
     m_whisker_forces.push_back(tmp_force);
 }
 
@@ -88,12 +90,12 @@ void WhiskerInterpreter::readWhiskers()
 
     if( whiskers_state.size() != m_n_whiskers)
     {
-        ERROR_STREAM("readWhiskers in WhiskerInterpreter expects " << m_n_whiskers << " whiskers while RobotInterface provides " << whiskers_state.size() );
+        ERROR_STREAM("ReadWhiskers in WhiskerInterpreter expects " << m_n_whiskers << " whiskers while RobotInterface provides " << whiskers_state.size() << ".");
         return;
     }
 
     for(int i = 0; i<m_n_whiskers; ++i)
-        INFO_STREAM("whisker " << i << " has value " << whiskers_state[i]);
+        INFO_STREAM("Whisker " << i << " has value " << whiskers_state[i]);
 
     for(uint i = 0; i < m_whisker_forces.size(); ++i)
     {
