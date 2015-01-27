@@ -21,21 +21,6 @@ void RobotRepresentation::setWhiskersState(std::vector<float> whisker_state)
     }
 }
 
-bool RobotRepresentation::selfCheck()
-{
-
-    if(!m_preferred_arm_set)
-    {
-        ERROR_STREAM("In RobotConfig of " << m_name << " preferred arm was not set");
-        return false;
-    }
-
-    if(m_n_joints_in_chain <= 0)
-        ERROR_STREAM("In RobotConfig of " << m_name << " kinematic chain contains no joints");
-
-    return true;
-}
-
 void RobotRepresentation::loadUrdfFromFile(const std::string& filename)
 {
     m_urdf_model.clear();

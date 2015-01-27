@@ -139,21 +139,6 @@ std::vector<float> StemRepresentation::getNearestXYZ()
     return m_nearestXYZ;
 }
 
-bool StemRepresentation::selfCheck()
-{
-
-    bool IamOK = true;
-
-    if( !( ( m_x_nodes.size() == m_y_nodes.size() ) && ( m_y_nodes.size() == m_z_nodes.size() ) ) )
-    {
-        ERROR_STREAM("In stem with id " << m_stem_id << ", vectors with node coordinates not of equal length!");
-        ERROR_STREAM("\t x_nodes.size() = " << m_x_nodes.size() << " y_nodes.size() = " << m_y_nodes.size() << " z_nodes.size() = " << m_z_nodes.size() << std::endl);
-        IamOK = false;
-    }
-
-    return IamOK;
-}
-
 bool StemRepresentation::isXYZonStem(std::vector<float> xyz)
 {
     if(xyz.size() != 3)
@@ -173,8 +158,6 @@ bool StemRepresentation::isXYZonStem(std::vector<float> xyz)
 
 void StemRepresentation::loadNodesXYZ(std::vector<float> x, std::vector<float> y, std::vector<float> z)
 {
-    if(!selfCheck())
-        return;
 
     m_x_nodes.clear();
     m_y_nodes.clear();
@@ -188,8 +171,6 @@ void StemRepresentation::loadNodesXYZ(std::vector<float> x, std::vector<float> y
     }
 
     m_n_nodes = m_x_nodes.size();
-
-    selfCheck();
 
 }
 

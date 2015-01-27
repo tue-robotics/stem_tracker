@@ -14,19 +14,6 @@ RobotStatus::RobotStatus(RobotRepresentation* p_robot_representation)
     m_xyz_reached_threshold = -1.0;
 }
 
-bool RobotStatus::selfCheck()
-{
-    bool IamOK = true;
-
-    if(m_n_joints_monitoring <= 0)
-    {
-        ERROR_STREAM("Trying to use RobotStatus object while number of joints to monitor is zero or negative!");
-        IamOK = false;
-    }
-
-    return IamOK;
-}
-
 int RobotStatus::getNjointsMonitoring()
 {
     return m_n_joints_monitoring;

@@ -1,5 +1,5 @@
-#ifndef LOGGINGINTERFACE_H
-#define LOGGINGINTERFACE_H
+#ifndef LOGGINGMACROS_H
+#define LOGGINGMACROS_H
 
 #include <ros/ros.h>
 
@@ -7,4 +7,4 @@
 #define     WARNING_STREAM    ROS_WARN_STREAM
 #define     ERROR_STREAM      ROS_ERROR_STREAM
 
-#endif // LOGGINGINTERFACE_H
+#endif // LOGGINGMACROS_H

@@ -24,6 +24,7 @@ class StemRepresentation
 
     public:
         StemRepresentation(int stem_id);
+
         int getStemID();
         void initializeTangent();
         std::vector<float> getCurrentTangent();
@@ -31,7 +32,7 @@ class StemRepresentation
         std::vector<float> getNodesX();
         std::vector<float> getNodesY();
         std::vector<float> getNodesZ();
-        bool selfCheck();
+
         bool isXYZonStem(std::vector<float> xyz);
         void updateNearestXYZ(std::vector<float> from_xyz);
         std::vector<float> getNearestXYZ();

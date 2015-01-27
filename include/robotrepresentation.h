@@ -27,7 +27,6 @@ private:
 public:
     RobotRepresentation(const std::string& name);
 
-    bool selfCheck();
     void printAll();
 
     void setInitialPoseJointRefs(const std::vector<float> joint_refs);

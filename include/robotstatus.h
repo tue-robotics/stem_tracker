@@ -27,7 +27,7 @@ class RobotStatus
 
     public:
         RobotStatus(RobotRepresentation* p_robot_representation);
-        bool selfCheck();
+
         double setXYZreachedThreshold(double xyz_reached_threshold);
         void setPosReachedThreshold(float pos_reached_threshold);
         bool reachedPosition(KDL::JntArray reference);
