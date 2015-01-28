@@ -4,7 +4,6 @@
 #include <ros/ros.h>
 #include <sensor_msgs/JointState.h>
 #include <std_msgs/Float32MultiArray.h>
-#include <std_msgs/Float32.h>
 #include <kdl/jntarray.hpp>
 
 class RobotRepresentation;
@@ -31,7 +30,7 @@ public:
 
     void receivedAmigoTorsoMsg(const sensor_msgs::JointState& msg);
     void receivedAmigoArmMsg(const sensor_msgs::JointState& msg);
-    void receivedWhiskerMsg(const std_msgs::Float32MultiArray & msg);
+    void receivedWhiskerMsg(const std_msgs::Float32MultiArray& msg);
 
     void publishAmigoArmMessage(sensor_msgs::JointState arm_message);
     void publishAmigoJointPosRefs(KDL::JntArray joint_array);

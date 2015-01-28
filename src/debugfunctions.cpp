@@ -1,6 +1,6 @@
 #include "debugfunctions.h"
-
 #include "loggingmacros.h"
+
 
 void printKDLframe(KDL::Frame kdl_frame)
 {

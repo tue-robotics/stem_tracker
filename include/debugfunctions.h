@@ -4,7 +4,7 @@
 #include <kdl/frames.hpp>
 #include <kdl/framevel.hpp>
 #include <kdl/jntarray.hpp>
-#include <ros/ros.h>
+#include <vector>
 
 void printKDLframe(KDL::Frame kdl_frame);
 void printXYZvector(std::vector<float> vect);

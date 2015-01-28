@@ -1,5 +1,6 @@
 #include <kdl/chainfksolverpos_recursive.hpp>
 #include <sensor_msgs/JointState.h>
+#include <sys/time.h>
 
 #include "robotstatus.h"
 #include "loggingmacros.h"
@@ -16,13 +17,8 @@ RobotStatus::RobotStatus(RobotRepresentation* p_robot_representation)
     m_p_robot_representation = p_robot_representation;
     m_pos_reached_threshold = -1.0;
     m_xyz_reached_threshold = -1.0;
-    m_last_update_times.resize(m_n_joints_monitoring);
+    m_last_update_times.assign(m_n_joints_monitoring, 0);
     m_starting_up.assign(m_n_joints_monitoring,true);
-}
-
-void RobotStatus::setPosReachedThreshold(float pos_reached_threshold)
-{
-    m_pos_reached_threshold = pos_reached_threshold;
 }
 
 bool RobotStatus::reachedPosition(KDL::JntArray reference)
@@ -46,11 +42,6 @@ bool RobotStatus::reachedPosition(KDL::JntArray reference)
     }
 
     return true;
-}
-
-double RobotStatus::setXYZreachedThreshold(double xyz_reached_threshold)
-{
-    m_xyz_reached_threshold = xyz_reached_threshold;
 }
 
 bool RobotStatus::reachedPosition(std::vector<float> reference)
@@ -84,12 +75,15 @@ bool RobotStatus::reachedPosition(std::vector<float> reference)
 
 void RobotStatus::updateJointStatus(KDL::JntArray updated_joint_status, std::vector<int> joints_updated)
 {
+    struct timeval tp;
+    gettimeofday(&tp, NULL);
+
     m_joints_to_monitor = updated_joint_status;
     for(uint i = 0; i < m_n_joints_monitoring; ++i)
     {
         if(joints_updated.at(i) == 1)
         {
-            m_last_update_times.at(i) = ros::Time::now();
+            m_last_update_times.at(i) = tp.tv_sec * 1000000 + tp.tv_usec;
             m_starting_up.at(i) = false;
         }
     }
@@ -106,22 +100,25 @@ bool RobotStatus::waitingForFirstStatusUpdate()
     return false;
 }
 
-double RobotStatus::getWorstCaseTimeSinceLastUpdate()
+const long int RobotStatus::getWorstCaseTimeSinceLastUpdate() const
 {
     uint i_max = 0;
-    double tempmax = 0.0;
-    ros::Duration interval;
+    long int tempmax = 0, interval, now;
+    struct timeval tp;
+
     for(uint i = 0; i < m_n_joints_monitoring; ++i)
     {
-        interval = ros::Time::now() - m_last_update_times.at(i);
-        if(interval.toSec() >= tempmax)
+        gettimeofday(&tp, NULL);
+        now = tp.tv_sec * 1000000 + tp.tv_usec;
+        interval = now - m_last_update_times.at(i);
+        if( interval >= tempmax)
         {
             i_max = i;
-            tempmax = interval.toSec();
+            tempmax = interval;
         }
     }
-    interval = ros::Time::now() - m_last_update_times.at(i_max);
-    return interval.toSec();
+
+    return now - m_last_update_times.at(i_max);
 }
 
 bool RobotStatus::isUpToDate()
@@ -129,15 +126,10 @@ bool RobotStatus::isUpToDate()
     if(waitingForFirstStatusUpdate())
         return false;
 
-    if(getWorstCaseTimeSinceLastUpdate() < m_up_to_date_threshold)
+    if(getWorstCaseTimeSinceLastUpdate() < (long int) (m_up_to_date_threshold * 1000000))
         return true;
     else
         return false;
-}
-
-void RobotStatus::setUpToDateThreshold(double threshold)
-{
-    m_up_to_date_threshold = threshold;
 }
 
 const std::vector<float>& RobotStatus::getGripperXYZ()
@@ -185,18 +177,6 @@ bool RobotStatus::hasValidGripperXYZ()
     }
     else
         return false;
-}
-
-void RobotStatus::printAll()
-{
-    INFO_STREAM("===============");
-
-    INFO_STREAM("Robot status: ");
-
-    for(int i; i<m_n_joints_monitoring; ++i)
-        INFO_STREAM("\t" << m_joints_to_monitor(i));
-
-    INFO_STREAM("===============");
 }
 
 RobotStatus::~RobotStatus()
