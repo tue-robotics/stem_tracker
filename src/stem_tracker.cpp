@@ -8,8 +8,6 @@
 //- reageren op combinatie van whisker forces ipv naar bekende intersection
 //- check voor welke objecten interface naar andere object alleen voor config nodig is (vb in robotstatus)
 //- maak een robotstatus up to date reset, bijv om na wisselen van arm opnieuw op up to date info te wachten
-//- robotstatus up to date check voor volledige array
-//- selfchecks updaten of weghalen
 //- use stem length instead of distance in z for lin_tan_d
 //- veiligheidscheck voor verspringen joint coordinaten
 //- use z rotation of setpoint to increase reachable space
@@ -114,11 +112,10 @@ int main(int argc, char** argv)
             /* start timer, for profiling */
             sp.startTimer("main");
 
-
+            /* bring arm to preposition */
             if(TomatoMonitor.getState() == STEMTRACK_STATE_PREPOS && AmigoStatus.isUpToDate())
             {
-                /* bring arm to initial position */
-                AmigoInterface.publishJointPosRefs(AmigoRepresentation.getInitialPoseJointRefs());
+                AmigoInterface.publishAmigoJointPosRefs(AmigoRepresentation.getInitialPoseJointRefs());
                 TomatoMonitor.updateState();
             }
 
@@ -135,7 +132,7 @@ int main(int argc, char** argv)
                 TomatoControl.updateJointPosReferences();
 
                 /* send references to joint controllers */
-                AmigoInterface.publishJointPosRefs(TomatoControl.getJointPosRefs());
+                AmigoInterface.publishAmigoJointPosRefs(TomatoControl.getJointPosRefs());
 
                 /* check if reference reached */
                 TomatoMonitor.updateState();
@@ -162,7 +159,7 @@ int main(int argc, char** argv)
                 TomatoControl.updateJointPosReferences();
 
                 /* send references to joint controllers */
-                AmigoInterface.publishJointPosRefs(TomatoControl.getJointPosRefs());
+                AmigoInterface.publishAmigoJointPosRefs(TomatoControl.getJointPosRefs());
 
                 /* check if end of stem reached */
                 TomatoMonitor.updateState();
@@ -175,7 +172,7 @@ int main(int argc, char** argv)
             }
 
             if(!AmigoStatus.isUpToDate())
-                INFO_STREAM("waiting for up to date robot status information");
+                INFO_STREAM("Waiting for up to date robot status information");
 
             /* stop and publish timer */
             sp.stopTimer("main");

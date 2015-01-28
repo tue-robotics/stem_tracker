@@ -5,18 +5,17 @@
 #include <iostream>
 #include <ros/ros.h>
 #include <kdl/jntarray.hpp>
-#include <kdl/chainfksolverpos_recursive.hpp>
 #include <kdl/frames.hpp>
-#include <sensor_msgs/JointState.h>
 
-#include "robotrepresentation.h"
-
+class RobotRepresentation;
 
 class RobotStatus
 {
     private:
         ros::Time m_last_update;
-        KDL::JntArray m_joints_to_monitor; // order should be: torso / shoulder-jaw / shoulder-pitch / shoulder-roll / elbow-pitch / elbow-roll / wrist-pitch / wrist-yaw
+        std::vector<ros::Time> m_last_update_times;
+        std::vector<bool> m_starting_up;
+        KDL::JntArray m_joints_to_monitor; // for amigo: torso / shoulder-jaw / shoulder-pitch / shoulder-roll / elbow-pitch / elbow-roll / wrist-pitch / wrist-yaw
         int m_n_joints_monitoring;
         std::vector<float> m_gripper_xyz;
         double m_up_to_date_threshold;
@@ -33,16 +32,19 @@ class RobotStatus
         bool reachedPosition(KDL::JntArray reference);
         bool reachedPosition(std::vector<float> reference);
         void setUpToDateThreshold(double threshold);
-        void updateJointStatus(KDL::JntArray updated_joint_status);
-        KDL::JntArray getJointStatus();
-        std::vector<float> getGripperXYZ();
-        KDL::Frame getGripperKDLframe();
+        void updateJointStatus(KDL::JntArray updated_joint_status, std::vector<int> joints_updated);
+        bool waitingForFirstStatusUpdate();
+
         bool isGripperXYZvalid();
         bool hasValidGripperXYZ();
         void updateGripperXYZ();
-        int getNjointsMonitoring();
-        ros::Time getLastUpdateTime();
-        double getTimeSinceLastUpdate();
+
+        const KDL::JntArray& getJointStatus() const { return m_joints_to_monitor; }
+        const int& getNjointsMonitoring() const { return m_n_joints_monitoring; }
+        const std::vector<float>& getGripperXYZ();
+        const KDL::Frame& getGripperKDLframe();
+        double getWorstCaseTimeSinceLastUpdate();
+
         bool isUpToDate();
         void printAll();
 

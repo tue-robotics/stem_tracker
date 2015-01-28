@@ -7,8 +7,8 @@
 #include <std_msgs/Float32.h>
 #include <kdl/jntarray.hpp>
 
-#include "robotrepresentation.h"
-#include "robotstatus.h"
+class RobotRepresentation;
+class RobotStatus;
 
 class RobotInterface
 {
@@ -22,7 +22,9 @@ private:
     ros::Subscriber m_torso_meas_sub;
     ros::Subscriber m_whisker_sub;
 public:
-    RobotInterface(ros::NodeHandle node, RobotRepresentation* p_robot_representation, RobotStatus* p_robot_status);
+    RobotInterface(ros::NodeHandle node, RobotRepresentation* p_robot_representation, RobotStatus* p_robot_status)
+        : m_node(node), m_p_robot_representation(p_robot_representation), m_p_robot_status(p_robot_status) {}
+
     void connectToAmigoArm(const bool leftArmIsPreferred);
     void connectToAmigoTorso();
     void connectToWhiskers();
@@ -32,7 +34,7 @@ public:
     void receivedWhiskerMsg(const std_msgs::Float32MultiArray & msg);
 
     void publishAmigoArmMessage(sensor_msgs::JointState arm_message);
-    void publishJointPosRefs(KDL::JntArray joint_array);
+    void publishAmigoJointPosRefs(KDL::JntArray joint_array);
 
     ~RobotInterface();
 };

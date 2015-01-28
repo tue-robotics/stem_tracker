@@ -94,8 +94,8 @@ void WhiskerInterpreter::readWhiskers()
         return;
     }
 
-    for(int i = 0; i<m_n_whiskers; ++i)
-        INFO_STREAM("Whisker " << i << " has value " << whiskers_state[i]);
+//    for(int i = 0; i<m_n_whiskers; ++i)
+//        INFO_STREAM("Whisker " << i << " has value " << whiskers_state[i]);
 
     for(uint i = 0; i < m_whisker_forces.size(); ++i)
     {

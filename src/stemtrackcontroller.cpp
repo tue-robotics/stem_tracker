@@ -1,5 +1,9 @@
 #include "stemtrackcontroller.h"
 
+#include <kdl/chainiksolverpos_nr_jl.hpp>
+#include <kdl/chainfksolverpos_recursive.hpp>
+#include <kdl/chainiksolvervel_pinv.hpp>
+
 #include "debugfunctions.h"
 #include "robotrepresentation.h"
 #include "stemrepresentation.h"

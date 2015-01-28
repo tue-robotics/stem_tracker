@@ -4,10 +4,8 @@
 #include <ros/ros.h>
 #include <vector>
 #include <math.h>
-
-#include <kdl/chainiksolverpos_nr_jl.hpp>
-#include <kdl/chainfksolverpos_recursive.hpp>
-#include <kdl/chainiksolvervel_pinv.hpp>
+#include <kdl/jntarray.hpp>
+#include <kdl/frames.hpp>
 
 class RobotRepresentation;
 class StemRepresentation;

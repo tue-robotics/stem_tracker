@@ -1,10 +1,10 @@
 #ifndef STEMTRACKMONITOR_H
 #define STEMTRACKMONITOR_H
 
-#include "stemrepresentation.h"
-#include "robotrepresentation.h"
-#include "robotstatus.h"
-#include "stemtrackcontroller.h"
+class StemRepresentation;
+class RobotRepresentation;
+class RobotStatus;
+class StemTrackController;
 
 enum{
     STEMTRACK_STATE_PREPOS = 0,
@@ -26,7 +26,9 @@ private:
     int m_state;
     bool m_debug_state_par;
 public:
-    StemTrackMonitor(StemRepresentation* p_stem_representation, RobotRepresentation* p_robot_representation, RobotStatus* p_robot_status , StemTrackController* p_stemtrack_control);
+    StemTrackMonitor(StemRepresentation* p_stem_representation, RobotRepresentation* p_robot_representation, RobotStatus* p_robot_status , StemTrackController* p_stemtrack_control)
+        : m_p_robot_representation(p_robot_representation), m_p_stem_representation(p_stem_representation), m_p_stemtrack_control(p_stemtrack_control), m_p_robot_status(p_robot_status), m_state(STEMTRACK_STATE_PREPOS) {}
+
     bool reachedEndOfStem();
     void updateState();
 

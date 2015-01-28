@@ -1,14 +1,10 @@
 #include "stemtrackmonitor.h"
 #include "loggingmacros.h"
 
-StemTrackMonitor::StemTrackMonitor(StemRepresentation* p_stem_representation, RobotRepresentation* p_robot_representation, RobotStatus* p_robot_status, StemTrackController* p_stemtrack_control)
-{
-    m_p_robot_representation = p_robot_representation;
-    m_p_stem_representation = p_stem_representation;
-    m_p_stemtrack_control = p_stemtrack_control;
-    m_p_robot_status = p_robot_status;
-    m_state = STEMTRACK_STATE_PREPOS;
-}
+#include "stemrepresentation.h"
+#include "robotrepresentation.h"
+#include "robotstatus.h"
+#include "stemtrackcontroller.h"
 
 void StemTrackMonitor::setDebugStateParameter(bool debug_state_par)
 {
