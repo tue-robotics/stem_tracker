@@ -78,7 +78,14 @@ add_executable(stem_tracker
     ${HEADERS}
     src/stem_tracker.cpp
 )
+
+add_executable(whisker_simulator
+    ${HEADERS}
+    src/whisker_simulator.cpp
+)
+
 target_link_libraries(stem_tracker ${catkin_LIBRARIES} stem_tracker_libs)
+target_link_libraries(whisker_simulator ${catkin_LIBRARIES} stem_tracker_libs)
 
 
 

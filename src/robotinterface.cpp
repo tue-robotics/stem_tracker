@@ -110,4 +110,5 @@ RobotInterface::~RobotInterface()
     m_torso_ref_pub.shutdown();
     m_arm_meas_sub.shutdown();
     m_arm_ref_pub.shutdown();
+    m_whisker_sub.shutdown();
 }

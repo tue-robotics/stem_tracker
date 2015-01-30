@@ -1,15 +1,16 @@
 #include "stem_tracker.h"
 
 // TODO:
+//- reageren op combinatie van whisker forces ipv naar bekende intersection
 //- rekening houden met joint limits als alleen ik vel solver, nulruimte term toevoegen
 //- tilt met stem fixen als alleen ik vel solver
 //- z verplaatsing functie van error
-//- reageren op combinatie van whisker forces ipv naar bekende intersection
+//- whisker orocos component alleen sturen als msg ontvangen
 //- check voor welke objecten interface naar andere object alleen voor config nodig is (vb in robotstatus)
 //- use stem length instead of distance in z for lin_tan_d
 //- use rotation around z to increase reachable space
 //- orientatie base frame tov gripper frame voor 'neutrale' pose configureerbaar maken
-//- whisker orocos component alleen sturen als msg ontvangen
+//- unit tests
 
 // KNOWN-BUGS
 //- hangen bij hele lage z-snelheid ref
