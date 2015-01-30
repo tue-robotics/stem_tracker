@@ -20,12 +20,8 @@ class StemTrackConfigurer
 {
 
 private:
-
-    const double extractDouble(tue::Configuration& config, const std::string& name);
-    const float extractFloat(tue::Configuration& config, const std::string& name);
-    const int extractInt(tue::Configuration& config, const std::string& name);
-    const bool extractBool(tue::Configuration& config, const std::string& name);
-    const std::string extractString(tue::Configuration& config, const std::string& name);
+    template <class T>
+    const T getConfigPar(tue::Configuration& config, const std::string& name);
 
 public:
 

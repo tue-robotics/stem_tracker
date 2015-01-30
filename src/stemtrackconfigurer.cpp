@@ -10,64 +10,37 @@
 #include "visualizationinterface.h"
 #include "loggingmacros.h"
 
-const double StemTrackConfigurer::extractDouble(tue::Configuration& config, const std::string& name)
+template <class T>
+const T StemTrackConfigurer::getConfigPar(tue::Configuration& config, const std::string& name)
 {
-    double tmp;
-    config.value(name, tmp);
-    return tmp;
-}
-
-const float StemTrackConfigurer::extractFloat(tue::Configuration& config, const std::string& name)
-{
-    float tmp;
-    config.value(name, tmp);
-    return tmp;
-}
-
-const int StemTrackConfigurer::extractInt(tue::Configuration& config, const std::string& name)
-{
-    int tmp;
-    config.value(name, tmp);
-    return tmp;
-}
-
-const bool StemTrackConfigurer::extractBool(tue::Configuration& config, const std::string& name)
-{
-    bool tmp;
-    config.value(name, tmp);
-    return tmp;
-}
-
-const std::string StemTrackConfigurer::extractString(tue::Configuration& config, const std::string& name)
-{
-    std::string tmp;
+    T tmp;
     config.value(name, tmp);
     return tmp;
 }
 
 const std::string StemTrackConfigurer::getBaseFrame(tue::Configuration& config)
 {
-    return extractString(config, "base_frame");
+    return getConfigPar<std::string>(config, "base_frame");
 }
 
 const int StemTrackConfigurer::getUpdateRate(tue::Configuration& config)
 {
-    return extractInt(config, "update_rate");
+    return getConfigPar<int>(config, "update_rate");
 }
 
 const int StemTrackConfigurer::getLoglevel(tue::Configuration& config)
 {
-    return extractInt(config,"loglevel");
+    return getConfigPar<int>(config,"loglevel");
 }
 
 const bool StemTrackConfigurer::getUseLeft(tue::Configuration& config)
 {
-    return extractBool(config, "use_leftarm");
+    return getConfigPar<bool>(config, "use_leftarm");
 }
 
 void StemTrackConfigurer::configureStemRepresentation(tue::Configuration& config, StemRepresentation& stem_representation)
 {
-    stem_representation.setLinTangentDistance( extractFloat(config, "lin_tan_d") );
+    stem_representation.setLinTangentDistance( getConfigPar<float>(config, "lin_tan_d") );
 
     std::vector<float> stemNodesX, stemNodesY, stemNodesZ;
 
@@ -75,9 +48,9 @@ void StemTrackConfigurer::configureStemRepresentation(tue::Configuration& config
     {
         while(config.nextArrayItem())
         {
-            stemNodesX.push_back( extractFloat(config, "x") );
-            stemNodesY.push_back( extractFloat(config, "y") );
-            stemNodesZ.push_back( extractFloat(config, "z") );
+            stemNodesX.push_back( getConfigPar<float>(config, "x") );
+            stemNodesY.push_back( getConfigPar<float>(config, "y") );
+            stemNodesZ.push_back( getConfigPar<float>(config, "z") );
         }
 
         config.endArray();
@@ -98,10 +71,10 @@ void StemTrackConfigurer::configureStemRepresentation(tue::Configuration& config
 
 void StemTrackConfigurer::configureWhiskerInterpreter(tue::Configuration& config, WhiskerInterpreter& whisker_interpreter)
 {
-    whisker_interpreter.setNumberOfWhiskers( extractInt(config, "n_whiskers") );
-    whisker_interpreter.setWhiskerLength( extractFloat(config, "whisker_length") );
-    whisker_interpreter.setGripperDiameter( extractFloat(config, "gripper_diameter") );
-    whisker_interpreter.setMaxWhiskerForce( extractFloat(config, "max_whisker_force") );
+    whisker_interpreter.setNumberOfWhiskers( getConfigPar<int>(config, "n_whiskers") );
+    whisker_interpreter.setWhiskerLength( getConfigPar<float>(config, "whisker_length") );
+    whisker_interpreter.setGripperDiameter( getConfigPar<float>(config, "gripper_diameter") );
+    whisker_interpreter.setMaxWhiskerForce( getConfigPar<float>(config, "max_whisker_force") );
 
     if( getLoglevel(config) > 0 )
     {
@@ -117,13 +90,13 @@ void StemTrackConfigurer::configureRobotRepresentation(tue::Configuration& confi
     else
         robot_representation.setRightArmIsPreferred();
 
-    robot_representation.loadUrdfFromFile( extractString(config, "robot_urdf_file") );
+    robot_representation.loadUrdfFromFile( getConfigPar<std::string>(config, "robot_urdf_file") );
     robot_representation.loadKinematicTreeFromUrdf();
 
     if( getUseLeft(config) )
-        robot_representation.loadKinematicChainFromTree( extractString(config, "root_link"), extractString(config, "left_end_link") );
+        robot_representation.loadKinematicChainFromTree( getConfigPar<std::string>(config, "root_link"), getConfigPar<std::string>(config, "left_end_link") );
     else
-        robot_representation.loadKinematicChainFromTree( extractString(config, "root_link"), extractString(config, "right_end_link") );
+        robot_representation.loadKinematicChainFromTree( getConfigPar<std::string>(config, "root_link"), getConfigPar<std::string>(config, "right_end_link") );
 
     robot_representation.loadJointLimits();
 
@@ -131,7 +104,7 @@ void StemTrackConfigurer::configureRobotRepresentation(tue::Configuration& confi
     if (config.readArray("initial_pose"))
     {
         while(config.nextArrayItem())
-            tmp.push_back( extractFloat(config, "q") );
+            tmp.push_back( getConfigPar<float>(config, "q") );
 
         config.endArray();
     }
@@ -147,9 +120,9 @@ void StemTrackConfigurer::configureRobotRepresentation(tue::Configuration& confi
 
 void StemTrackConfigurer::configureRobotStatus(tue::Configuration& config, RobotStatus& robot_status)
 {
-    robot_status.setXYZreachedThreshold( extractDouble(config, "xyz_reached_threshold") );
-    robot_status.setUpToDateThreshold( extractDouble(config, "up_to_date_threshold") );
-    robot_status.setPosReachedThreshold( extractFloat(config, "pos_reached_threshold") );
+    robot_status.setXYZreachedThreshold( getConfigPar<double>(config, "xyz_reached_threshold") );
+    robot_status.setUpToDateThreshold( getConfigPar<double>(config, "up_to_date_threshold") );
+    robot_status.setPosReachedThreshold( getConfigPar<double>(config, "pos_reached_threshold") );
 
     if( getLoglevel(config) > 0 )
     {
@@ -160,11 +133,11 @@ void StemTrackConfigurer::configureRobotStatus(tue::Configuration& config, Robot
 
 void StemTrackConfigurer::configureStemTrackController(tue::Configuration& config, StemTrackController& stem_track_controller)
 {
-    stem_track_controller.setMaxZvelocity( extractFloat(config, "max_z_dot") );
-    stem_track_controller.setUpdateRate( extractInt(config, "update_rate") );
-    stem_track_controller.setTiltWithStem( extractBool(config, "tilt_with_stem") );
-    stem_track_controller.setDebugIKsolver( extractBool(config, "debug_ik_solver") );
-    stem_track_controller.setUseInverseVelocitySolverOnly( extractBool(config, "ik_vel_only") );
+    stem_track_controller.setMaxZvelocity( getConfigPar<float>(config, "max_z_dot") );
+    stem_track_controller.setUpdateRate( getConfigPar<int>(config, "update_rate") );
+    stem_track_controller.setTiltWithStem( getConfigPar<bool>(config, "tilt_with_stem") );
+    stem_track_controller.setDebugIKsolver( getConfigPar<bool>(config, "debug_ik_solver") );
+    stem_track_controller.setUseInverseVelocitySolverOnly( getConfigPar<bool>(config, "ik_vel_only") );
 
     if( getLoglevel(config) > 0 )
     {
@@ -188,7 +161,7 @@ void StemTrackConfigurer::configureRobotInterface(tue::Configuration& config, Ro
 
 void StemTrackConfigurer::configureStemTrackMonitor(tue::Configuration& config, StemTrackMonitor& stemtrack_monitor)
 {
-    stemtrack_monitor.setDebugStateParameter( extractBool(config, "debug_state_par") );
+    stemtrack_monitor.setDebugStateParameter( getConfigPar<bool>(config, "debug_state_par") );
 
     if( getLoglevel(config) > 0 )
     {
@@ -199,7 +172,7 @@ void StemTrackConfigurer::configureStemTrackMonitor(tue::Configuration& config, 
 
 void StemTrackConfigurer::configureVisualizationInterface(tue::Configuration& config, VisualizationInterface& visualization_interface)
 {
-    visualization_interface.connectToRos( extractString(config, "topic_name"), extractInt(config, "buffer_size") );
+    visualization_interface.connectToRos( getConfigPar<std::string>(config, "topic_name"), getConfigPar<int>(config, "buffer_size") );
 
     if( getLoglevel(config) > 0 )
     {

@@ -9,8 +9,7 @@
 //- check voor welke objecten interface naar andere object alleen voor config nodig is (vb in robotstatus)
 //- maak een robotstatus up to date reset, bijv om na wisselen van arm opnieuw op up to date info te wachten
 //- use stem length instead of distance in z for lin_tan_d
-//- veiligheidscheck voor verspringen joint coordinaten
-//- use z rotation of setpoint to increase reachable space
+//- use rotation around z to increase reachable space
 //- orientatie base frame tov gripper frame voor 'neutrale' pose configureerbaar maken
 
 // KNOWN-BUGS
