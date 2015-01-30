@@ -22,7 +22,6 @@ private:
     std::vector<std::string> m_q_joint_names;
     std::string m_root_link_name;
     std::string m_tip_link_name;
-    std::vector<float> m_whisker_state;
 
 public:
     RobotRepresentation(const std::string& name);
@@ -32,7 +31,6 @@ public:
     void setInitialPoseJointRefs(const std::vector<float> joint_refs);
     void setLeftArmIsPreferred();
     void setRightArmIsPreferred();
-    void setWhiskersState(std::vector<float> whisker_state);
 
     bool isLeftArmPreferred();
     bool isRightArmPreferred();
@@ -46,7 +44,6 @@ public:
     const KDL::Chain& getKinematicChain() const { return m_kinematic_chain; }
     const std::string& getName() const { return m_name; }
     const KDL::JntArray& getInitialPoseJointRefs() const { return m_q_initial_pose; }
-    const std::vector<float> getWhiskersState() const { return m_whisker_state; }
 
     void loadUrdfFromFile(const std::string& filename);
     void loadKinematicTreeFromUrdf();

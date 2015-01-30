@@ -21,6 +21,20 @@ RobotStatus::RobotStatus(RobotRepresentation* p_robot_representation)
     m_starting_up.assign(m_n_joints_monitoring,true);
 }
 
+void RobotStatus::updateWhiskerMeasurements(std::vector<float> updated_whisker_measurements)
+{
+    if(updated_whisker_measurements.size() != m_n_whiskers)
+    {
+        ERROR_STREAM("In RobotStatus received whisker message of length " << updated_whisker_measurements.size() << " , I was expecting length " << m_n_whiskers);
+        return;
+    }
+
+    for( uint i = 0; i < m_n_whiskers; ++i)
+            m_whisker_measurements[i] = updated_whisker_measurements[i];
+
+    return;
+}
+
 bool RobotStatus::reachedPosition(KDL::JntArray reference)
 {
     if( reference.rows() != m_n_joints_monitoring )

@@ -54,13 +54,13 @@ int main(int argc, char** argv)
     RobotRepresentation AmigoRepresentation("amigo");
     TomatoConfigurer.configureRobotRepresentation(config, AmigoRepresentation);
 
-    /* initialize and configure whisker interpretation object */
-    WhiskerInterpreter TomatoWhiskerGripper(&AmigoRepresentation);
-    TomatoConfigurer.configureWhiskerInterpreter(config, TomatoWhiskerGripper);
-
     /* initialize and configure robot status object */
     RobotStatus AmigoStatus(&AmigoRepresentation);
     TomatoConfigurer.configureRobotStatus(config, AmigoStatus);
+
+    /* initialize and configure whisker interpretation object */
+    WhiskerInterpreter TomatoWhiskerGripper(&AmigoStatus);
+    TomatoConfigurer.configureWhiskerInterpreter(config, TomatoWhiskerGripper);
 
     /* initialize and configure stem tracking controller object */
     StemTrackController TomatoControl(&AmigoRepresentation, &AmigoStatus, &TomatoStem);

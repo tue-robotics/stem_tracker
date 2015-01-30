@@ -1,27 +1,12 @@
 #include "whiskerinterpreter.h"
 #include "loggingmacros.h"
 #include <cmath>
+#include "robotstatus.h"
 
-
-void WhiskerInterpreter::setNumberOfWhiskers(const int& n_whiskers)
+void WhiskerInterpreter::updateWhiskers(std::vector<float> whisker_values)
 {
-    m_n_whiskers = n_whiskers;
-}
-
-void WhiskerInterpreter::setGripperDiameter(const float& gripper_diameter)
-{
-    m_gripper_diameter = gripper_diameter;
-    m_gripper_radius = gripper_diameter / 2.0f;
-}
-
-void WhiskerInterpreter::setWhiskerLength(const float& whisker_length)
-{
-    m_whisker_length = whisker_length;
-}
-
-void WhiskerInterpreter::setMaxWhiskerForce(const float& max_whisker_force)
-{
-    m_max_whisker_force = max_whisker_force;
+    for(int i=0; i<m_n_whiskers; ++i)
+        m_whisker_values[i] = whisker_values[i];
 }
 
 void WhiskerInterpreter::simulateWhiskerGripper(const std::vector<float>& gripper_center, const std::vector<float>& stem_center)
@@ -86,11 +71,11 @@ void WhiskerInterpreter::readWhiskers()
 
     m_estimated_pos.assign(3,0.0);
 
-    std::vector<float> whiskers_state = m_p_robot_representation->getWhiskersState();
+    std::vector<float> whisker_measurements = m_p_robot_status->getWhiskerMeasurements();
 
-    if( whiskers_state.size() != m_n_whiskers)
+    if( whisker_measurements.size() != m_n_whiskers)
     {
-        ERROR_STREAM("ReadWhiskers in WhiskerInterpreter expects " << m_n_whiskers << " whiskers while RobotInterface provides " << whiskers_state.size() << ".");
+        ERROR_STREAM("In WhiskerInterpreter we expect " << m_n_whiskers << " whiskers while RobotStatus provides " << whisker_measurements.size());
         return;
     }
 

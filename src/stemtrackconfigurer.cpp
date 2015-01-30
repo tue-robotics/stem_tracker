@@ -123,6 +123,7 @@ void StemTrackConfigurer::configureRobotStatus(tue::Configuration& config, Robot
     robot_status.setXYZreachedThreshold( getConfigPar<double>(config, "xyz_reached_threshold") );
     robot_status.setUpToDateThreshold( getConfigPar<double>(config, "up_to_date_threshold") );
     robot_status.setPosReachedThreshold( getConfigPar<double>(config, "pos_reached_threshold") );
+    robot_status.setNumberOfWhiskers( getConfigPar<int>(config, "n_whiskers") );
 
     if( getLoglevel(config) > 0 )
     {
