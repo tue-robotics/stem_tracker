@@ -3,11 +3,9 @@
 // TODO:
 //- rekening houden met joint limits als alleen ik vel solver, nulruimte term toevoegen
 //- tilt met stem fixen als alleen ik vel solver
-//- template ipv extractFloat, extractDouble etc
 //- z verplaatsing functie van error
 //- reageren op combinatie van whisker forces ipv naar bekende intersection
 //- check voor welke objecten interface naar andere object alleen voor config nodig is (vb in robotstatus)
-//- maak een robotstatus up to date reset, bijv om na wisselen van arm opnieuw op up to date info te wachten
 //- use stem length instead of distance in z for lin_tan_d
 //- use rotation around z to increase reachable space
 //- orientatie base frame tov gripper frame voor 'neutrale' pose configureerbaar maken
@@ -84,7 +82,6 @@ int main(int argc, char** argv)
     sp.initialize();
 
 
-
     /* main update loop */
     while(ros::ok())
     {
@@ -100,6 +97,7 @@ int main(int argc, char** argv)
             TomatoConfigurer.configureRobotInterface(config, AmigoInterface);
             TomatoConfigurer.configureStemTrackMonitor(config, TomatoMonitor);
             TomatoConfigurer.configureVisualizationInterface(config, RvizInterface);
+            AmigoStatus.resetUpToDateStatus();
         }
 
         if (!config.hasError())

@@ -121,6 +121,11 @@ const long int RobotStatus::getWorstCaseTimeSinceLastUpdate() const
     return now - m_last_update_times.at(i_max);
 }
 
+void RobotStatus::resetUpToDateStatus()
+{
+    m_starting_up.assign(m_n_joints_monitoring,true);
+}
+
 bool RobotStatus::isUpToDate()
 {
     if(waitingForFirstStatusUpdate())

@@ -36,6 +36,7 @@ class RobotStatus
         bool isGripperXYZvalid();
         bool hasValidGripperXYZ();
         void updateGripperXYZ();
+        void resetUpToDateStatus();
         bool isUpToDate();
 
         const KDL::JntArray& getJointStatus() const { return m_joints_to_monitor; }
