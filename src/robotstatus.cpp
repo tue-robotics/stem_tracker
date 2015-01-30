@@ -17,8 +17,10 @@ RobotStatus::RobotStatus(RobotRepresentation* p_robot_representation)
     m_p_robot_representation = p_robot_representation;
     m_pos_reached_threshold = -1.0;
     m_xyz_reached_threshold = -1.0;
-    m_last_update_times.assign(m_n_joints_monitoring, 0);
-    m_starting_up.assign(m_n_joints_monitoring,true);
+    m_last_joint_update_times.assign(m_n_joints_monitoring, 0);
+    m_last_whiskers_update = 0;
+    m_wait_for_joint_update.assign(m_n_joints_monitoring,true);
+    m_wait_for_whiskers_update = true;
 }
 
 void RobotStatus::updateWhiskerMeasurements(std::vector<float> updated_whisker_measurements)
@@ -32,6 +34,10 @@ void RobotStatus::updateWhiskerMeasurements(std::vector<float> updated_whisker_m
     for( uint i = 0; i < m_n_whiskers; ++i)
             m_whisker_measurements[i] = updated_whisker_measurements[i];
 
+    m_wait_for_whiskers_update = false;
+    struct timeval tp;
+    gettimeofday(&tp, NULL);
+    m_last_whiskers_update = tp.tv_sec * 1000000 + tp.tv_usec;
     return;
 }
 
@@ -97,24 +103,24 @@ void RobotStatus::updateJointStatus(KDL::JntArray updated_joint_status, std::vec
     {
         if(joints_updated.at(i) == 1)
         {
-            m_last_update_times.at(i) = tp.tv_sec * 1000000 + tp.tv_usec;
-            m_starting_up.at(i) = false;
+            m_last_joint_update_times.at(i) = tp.tv_sec * 1000000 + tp.tv_usec;
+            m_wait_for_joint_update.at(i) = false;
         }
     }
     return;
 }
 
-bool RobotStatus::waitingForFirstStatusUpdate()
+bool RobotStatus::waitingForFirstJointStatusUpdate()
 {
     for(uint i = 0; i < m_n_joints_monitoring; ++i)
     {
-        if( m_starting_up.at(i) == true)
+        if( m_wait_for_joint_update.at(i) == true)
             return true;
     }
     return false;
 }
 
-const long int RobotStatus::getWorstCaseTimeSinceLastUpdate() const
+const long int RobotStatus::getWorstCaseTimeSinceLastJointUpdate() const
 {
     uint i_max = 0;
     long int tempmax = 0, interval, now;
@@ -124,7 +130,7 @@ const long int RobotStatus::getWorstCaseTimeSinceLastUpdate() const
     {
         gettimeofday(&tp, NULL);
         now = tp.tv_sec * 1000000 + tp.tv_usec;
-        interval = now - m_last_update_times.at(i);
+        interval = now - m_last_joint_update_times.at(i);
         if( interval >= tempmax)
         {
             i_max = i;
@@ -132,20 +138,40 @@ const long int RobotStatus::getWorstCaseTimeSinceLastUpdate() const
         }
     }
 
-    return now - m_last_update_times.at(i_max);
+    return now - m_last_joint_update_times.at(i_max);
+}
+
+const long int RobotStatus::getTimeSinceLastWhiskersUpdate() const
+{
+    long int now;
+    struct timeval tp;
+    gettimeofday(&tp, NULL);
+    now = tp.tv_sec * 1000000 + tp.tv_usec;
+    return now - m_last_whiskers_update;
 }
 
 void RobotStatus::resetUpToDateStatus()
 {
-    m_starting_up.assign(m_n_joints_monitoring,true);
+    m_wait_for_joint_update.assign(m_n_joints_monitoring,true);
 }
 
-bool RobotStatus::isUpToDate()
+bool RobotStatus::jointStatusIsUpToDate()
 {
-    if(waitingForFirstStatusUpdate())
+    if(waitingForFirstJointStatusUpdate())
         return false;
 
-    if(getWorstCaseTimeSinceLastUpdate() < (long int) (m_up_to_date_threshold * 1000000))
+    if(getWorstCaseTimeSinceLastJointUpdate() < (long int) (m_joints_up_to_date_threshold * 1000000))
+        return true;
+    else
+        return false;
+}
+
+bool RobotStatus::whiskerMeasurementsAreUpToDate()
+{
+    if(m_wait_for_whiskers_update)
+        return false;
+
+    if(getTimeSinceLastWhiskersUpdate() < (long int) (m_whiskers_up_to_date_threshold * 1000000))
         return true;
     else
         return false;
@@ -189,7 +215,7 @@ bool RobotStatus::isGripperXYZvalid()
 
 bool RobotStatus::hasValidGripperXYZ()
 {
-    if( isUpToDate() )
+    if( jointStatusIsUpToDate() )
     {
         updateGripperXYZ();
         return isGripperXYZvalid();

@@ -9,6 +9,7 @@
 //- use stem length instead of distance in z for lin_tan_d
 //- use rotation around z to increase reachable space
 //- orientatie base frame tov gripper frame voor 'neutrale' pose configureerbaar maken
+//- whisker orocos component alleen sturen als msg ontvangen
 
 // KNOWN-BUGS
 //- hangen bij hele lage z-snelheid ref
@@ -109,13 +110,13 @@ int main(int argc, char** argv)
             sp.startTimer("main");
 
             /* bring arm to preposition */
-            if(TomatoMonitor.getState() == STEMTRACK_STATE_PREPOS && AmigoStatus.isUpToDate())
+            if(TomatoMonitor.getState() == STEMTRACK_STATE_PREPOS && AmigoStatus.jointStatusIsUpToDate())
             {
                 AmigoInterface.publishAmigoJointPosRefs(AmigoRepresentation.getInitialPoseJointRefs());
                 TomatoMonitor.updateState();
             }
 
-            if(TomatoMonitor.getState() == STEMTRACK_STATE_GRASP  )
+            if(TomatoMonitor.getState() == STEMTRACK_STATE_GRASP && AmigoStatus.whiskerMeasurementsAreUpToDate()  )
             {
                 /* find and show nearest intersection with stem */
                 TomatoStem.updateNearestXYZ(AmigoStatus.getGripperXYZ());
@@ -134,7 +135,7 @@ int main(int argc, char** argv)
                 TomatoMonitor.updateState();
             }
 
-            if(TomatoMonitor.getState() == STEMTRACK_STATE_FOLLOW && AmigoStatus.hasValidGripperXYZ() )
+            if(TomatoMonitor.getState() == STEMTRACK_STATE_FOLLOW && AmigoStatus.hasValidGripperXYZ() && AmigoStatus.whiskerMeasurementsAreUpToDate() )
             {
                 /* forward kinematics */
                 RvizInterface.showXYZ(AmigoStatus.getGripperXYZ(), gripper_center);
@@ -167,8 +168,11 @@ int main(int argc, char** argv)
                 RvizInterface.showArrow(TomatoWhiskerGripper.getEstimatedPosError(), AmigoStatus.getGripperXYZ(), whisker_net_force);
             }
 
-            if(!AmigoStatus.isUpToDate())
-                INFO_STREAM("Waiting for up to date robot status information");
+            if(!AmigoStatus.jointStatusIsUpToDate())
+                INFO_STREAM("Waiting for up to date joint status information");
+
+            if(!AmigoStatus.whiskerMeasurementsAreUpToDate())
+                INFO_STREAM("Waiting for up to date whisker status information");
 
             /* stop and publish timer */
             sp.stopTimer("main");

@@ -121,7 +121,8 @@ void StemTrackConfigurer::configureRobotRepresentation(tue::Configuration& confi
 void StemTrackConfigurer::configureRobotStatus(tue::Configuration& config, RobotStatus& robot_status)
 {
     robot_status.setXYZreachedThreshold( getConfigPar<double>(config, "xyz_reached_threshold") );
-    robot_status.setUpToDateThreshold( getConfigPar<double>(config, "up_to_date_threshold") );
+    robot_status.setJointsUpToDateThreshold( getConfigPar<double>(config, "joints_up_to_date_threshold") );
+    robot_status.setWhiskersUpToDateThreshold( getConfigPar<double>(config, "whiskers_up_to_date_threshold") );
     robot_status.setPosReachedThreshold( getConfigPar<double>(config, "pos_reached_threshold") );
     robot_status.setNumberOfWhiskers( getConfigPar<int>(config, "n_whiskers") );
 

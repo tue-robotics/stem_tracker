@@ -13,7 +13,8 @@ robot_description_rosparam:     /amigo/robot_description        # amigo urdf mod
 root_link:                      base_link                       # start of kinematic chain we are controlling
 left_end_link:                  grippoint_left                  # end of kinematic chain we are controlling, if use_leftarm
 right_end_link:                 grippoint_right                 # end of kinematic chain we are controlling, if not use_leftarm
-up_to_date_threshold:           0.05                            # consider robot status up to date if measurement received within passed x sec
+joints_up_to_date_threshold:    0.05                            # consider joints status up to date if measurement received within passed x sec
+whiskers_up_to_date_threshold:  0.1                             # consider whisker status up to date if measurement received within passed x sec
 initial_pose:                                                   # pose used as preposition, length should be equal to the number of joints in kinematic chain
     - {q: 0.1}
     - {q: -0.1}
