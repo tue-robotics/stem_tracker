@@ -53,7 +53,7 @@ int main(int argc, char** argv)
     ymlToMsg(config, whisker_values_msg);
 
     /* initialize node */
-    ros::init(argc, argv, THIS_PACKAGE);
+    ros::init(argc, argv, THIS_NODE);
     ros::NodeHandle n;
     ros::Rate r(3);
 

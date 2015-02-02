@@ -27,5 +27,6 @@
 #include "loggingmacros.h"
 
 #define     THIS_PACKAGE    "stem_tracker"
+#define     THIS_NODE       THIS_PACKAGE
 
 #endif // STEM_TRACKER_H

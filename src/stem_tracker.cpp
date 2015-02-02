@@ -44,7 +44,7 @@ int main(int argc, char** argv)
     }
 
     /* initialize node */
-    ros::init(argc, argv, THIS_PACKAGE);
+    ros::init(argc, argv, THIS_NODE);
     ros::NodeHandle n;
     ros::Rate r(TomatoConfigurer.getUpdateRate(config));
 

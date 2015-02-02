@@ -13,5 +13,6 @@
 #include "loggingmacros.h"
 
 #define     THIS_PACKAGE    "stem_tracker"
+#define     THIS_NODE       "whisker_simulator"
 
 #endif // WHISKER_SIMULATOR_H
