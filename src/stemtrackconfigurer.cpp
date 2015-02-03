@@ -75,6 +75,7 @@ void StemTrackConfigurer::configureWhiskerInterpreter(tue::Configuration& config
     whisker_interpreter.setWhiskerLength( getConfigPar<float>(config, "whisker_length") );
     whisker_interpreter.setGripperDiameter( getConfigPar<float>(config, "gripper_diameter") );
     whisker_interpreter.setMaxWhiskerForce( getConfigPar<float>(config, "max_whisker_force") );
+    whisker_interpreter.setNumberOfSamplesForInitialization( getConfigPar<int>(config,"n_samples_for_initialization") );
 
     if( getLoglevel(config) > 0 )
     {

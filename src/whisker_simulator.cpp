@@ -28,6 +28,7 @@ int main(int argc, char** argv)
 {
 
     std_msgs::Float32MultiArray whisker_values_msg;
+    int this_node_rate;
 
     /* initialize configuration */
     tue::Configuration config;
@@ -50,12 +51,13 @@ int main(int argc, char** argv)
         return 1;
     }
 
+    config.value("rate",this_node_rate);
     ymlToMsg(config, whisker_values_msg);
 
     /* initialize node */
     ros::init(argc, argv, THIS_NODE);
     ros::NodeHandle n;
-    ros::Rate r(3);
+    ros::Rate r(this_node_rate);
 
     ros::Publisher whisker_pub = n.advertise<std_msgs::Float32MultiArray>("/amigo/whiskergripper/measurements", 0);
 

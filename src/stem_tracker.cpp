@@ -14,6 +14,7 @@
 
 // KNOWN-BUGS
 //- hangen bij hele lage z-snelheid ref
+//- in config: een spatie na een int werkt wel maar een tab na een int zorgt ervoor dat type niet meer herkend
 
 
 int main(int argc, char** argv)
@@ -73,7 +74,7 @@ int main(int argc, char** argv)
     TomatoConfigurer.configureRobotInterface(config, AmigoInterface);
 
     /* initialize state machine and safety monitor */
-    StemTrackMonitor TomatoMonitor(&TomatoStem, &AmigoRepresentation, &AmigoStatus, &TomatoControl);
+    StemTrackMonitor TomatoMonitor(&TomatoStem, &AmigoRepresentation, &AmigoStatus, &TomatoControl, &TomatoWhiskerGripper);
     TomatoConfigurer.configureStemTrackMonitor(config, TomatoMonitor);
 
     /* initialize and configure visualization object */
@@ -110,14 +111,21 @@ int main(int argc, char** argv)
             /* start timer, for profiling */
             sp.startTimer("main");
 
+            /* obtain nominal whisker values */
+            if(TomatoMonitor.getState() == INIT && AmigoStatus.whiskerMeasurementsAreUpToDate())
+            {
+                TomatoWhiskerGripper.obtainNominalWhiskerValues();
+                TomatoMonitor.updateState();
+            }
+
             /* bring arm to preposition */
-            if(TomatoMonitor.getState() == STEMTRACK_STATE_PREPOS && AmigoStatus.jointStatusIsUpToDate())
+            if(TomatoMonitor.getState() == PREPOS && AmigoStatus.jointStatusIsUpToDate())
             {
                 AmigoInterface.publishAmigoJointPosRefs(AmigoRepresentation.getInitialPoseJointRefs());
                 TomatoMonitor.updateState();
             }
 
-            if(TomatoMonitor.getState() == STEMTRACK_STATE_GRASP && AmigoStatus.whiskerMeasurementsAreUpToDate()  )
+            if(TomatoMonitor.getState() == GRASP && AmigoStatus.whiskerMeasurementsAreUpToDate()  )
             {
                 /* find and show nearest intersection with stem */
                 TomatoStem.updateNearestXYZ(AmigoStatus.getGripperXYZ());
@@ -136,7 +144,7 @@ int main(int argc, char** argv)
                 TomatoMonitor.updateState();
             }
 
-            if(TomatoMonitor.getState() == STEMTRACK_STATE_FOLLOW && AmigoStatus.hasValidGripperXYZ() && AmigoStatus.whiskerMeasurementsAreUpToDate() )
+            if(TomatoMonitor.getState() == FOLLOW && AmigoStatus.hasValidGripperXYZ() && AmigoStatus.whiskerMeasurementsAreUpToDate() )
             {
                 /* forward kinematics */
                 RvizInterface.showXYZ(AmigoStatus.getGripperXYZ(), gripper_center);
@@ -163,7 +171,7 @@ int main(int argc, char** argv)
                 TomatoMonitor.updateState();
             }
 
-            if(TomatoMonitor.getState() == STEMTRACK_STATE_END)
+            if(TomatoMonitor.getState() == END)
             {
                 TomatoWhiskerGripper.readWhiskers();
                 RvizInterface.showArrow(TomatoWhiskerGripper.getEstimatedPosError(), AmigoStatus.getGripperXYZ(), whisker_net_force);
@@ -182,7 +190,7 @@ int main(int argc, char** argv)
         }
 
         else
-            ERROR_STREAM("error in loading config file!");
+            ERROR_STREAM("Error in config file: " << config.error());
 
         /* wait for next sample */
         r.sleep();
