@@ -15,7 +15,7 @@
 // KNOWN-BUGS
 //- hangen bij hele lage z-snelheid ref
 //- in config: een spatie na een int werkt wel maar een tab na een int zorgt ervoor dat type niet meer herkend
-
+//- in analoginsgeneric eerste input altijd gelijk aan 1.46!!
 
 int main(int argc, char** argv)
 {
