@@ -1,10 +1,9 @@
 #include "whisker_simulator.h"
 
-void ymlToMsg(tue::Configuration& config, std_msgs::Float32MultiArray& msg)
+void ymlToWhiskerMsg(tue::Configuration& config, std_msgs::Float32MultiArray& msg)
 {
     msg.data.clear();
     double tmp;
-    int n_whiskers = 0;
 
     if (config.readArray("whisker_values"))
     {
@@ -12,22 +11,34 @@ void ymlToMsg(tue::Configuration& config, std_msgs::Float32MultiArray& msg)
         {
             config.value("w",tmp);
             msg.data.push_back(tmp);
-            ++n_whiskers;
         }
+        config.endArray();
     }
 
-    std_msgs::MultiArrayDimension dim;
-    dim.size = n_whiskers;
-    dim.label = "whiskers_from_sim";
-    msg.layout.dim.push_back(dim);
+    return;
+}
 
+void ymlToPressureMsg(tue::Configuration& config, std_msgs::Float32MultiArray& msg)
+{
+    msg.data.clear();
+    double tmp;
+
+    if (config.readArray("pressure_values"))
+    {
+        while(config.nextArrayItem())
+        {
+            config.value("p",tmp);
+            msg.data.push_back(tmp);
+        }
+        config.endArray();
+    }
     return;
 }
 
 int main(int argc, char** argv)
 {
 
-    std_msgs::Float32MultiArray whisker_values_msg;
+    std_msgs::Float32MultiArray whisker_values_msg, pressure_values_msg;
     int this_node_rate;
 
     /* initialize configuration */
@@ -52,14 +63,16 @@ int main(int argc, char** argv)
     }
 
     config.value("rate",this_node_rate);
-    ymlToMsg(config, whisker_values_msg);
+    ymlToWhiskerMsg(config, whisker_values_msg);
+    ymlToPressureMsg(config, pressure_values_msg);
 
     /* initialize node */
     ros::init(argc, argv, THIS_NODE);
     ros::NodeHandle n;
     ros::Rate r(this_node_rate);
 
-    ros::Publisher whisker_pub = n.advertise<std_msgs::Float32MultiArray>("/amigo/whiskergripper/measurements", 0);
+    ros::Publisher pressure_pub = n.advertise<std_msgs::Float32MultiArray>("/amigo/whiskergripper/top_measurements", 0);
+    ros::Publisher whisker_pub = n.advertise<std_msgs::Float32MultiArray>("/amigo/whiskergripper/whisker_measurements", 0);
 
     /* main update loop */
     while(ros::ok())
@@ -68,13 +81,15 @@ int main(int argc, char** argv)
         if (config.sync())
         {
             /* config file changed */
-            ymlToMsg(config, whisker_values_msg);
+            ymlToWhiskerMsg(config, whisker_values_msg);
+            ymlToPressureMsg(config, pressure_values_msg);
 
         }
 
         if (!config.hasError())
         {
             whisker_pub.publish(whisker_values_msg);
+            pressure_pub.publish(pressure_values_msg);
         }
 
         else
