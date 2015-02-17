@@ -6,6 +6,7 @@
 #include "robotstatus.h"
 #include "stemtrackcontroller.h"
 #include "whiskerinterpreter.h"
+#include "debugfunctions.h"
 
 bool StemTrackMonitor::reachedEndOfStem()
 {
@@ -56,7 +57,6 @@ void StemTrackMonitor::updateState()
     {
     case INIT:
         m_state = CALIBRATE;
-        INFO_STREAM("=============================================");
         INFO_STREAM("==> Initializing");
         break;
     case CALIBRATE:

@@ -95,7 +95,7 @@ tilt_with_stem:                 0             # if true (1) tilt gripper based o
 debug_ik_solver:                0             # if true (1) status of kdl ik solver will be printed
 ik_vel_only:                    0             # if true (1) after initialization we only use kdl ik velocity solver, no
                                                # fk or ik position solvers
-xyz_reached_threshold:          0.0           # if cartesian position error of the gripper in robot-status is below this
+xyz_reached_threshold:          0.05          # if cartesian position error of the gripper in robot-status is below this
                                                # threshold position is considered reached
 pos_reached_threshold:          0.1           # if absolute position error for each of the joints in robot-status is below
                                                # this threshold position is considered reached

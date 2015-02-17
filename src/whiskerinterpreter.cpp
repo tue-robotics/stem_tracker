@@ -44,8 +44,6 @@ void WhiskerInterpreter::simulateWhiskerGripper(const std::vector<float>& grippe
         tmp_force.at(1) = (m_estimated_pos[1] / dist_gripper_to_stem) * m_max_whisker_force * whisker_fraction_deformed;
     }
 
-    INFO_STREAM("Forces: x = " << tmp_force[0] << " y = " << tmp_force[1] );
-
     m_whisker_forces.push_back(tmp_force);
 }
 
@@ -63,6 +61,7 @@ void WhiskerInterpreter::obtainNominalValues()
     {
         m_has_nominal_values = true;
 
+        INFO_STREAM("===============================");
         INFO_STREAM("Nominal whisker values: ");
         std::stringstream tmp;
         for( uint i = 0; i < m_n_whiskers; ++i)
@@ -96,9 +95,6 @@ void WhiskerInterpreter::readWhiskers()
         ERROR_STREAM("In WhiskerInterpreter we expect " << m_n_whiskers << " whiskers while RobotStatus provides " << whisker_measurements.size());
         return;
     }
-
-    //    for(int i = 0; i<m_n_whiskers; ++i)
-    //        INFO_STREAM("Whisker " << i << " has value " << whiskers_state[i]);
 
     for(uint i = 0; i < m_whisker_forces.size(); ++i)
     {

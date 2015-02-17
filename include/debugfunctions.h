@@ -7,7 +7,7 @@
 #include <vector>
 
 void printKDLframe(KDL::Frame kdl_frame);
-void printXYZvector(std::vector<float> vect);
+void printVector(std::vector<float> vect);
 void printKDLVelframe(KDL::FrameVel kdl_vel_frame);
 void printKDLJntArray(KDL::JntArray kdl_array);
 

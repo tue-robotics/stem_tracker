@@ -61,9 +61,19 @@ void printKDLVelframe(KDL::FrameVel kdl_vel_frame)
 }
 
 
-
-void printXYZvector(std::vector<float> vect)
+void printVector(std::vector<float> vect)
 {
-    INFO_STREAM("x = " << vect.at(0) << " y = " << vect.at(1) << " z = " << vect.at(2));
+    if(vect.size() == 0)
+    {
+        INFO_STREAM("vector empty");
+        return;
+    }
+
+    std::stringstream tmp;
+    for(uint i = 0; i < vect.size(); ++i)
+        tmp << "vect[" << i << "] = " << vect.at(i) << "  ";
+
+    INFO_STREAM(tmp.str());
+    return;
 }
 
