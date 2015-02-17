@@ -29,10 +29,22 @@ initial_pose:                                                   # pose used as p
 # WHISKER CONFIG
 #######################
 
-n_whiskers:                     18                              # total numbers of whiskers in gripper
-whisker_length:                 0.05                            # length of a single whisker, in meters
-gripper_diameter:               0.1                             # diameter of gripper at whisker-root, in meters
-max_whisker_force:              1.0                             # force applied to the stem by a fully bended (90 degrees) whisker
+whisker_angles:                     # Angle the center of the area covered by this whisker makes wrt the x-axes in the
+    - {ang: -1}   #13                # xy plane of the gripper. Positive is rotating x towards y. Unit: degrees between 0
+    - {ang: 45}   # 7                # and 360 (integers). Provide -1 for the left 'grasp whisker' and -2 for the right
+    - {ang: 80}   # 2                # 'grasp whisker'. Order is order at which the whisker values are stored in the message
+    - {ang: 100}  #14                # coming from orocos.
+    - {ang: 135}  #15
+    - {ang: 160}  #16
+    - {ang: 210}  #17
+    - {ang: 230}  # 4
+    - {ang: 270}  # 1
+    - {ang: 290}  #10
+    - {ang: 310}  # 5
+    - {ang: -2}   # 3
+whisker_length:                 0.05                            # length of a single whisker, in meters (used only for sim)
+gripper_diameter:               0.1                             # diameter of gripper at whisker-root, in meters (used only for sim)
+max_whisker_force:              1.0                             # force applied to the stem by a fully bended (90 degrees) whisker (used only for sim)
 n_samples_for_initialization:	100                             # number of samples we take to average whisker values during initialization (the average will be considered the nominal value)
 
 #######################

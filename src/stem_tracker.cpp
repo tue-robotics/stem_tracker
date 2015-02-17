@@ -11,11 +11,12 @@
 //- use rotation around z to increase reachable space
 //- orientatie base frame tov gripper frame voor 'neutrale' pose configureerbaar maken
 //- unit tests
+//- ints ipv array voor analoginsgeneric
 
 // KNOWN-BUGS
 //- hangen bij hele lage z-snelheid ref
 //- in config: een spatie na een int werkt wel maar een tab na een int zorgt ervoor dat type niet meer herkend
-//- in analoginsgeneric eerste input altijd gelijk aan 1.46!!
+
 
 int main(int argc, char** argv)
 {
