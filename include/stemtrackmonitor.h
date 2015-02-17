@@ -10,14 +10,9 @@ class RobotStatus;
 class StemTrackController;
 class WhiskerInterpreter;
 
-//std::map<char, int> mapDial {
-//    { 'A', 2 }
-//};
-//std::map<stemtrack_state_t, const char*> stemTrackStateToString;
-//stateToString.at(INIT) = "INIT";
-
 enum stemtrack_state_t{
     INIT,
+    CALIBRATE,
     PREPOS,
     GRASP,
     FOLLOW,

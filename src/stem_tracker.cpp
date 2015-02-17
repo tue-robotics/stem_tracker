@@ -113,7 +113,7 @@ int main(int argc, char** argv)
             sp.startTimer("main");
 
             /* obtain nominal whisker values */
-            if(TomatoMonitor.getState() == INIT && AmigoStatus.whiskerMeasurementsAreUpToDate() && AmigoStatus.pressureSensorMeasurementsAreUpToDate())
+            if(TomatoMonitor.getState() == CALIBRATE && AmigoStatus.whiskerMeasurementsAreUpToDate() && AmigoStatus.pressureSensorMeasurementsAreUpToDate())
             {
                 TomatoWhiskerGripper.obtainNominalValues();
                 TomatoMonitor.updateState();

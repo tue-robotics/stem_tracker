@@ -59,8 +59,6 @@ void WhiskerInterpreter::obtainNominalValues()
 
     ++m_took_n_samples_for_initialization;
 
-    INFO_STREAM("Took " << m_took_n_samples_for_initialization << " out of " << m_n_samples_for_initialization << " samples to determine nominal whiskergripper values.");
-
     if( m_took_n_samples_for_initialization == m_n_samples_for_initialization)
     {
         m_has_nominal_values = true;

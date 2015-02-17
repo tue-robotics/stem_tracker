@@ -26,6 +26,8 @@ const std::string StemTrackMonitor::stateToString(stemtrack_state_t state) const
     {
     case INIT:
         return "INIT";
+    case CALIBRATE:
+        return "CALIBRATE";
     case PREPOS:
         return "PREPOS";
     case GRASP:
@@ -52,8 +54,12 @@ void StemTrackMonitor::updateState()
 
     switch (m_state)
     {
-
     case INIT:
+        m_state = CALIBRATE;
+        INFO_STREAM("=============================================");
+        INFO_STREAM("==> Initializing");
+        break;
+    case CALIBRATE:
         if( m_p_whisker_interpreter->isInitialized())
         {
             m_state = PREPOS;

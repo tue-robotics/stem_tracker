@@ -88,7 +88,7 @@ bool RobotStatus::reachedPosition(std::vector<float> reference)
 {
     if( reference.size() != 3)
     {
-        ERROR_STREAM("Check for reachedPosition with vector of " << reference.size() << " elements. I need xyz.");
+        WARNING_STREAM("Check for reachedPosition with vector of " << reference.size() << " elements. I need xyz.");
         return false;
     }
 
