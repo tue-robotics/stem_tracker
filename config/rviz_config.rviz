@@ -5,6 +5,7 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /Global Options1
+        - /Status1
         - /Marker1
         - /Marker1/Namespaces1
       Splitter Ratio: 0.678571
@@ -29,7 +30,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: LRF - Base
+    SyncSource: ""
 Visualization Manager:
   Class: ""
   Displays:
@@ -467,7 +468,6 @@ Visualization Manager:
       Transport Hint: raw
       Value: false
       Visibility:
-        "": true
         CBNav - Cost cloud: true
         CBNav - Desired Orientation: true
         CBNav - Footprint: true
@@ -489,6 +489,7 @@ Visualization Manager:
         LRF - Base: true
         LRF - Torso: true
         Loc - Map: false
+        Marker: true
         Nav - Map: true
         Reasoner: false
         RobotModel: true
@@ -507,7 +508,6 @@ Visualization Manager:
       Transport Hint: raw
       Value: false
       Visibility:
-        "": true
         CBNav - Cost cloud: true
         CBNav - Desired Orientation: true
         CBNav - Footprint: true
@@ -529,6 +529,7 @@ Visualization Manager:
         LRF - Base: true
         LRF - Torso: true
         Loc - Map: true
+        Marker: true
         Nav - Map: true
         Reasoner: true
         RobotModel: true
@@ -893,17 +894,13 @@ Visualization Manager:
       Marker Topic: /stem_track_markers
       Name: Marker
       Namespaces:
-        gripper_center: true
-        nearest_stem_intersection: true
-        stem: true
-        stem_tangent: true
-        whisker_force: true
+        {}
       Queue Size: 100
       Value: true
   Enabled: true
   Global Options:
     Background Color: 170; 85; 0
-    Fixed Frame: map
+    Fixed Frame: amigo/base_link
     Frame Rate: 30
   Name: root
   Tools:
@@ -924,22 +921,22 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 3.65075
+      Distance: 1.69542
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.514089
-        Y: 3.1439
-        Z: -0.00888075
+        X: 0.655292
+        Y: 0.797857
+        Z: 1.0113
       Name: Current View
       Near Clip Distance: 0.01
-      Pitch: 0.514797
+      Pitch: 0.459797
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 0.679999
+      Yaw: 0.73
     Saved:
       - Angle: 0
         Class: rviz/TopDownOrtho
