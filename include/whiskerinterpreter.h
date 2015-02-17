@@ -11,13 +11,13 @@ class WhiskerInterpreter
 
 private:
 
-    int m_n_whiskers;
+    int m_n_whiskers, m_n_pressure_sensors;
     float m_whisker_length;
     float m_gripper_diameter;
     float m_gripper_radius;
     float m_max_whisker_force;
     bool m_has_nominal_values;
-    std::vector<float> m_nominal_values;
+    std::vector<float> m_nominal_whisker_values, m_nominal_pressure_sensor_values;
     std::vector< std::vector<float> > m_whisker_forces;
     std::vector<float> m_estimated_pos;
     std::vector<float> m_whisker_values;
@@ -33,11 +33,12 @@ public:
     inline void setGripperDiameter(const float& gripper_diameter) { m_gripper_diameter = gripper_diameter; m_gripper_radius = gripper_diameter / 2.0f; }
     inline void setWhiskerLength(const float& whisker_length) { m_whisker_length = whisker_length; }
     inline void setMaxWhiskerForce(const float& max_whisker_force) { m_max_whisker_force = max_whisker_force; }
-    inline void setNumberOfWhiskers(const int& n_whiskers) { m_n_whiskers = n_whiskers; m_nominal_values.assign(n_whiskers,0.0); }
+    inline void setNumberOfWhiskers(const int& n) { m_n_whiskers = n; m_nominal_whisker_values.assign(n,0.0); }
+    inline void setNumberOfPressureSensors(const int& n) { m_n_pressure_sensors = n; m_nominal_pressure_sensor_values.assign(n,0.0); }
     inline void setNumberOfSamplesForInitialization(const int& n_samples) { m_n_samples_for_initialization = n_samples; }
 
     void readWhiskers();
-    void obtainNominalWhiskerValues();
+    void obtainNominalValues();
     void updateWhiskers(std::vector<float> whisker_values);
 
     inline const bool isInitialized() const { return m_has_nominal_values; }

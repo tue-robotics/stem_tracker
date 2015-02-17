@@ -1,6 +1,7 @@
 
 update_rate:                    100                             # spin rate of stem_tracking node, in hz
-loglevel:                       1                               # if larger than zero additional information will be printed (currently only one loglevel implemented)
+loglevel:                       1                               # if larger than zero additional information will be printed
+                                                                 # (currently only one loglevel implemented)
 base_frame:                     /amigo/base_link                # frame we use to define stem and to show markers in rviz
 
 #######################
@@ -13,10 +14,14 @@ robot_description_rosparam:     /amigo/robot_description        # amigo urdf mod
 root_link:                      base_link                       # start of kinematic chain we are controlling
 left_end_link:                  grippoint_left                  # end of kinematic chain we are controlling, if use_leftarm
 right_end_link:                 grippoint_right                 # end of kinematic chain we are controlling, if not use_leftarm
-joints_up_to_date_threshold:    0.05                            # consider joints status up to date if measurement received within passed x sec
-whiskers_up_to_date_threshold:  0.1                             # consider whisker status up to date if measurement received within passed x sec
-initial_pose:                                                   # pose used as preposition, length should be equal to the number of joints in kinematic chain
-    - {q: 0.1}
+joints_up_to_date_threshold:    0.05                            # consider joints status up to date if measurement received
+                                                                 # within passed x sec
+whiskers_up_to_date_threshold:  0.1            # consider whisker status up to date if measurement received
+                                                # within passed x sec
+pressure_sensors_up_to_date_threshold:  0.1    # consider pressure sensors status up to date if measurement received
+                                                # within passed x sec
+initial_pose:               # pose used as preposition, length should be equal to the number
+    - {q: 0.1}               # of joints in kinematic chain
     - {q: -0.1}
     - {q: -0.6}
     - {q: 0.0}
@@ -26,35 +31,58 @@ initial_pose:                                                   # pose used as p
     - {q: 0.0}
 
 #######################
-# WHISKER CONFIG
+# WHISKERGRIPPER CONFIG
 #######################
 
-whisker_angles:                     # Angle the center of the area covered by this whisker makes wrt the x-axes in the
-    - {ang: -1}   #13                # xy plane of the gripper. Positive is rotating x towards y. Unit: degrees between 0
-    - {ang: 45}   # 7                # and 360 (integers). Provide -1 for the left 'grasp whisker' and -2 for the right
-    - {ang: 80}   # 2                # 'grasp whisker'. Order is order at which the whisker values are stored in the message
-    - {ang: 100}  #14                # coming from orocos.
-    - {ang: 135}  #15
-    - {ang: 160}  #16
-    - {ang: 210}  #17
-    - {ang: 230}  # 4
-    - {ang: 270}  # 1
-    - {ang: 290}  #10
-    - {ang: 310}  # 5
-    - {ang: -2}   # 3
-whisker_length:                 0.05                            # length of a single whisker, in meters (used only for sim)
-gripper_diameter:               0.1                             # diameter of gripper at whisker-root, in meters (used only for sim)
-max_whisker_force:              1.0                             # force applied to the stem by a fully bended (90 degrees) whisker (used only for sim)
-n_samples_for_initialization:	100                             # number of samples we take to average whisker values during initialization (the average will be considered the nominal value)
+n_samples_for_initialization:	100             # number of samples we take to average whisker and pressure sensor values during
+                                                 # initialization (the average will be used as nominal value)
+whisker_touched_threshold:     0.1              # consider whisker touched if current value differs from nominal value for more than
+                                                 # this threshold
 
+whisker_coverage:                                                 # Angular 'piece of the pie' covered by a whisker in the xy plane
+    - {min: 350, max: 40, grasp_check: 0}   # label 13 port 8      # of the gripper. Positive is rotating x towards y. Direction of x
+    - {min: 20, max: 70, grasp_check: 0}    # label 7 port 6       # is zero. Unit: degrees between 0 and 360 (integers). The order is
+    - {min: 70, max: 90, grasp_check: 0}    # label 2 port 7       # the order at which the whisker values are stored in RobotStatus. If
+    - {min: 90, max: 110, grasp_check: 0}   # label 14 port 9      # a whisker is used to check whether the stem enters/leaves the gripper
+    - {min: 100, max: 160, grasp_check: 0}  # label 15 port 12     # grasp_check = true
+    - {min: 120, max: 220, grasp_check: 0}  # label 16 port 10
+    - {min: 180, max: 270, grasp_check: 0}  # label 17 port 11
+    - {min: 230, max: 250, grasp_check: 0}  # label 4 port 1
+    - {min: 260, max: 290, grasp_check: 0}  # label 1 port 4
+    - {min: 270, max: 300, grasp_check: 0}  # label 10 port 5
+    - {min: 300, max: 340, grasp_check: 0}  # label 5 port 2
+    - {min: 320, max: 10, grasp_check: 1}   # label 3 port 3
+
+pressure_sensor_strip_coverage:      # Angular 'piece of the pie' covered by a single pressure sensor sensor in the xy plane of the gripper.
+    - {min: 40, max: 140}             # Positive is rotating x towards y. Direction of x is zero. Unit: degrees between 0 and 360 (integers).
+    - {min: 140, max: 220}
+    - {min: 220, max: 320}
+
+pressure_sensor_location:        # Angular location of a pressure sensor in the xy plane of the gripper. Positive
+    - {ang: 70}  # port 13        # is rotating x towards y. Direction of x is zero. Unit: degrees between 0 and 360 (integers).
+    - {ang: 110} # port 14        # The order is the order at which the pressure sensor values are stored in RobotStatus.
+    - {ang: 180} # port 15
+    - {ang: 250} # port 16
+    - {ang: 295} # port 17
+
+pressure_sensor_touched_threshold:  0.03        # consider pressure sensor coverage touched when current value differs from nominal value
+                                                 # for more than this threshold
+#######################
+# WHISKER SIM CONFIG
+#######################
+
+whisker_length:                 0.05          # length of a single whisker, in meters (used only for sim)
+gripper_diameter:               0.1           # diameter of gripper at whisker-root, in meters (used only for sim)
+max_whisker_force:              1.0           # force applied to the stem by a fully bended (90 degrees) whisker
+                                               # (used only for sim)
 #######################
 # TOMATO STEM CONFIG
 #######################
 
-lin_tan_d:                      0.1                             # distance in z we use to calculate local linear tangent of stem
-stem_nodes:                                                     # stem nodes, defined in root_link
-#    - {x: 0.55, y: 0.35, z: 0.62}
-#    - {x: 0.2, y: 0.6, z: 0.62}  
+lin_tan_d:                      0.1           # distance in z we use to calculate local linear tangent of stem
+stem_nodes:                                   # stem nodes, defined in root_link
+#   - {x: 0.55, y: 0.35, z: 0.62}
+#   - {x: 0.2, y: 0.6, z: 0.62}
     - {x: 0.55, y: 0.3, z: 1.0}
     - {x: 0.55, y: 0.3, z: 1.2}
 
@@ -62,18 +90,20 @@ stem_nodes:                                                     # stem nodes, de
 # TRACKING CONTROL CONFIG
 ##########################
 
-max_z_dot:                      0.5                             # max gripper velocity in vertical direction during stem tracking (m/s)
-tilt_with_stem:                 0                               # if true (1) tilt gripper based on local derivative of stem
-debug_ik_solver:                0                               # if true (1) status of kdl ik solver will be printed
-ik_vel_only:                    0                               # if true (1) after initialization we only use kdl ik velocity solver, no fk or ik position solvers
-xyz_reached_threshold:          0.05                            # if cartesian position error of the gripper in robot-status is below this threshold position is considered reached
-pos_reached_threshold:          0.1                             # if absolute position error for each of the joints in robot-status is below this threshold position is considered reached
-
+max_z_dot:                      0.5           # max gripper velocity in vertical direction during stem tracking (m/s)
+tilt_with_stem:                 0             # if true (1) tilt gripper based on local derivative of stem
+debug_ik_solver:                0             # if true (1) status of kdl ik solver will be printed
+ik_vel_only:                    0             # if true (1) after initialization we only use kdl ik velocity solver, no
+                                               # fk or ik position solvers
+xyz_reached_threshold:          0.0           # if cartesian position error of the gripper in robot-status is below this
+                                               # threshold position is considered reached
+pos_reached_threshold:          0.1           # if absolute position error for each of the joints in robot-status is below
+                                               # this threshold position is considered reached
 ##########################
 # TRACKING MONITOR CONFIG
 ##########################
 
-debug_state_par:                1                               # if true (1) state will be printed every time it changes
+debug_state_par:                1             # if true (1) state will be printed every time it changes
 
 ##########################
 # VISUALIZATION CONFIG

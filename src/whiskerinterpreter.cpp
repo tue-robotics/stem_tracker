@@ -49,23 +49,33 @@ void WhiskerInterpreter::simulateWhiskerGripper(const std::vector<float>& grippe
     m_whisker_forces.push_back(tmp_force);
 }
 
-void WhiskerInterpreter::obtainNominalWhiskerValues()
+void WhiskerInterpreter::obtainNominalValues()
 {
     for( uint i = 0; i < m_n_whiskers; ++i)
-        m_nominal_values.at(i) += m_p_robot_status->getWhiskerMeasurements().at(i) / (float) m_n_samples_for_initialization;
+        m_nominal_whisker_values.at(i) += m_p_robot_status->getWhiskerMeasurements().at(i) / (float) m_n_samples_for_initialization;
+
+    for( uint i = 0; i < m_n_pressure_sensors; ++i)
+        m_nominal_pressure_sensor_values.at(i) += m_p_robot_status->getPressureSensorMeasurements().at(i) / (float) m_n_samples_for_initialization;
 
     ++m_took_n_samples_for_initialization;
 
-    INFO_STREAM("Took " << m_took_n_samples_for_initialization << " out of " << m_n_samples_for_initialization << " samples to determine nominal whisker values.");
+    INFO_STREAM("Took " << m_took_n_samples_for_initialization << " out of " << m_n_samples_for_initialization << " samples to determine nominal whiskergripper values.");
 
-    if( m_took_n_samples_for_initialization > m_n_samples_for_initialization)
+    if( m_took_n_samples_for_initialization == m_n_samples_for_initialization)
     {
         m_has_nominal_values = true;
+
         INFO_STREAM("Nominal whisker values: ");
         std::stringstream tmp;
         for( uint i = 0; i < m_n_whiskers; ++i)
-            tmp << "w" << i << "= " << m_nominal_values.at(i) << "  ";
+            tmp << "w" << i << "= " << m_nominal_whisker_values.at(i) << "  ";
         INFO_STREAM(tmp.str());
+
+        INFO_STREAM("Nominal pressure sensor values: ");
+        std::stringstream tmp2;
+        for( uint i = 0; i < m_n_pressure_sensors; ++i)
+            tmp2 << "p" << i << "= " << m_nominal_pressure_sensor_values.at(i) << "  ";
+        INFO_STREAM(tmp2.str());
     }
 
     return;

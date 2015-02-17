@@ -113,9 +113,9 @@ int main(int argc, char** argv)
             sp.startTimer("main");
 
             /* obtain nominal whisker values */
-            if(TomatoMonitor.getState() == INIT && AmigoStatus.whiskerMeasurementsAreUpToDate())
+            if(TomatoMonitor.getState() == INIT && AmigoStatus.whiskerMeasurementsAreUpToDate() && AmigoStatus.pressureSensorMeasurementsAreUpToDate())
             {
-                TomatoWhiskerGripper.obtainNominalWhiskerValues();
+                TomatoWhiskerGripper.obtainNominalValues();
                 TomatoMonitor.updateState();
             }
 
@@ -126,7 +126,7 @@ int main(int argc, char** argv)
                 TomatoMonitor.updateState();
             }
 
-            if(TomatoMonitor.getState() == GRASP && AmigoStatus.whiskerMeasurementsAreUpToDate()  )
+            if(TomatoMonitor.getState() == GRASP && AmigoStatus.isUpToDate()  )
             {
                 /* find and show nearest intersection with stem */
                 TomatoStem.updateNearestXYZ(AmigoStatus.getGripperXYZ());
@@ -145,7 +145,7 @@ int main(int argc, char** argv)
                 TomatoMonitor.updateState();
             }
 
-            if(TomatoMonitor.getState() == FOLLOW && AmigoStatus.hasValidGripperXYZ() && AmigoStatus.whiskerMeasurementsAreUpToDate() )
+            if(TomatoMonitor.getState() == FOLLOW && AmigoStatus.hasValidGripperXYZ() && AmigoStatus.isUpToDate() )
             {
                 /* forward kinematics */
                 RvizInterface.showXYZ(AmigoStatus.getGripperXYZ(), gripper_center);
@@ -181,8 +181,8 @@ int main(int argc, char** argv)
             if(!AmigoStatus.jointStatusIsUpToDate())
                 INFO_STREAM("Waiting for up to date joint status information");
 
-            if(!AmigoStatus.whiskerMeasurementsAreUpToDate())
-                INFO_STREAM("Waiting for up to date whisker status information");
+            if(!AmigoStatus.whiskerMeasurementsAreUpToDate() || !AmigoStatus.pressureSensorMeasurementsAreUpToDate())
+                INFO_STREAM("Waiting for up to date whiskergripper status information");
 
             /* stop and publish timer */
             sp.stopTimer("main");

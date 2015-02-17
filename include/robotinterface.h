@@ -20,6 +20,7 @@ private:
     ros::Subscriber m_arm_meas_sub;
     ros::Subscriber m_torso_meas_sub;
     ros::Subscriber m_whisker_sub;
+    ros::Subscriber m_pressure_sub;
 public:
     RobotInterface(ros::NodeHandle node, RobotRepresentation* p_robot_representation, RobotStatus* p_robot_status)
         : m_node(node), m_p_robot_representation(p_robot_representation), m_p_robot_status(p_robot_status) {}
@@ -27,10 +28,12 @@ public:
     void connectToAmigoArm(const bool leftArmIsPreferred);
     void connectToAmigoTorso();
     void connectToWhiskers();
+    void connectToPressureSensors();
 
     void receivedAmigoTorsoMsg(const sensor_msgs::JointState& msg);
     void receivedAmigoArmMsg(const sensor_msgs::JointState& msg);
     void receivedWhiskerMsg(const std_msgs::Float32MultiArray& msg);
+    void receivedPressureSensorMsg(const std_msgs::Float32MultiArray& msg);
 
     void publishAmigoArmMessage(sensor_msgs::JointState arm_message);
     void publishAmigoJointPosRefs(KDL::JntArray joint_array);

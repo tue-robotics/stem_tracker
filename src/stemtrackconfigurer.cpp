@@ -18,6 +18,24 @@ const T StemTrackConfigurer::getConfigPar(tue::Configuration& config, const std:
     return tmp;
 }
 
+const int StemTrackConfigurer::getConfigArrayLength(tue::Configuration& config, const std::string& name)
+{
+    int n = 0;
+    if (config.readArray(name))
+    {
+        while(config.nextArrayItem())
+            ++n;
+
+        config.endArray();
+    }
+    else
+    {
+        ERROR_STREAM("Requested array " << name << " not found in config.");
+    }
+
+    return n;
+}
+
 const std::string StemTrackConfigurer::getBaseFrame(tue::Configuration& config)
 {
     return getConfigPar<std::string>(config, "base_frame");
@@ -71,7 +89,9 @@ void StemTrackConfigurer::configureStemRepresentation(tue::Configuration& config
 
 void StemTrackConfigurer::configureWhiskerInterpreter(tue::Configuration& config, WhiskerInterpreter& whisker_interpreter)
 {
-    whisker_interpreter.setNumberOfWhiskers( getConfigPar<int>(config, "n_whiskers") );
+    whisker_interpreter.setNumberOfWhiskers( getConfigArrayLength(config, "whisker_coverage") );
+    whisker_interpreter.setNumberOfPressureSensors( getConfigArrayLength(config, "pressure_sensor_location" ) );
+
     whisker_interpreter.setWhiskerLength( getConfigPar<float>(config, "whisker_length") );
     whisker_interpreter.setGripperDiameter( getConfigPar<float>(config, "gripper_diameter") );
     whisker_interpreter.setMaxWhiskerForce( getConfigPar<float>(config, "max_whisker_force") );
@@ -124,8 +144,10 @@ void StemTrackConfigurer::configureRobotStatus(tue::Configuration& config, Robot
     robot_status.setXYZreachedThreshold( getConfigPar<double>(config, "xyz_reached_threshold") );
     robot_status.setJointsUpToDateThreshold( getConfigPar<double>(config, "joints_up_to_date_threshold") );
     robot_status.setWhiskersUpToDateThreshold( getConfigPar<double>(config, "whiskers_up_to_date_threshold") );
+    robot_status.setPressureSensorsUpToDateThreshold( getConfigPar<double>(config, "pressure_sensors_up_to_date_threshold") );
     robot_status.setPosReachedThreshold( getConfigPar<double>(config, "pos_reached_threshold") );
-    robot_status.setNumberOfWhiskers( getConfigPar<int>(config, "n_whiskers") );
+    robot_status.setNumberOfPressureSensors( getConfigArrayLength(config, "pressure_sensor_location") );
+    robot_status.setNumberOfWhiskers( getConfigArrayLength(config, "whisker_coverage") );
 
     if( getLoglevel(config) > 0 )
     {
@@ -154,6 +176,7 @@ void StemTrackConfigurer::configureRobotInterface(tue::Configuration& config, Ro
     robot_interface.connectToAmigoArm( getUseLeft(config) );
     robot_interface.connectToAmigoTorso();
     robot_interface.connectToWhiskers();
+    robot_interface.connectToPressureSensors();
 
     if( getLoglevel(config) > 0 )
     {

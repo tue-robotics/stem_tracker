@@ -21,6 +21,8 @@ RobotStatus::RobotStatus(RobotRepresentation* p_robot_representation)
     m_last_whiskers_update = 0;
     m_wait_for_joint_update.assign(m_n_joints_monitoring,true);
     m_wait_for_whiskers_update = true;
+    m_wait_for_pressure_sensors_update = true;
+    m_last_pressure_sensors_update = 0;
 }
 
 void RobotStatus::updateWhiskerMeasurements(std::vector<float> updated_whisker_measurements)
@@ -38,6 +40,24 @@ void RobotStatus::updateWhiskerMeasurements(std::vector<float> updated_whisker_m
     struct timeval tp;
     gettimeofday(&tp, NULL);
     m_last_whiskers_update = tp.tv_sec * 1000000 + tp.tv_usec;
+    return;
+}
+
+void RobotStatus::updatePressureSensorMeasurements(std::vector<float> updated_pressure_sensor_measurements)
+{
+    if(updated_pressure_sensor_measurements.size() != m_n_pressure_sensors)
+    {
+        ERROR_STREAM("In RobotStatus received pressure sensor message of length " << updated_pressure_sensor_measurements.size() << " , I was expecting length " << m_n_pressure_sensors);
+        return;
+    }
+
+    for( uint i = 0; i < m_n_pressure_sensors; ++i)
+            m_pressure_sensor_measurements[i] = updated_pressure_sensor_measurements[i];
+
+    m_wait_for_pressure_sensors_update = false;
+    struct timeval tp;
+    gettimeofday(&tp, NULL);
+    m_last_pressure_sensors_update = tp.tv_sec * 1000000 + tp.tv_usec;
     return;
 }
 
@@ -150,12 +170,35 @@ const long int RobotStatus::getTimeSinceLastWhiskersUpdate() const
     return now - m_last_whiskers_update;
 }
 
+const long int RobotStatus::getTimeSinceLastPressureSensorsUpdate() const
+{
+    long int now;
+    struct timeval tp;
+    gettimeofday(&tp, NULL);
+    now = tp.tv_sec * 1000000 + tp.tv_usec;
+    return now - m_last_pressure_sensors_update;
+}
+
 void RobotStatus::resetUpToDateStatus()
 {
+    m_wait_for_whiskers_update = true;
+    m_wait_for_pressure_sensors_update = true;
     m_wait_for_joint_update.assign(m_n_joints_monitoring,true);
 }
 
-bool RobotStatus::jointStatusIsUpToDate()
+const bool RobotStatus::isUpToDate()
+{
+    if(!jointStatusIsUpToDate())
+        return false;
+    if(!whiskerMeasurementsAreUpToDate())
+        return false;
+    if(!pressureSensorMeasurementsAreUpToDate())
+        return false;
+
+    return true;
+}
+
+const bool RobotStatus::jointStatusIsUpToDate()
 {
     if(waitingForFirstJointStatusUpdate())
         return false;
@@ -166,12 +209,23 @@ bool RobotStatus::jointStatusIsUpToDate()
         return false;
 }
 
-bool RobotStatus::whiskerMeasurementsAreUpToDate()
+const bool RobotStatus::whiskerMeasurementsAreUpToDate()
 {
     if(m_wait_for_whiskers_update)
         return false;
 
     if(getTimeSinceLastWhiskersUpdate() < (long int) (m_whiskers_up_to_date_threshold * 1000000))
+        return true;
+    else
+        return false;
+}
+
+const bool RobotStatus::pressureSensorMeasurementsAreUpToDate()
+{
+    if(m_wait_for_pressure_sensors_update)
+        return false;
+
+    if(getTimeSinceLastPressureSensorsUpdate() < (long int) (m_pressure_sensors_up_to_date_threshold * 1000000))
         return true;
     else
         return false;

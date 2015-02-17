@@ -22,6 +22,7 @@ class StemTrackConfigurer
 private:
     template <class T>
     const T getConfigPar(tue::Configuration& config, const std::string& name);
+    const int getConfigArrayLength(tue::Configuration& config, const std::string& name);
 
 public:
 

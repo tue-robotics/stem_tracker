@@ -5,12 +5,22 @@
 
 void RobotInterface::connectToWhiskers()
 {
-    m_whisker_sub = m_node.subscribe("/amigo/whiskergripper/measurements", 1000, &RobotInterface::receivedWhiskerMsg, this);
+    m_whisker_sub = m_node.subscribe("/amigo/whiskergripper/whisker_measurements", 1000, &RobotInterface::receivedWhiskerMsg, this);
+}
+
+void RobotInterface::connectToPressureSensors()
+{
+    m_pressure_sub = m_node.subscribe("/amigo/whiskergripper/top_measurements", 1000, &RobotInterface::receivedPressureSensorMsg, this);
 }
 
 void RobotInterface::receivedWhiskerMsg(const std_msgs::Float32MultiArray & msg)
 {
     m_p_robot_status->updateWhiskerMeasurements(msg.data);
+}
+
+void RobotInterface::receivedPressureSensorMsg(const std_msgs::Float32MultiArray & msg)
+{
+    m_p_robot_status->updatePressureSensorMeasurements(msg.data);
 }
 
 void RobotInterface::connectToAmigoArm(const bool leftArmIsPreferred)
