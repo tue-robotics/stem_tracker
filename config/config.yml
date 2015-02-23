@@ -1,7 +1,5 @@
 
 update_rate:                    100                             # spin rate of stem_tracking node, in hz
-loglevel:                       1                               # if larger than zero additional information will be printed
-                                                                 # (currently only one loglevel implemented)
 base_frame:                     /amigo/base_link                # frame we use to define stem and to show markers in rviz
 
 #######################
@@ -36,7 +34,7 @@ initial_pose:               # pose used as preposition, length should be equal t
 
 n_samples_for_initialization:	100             # number of samples we take to average whisker and pressure sensor values during
                                                  # initialization (the average will be used as nominal value)
-whisker_touched_threshold:     0.1              # consider whisker touched if current value differs from nominal value for more than
+whisker_touched_threshold:     0.2              # consider whisker touched if current value differs from nominal value for more than
                                                  # this threshold
 
 whisker_coverage:                                                 # Angular 'piece of the pie' covered by a whisker in the xy plane
@@ -44,7 +42,7 @@ whisker_coverage:                                                 # Angular 'pie
     - {min: 20, max: 70, grasp_check: 0}    # label 7 port 6       # is zero. Unit: degrees between 0 and 360 (integers). The order is
     - {min: 70, max: 90, grasp_check: 0}    # label 2 port 7       # the order at which the whisker values are stored in RobotStatus. If
     - {min: 90, max: 110, grasp_check: 0}   # label 14 port 9      # a whisker is used to check whether the stem enters/leaves the gripper
-    - {min: 100, max: 160, grasp_check: 0}  # label 15 port 12     # grasp_check = true
+    - {min: 100, max: 160, grasp_check: 0}  # label 15 port 12     # grasp_check = 1 
     - {min: 120, max: 220, grasp_check: 0}  # label 16 port 10
     - {min: 180, max: 270, grasp_check: 0}  # label 17 port 11
     - {min: 230, max: 250, grasp_check: 0}  # label 4 port 1
@@ -58,7 +56,7 @@ pressure_sensor_strip_coverage:      # Angular 'piece of the pie' covered by a s
     - {min: 140, max: 220}
     - {min: 220, max: 320}
 
-pressure_sensor_location:        # Angular location of a pressure sensor in the xy plane of the gripper. Positive
+pressure_sensor_location:        # Angular location of the pressure sensors in the xy plane of the gripper. Positive
     - {ang: 70}  # port 13        # is rotating x towards y. Direction of x is zero. Unit: degrees between 0 and 360 (integers).
     - {ang: 110} # port 14        # The order is the order at which the pressure sensor values are stored in RobotStatus.
     - {ang: 180} # port 15
@@ -73,8 +71,7 @@ pressure_sensor_touched_threshold:  0.03        # consider pressure sensor cover
 
 whisker_length:                 0.05          # length of a single whisker, in meters (used only for sim)
 gripper_diameter:               0.1           # diameter of gripper at whisker-root, in meters (used only for sim)
-max_whisker_force:              1.0           # force applied to the stem by a fully bended (90 degrees) whisker
-                                               # (used only for sim)
+
 #######################
 # TOMATO STEM CONFIG
 #######################
@@ -109,5 +106,4 @@ debug_state_par:                1             # if true (1) state will be printe
 # VISUALIZATION CONFIG
 ##########################
 
-topic_name:                     stem_track_markers              # name of topic through which rviz markers are published
 buffer_size:                    100                             # buffer size for rviz marker topic

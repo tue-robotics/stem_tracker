@@ -3,15 +3,8 @@
 #include <cmath>
 #include "robotstatus.h"
 
-void WhiskerInterpreter::updateWhiskers(std::vector<float> whisker_values)
-{
-    for(int i=0; i<m_n_whiskers; ++i)
-        m_whisker_values[i] = whisker_values[i];
-}
-
 void WhiskerInterpreter::simulateWhiskerGripper(const std::vector<float>& gripper_center, const std::vector<float>& stem_center)
 {
-    m_whisker_forces.clear();
     m_estimated_pos.clear();
 
     if(gripper_center.size() < 2 )
@@ -26,25 +19,19 @@ void WhiskerInterpreter::simulateWhiskerGripper(const std::vector<float>& grippe
         return;
     }
 
-    std::vector<float> tmp_force;
-    tmp_force.assign(3,0.0);
-
     m_estimated_pos.assign(3,0.0);
-
     m_estimated_pos[0] = gripper_center[0] - stem_center[0];
     m_estimated_pos[1] = gripper_center[1] - stem_center[1];
 
     float dist_gripper_to_stem = sqrt( m_estimated_pos[0] * m_estimated_pos[0] + m_estimated_pos[1] * m_estimated_pos[1] );
 
-    if( dist_gripper_to_stem < m_gripper_radius && dist_gripper_to_stem > m_gripper_radius - m_whisker_length)
+    if( dist_gripper_to_stem > m_gripper_radius || dist_gripper_to_stem < m_gripper_radius - m_whisker_length)
     {
-        /* simulated force is inverse of distance to stem */
-        float whisker_fraction_deformed = ( dist_gripper_to_stem - (m_gripper_radius - m_whisker_length) ) / m_whisker_length;
-        tmp_force.at(0) = (m_estimated_pos[0] / dist_gripper_to_stem) * m_max_whisker_force * whisker_fraction_deformed;
-        tmp_force.at(1) = (m_estimated_pos[1] / dist_gripper_to_stem) * m_max_whisker_force * whisker_fraction_deformed;
+        /* pos err not large enough to be noticed by whiskers, or stem not in gripper */
+        m_estimated_pos.assign(3,0.0);
     }
 
-    m_whisker_forces.push_back(tmp_force);
+    return;
 }
 
 void WhiskerInterpreter::obtainNominalValues()
@@ -80,13 +67,7 @@ void WhiskerInterpreter::obtainNominalValues()
 
 void WhiskerInterpreter::readWhiskers()
 {
-    m_whisker_forces.clear();
-    m_estimated_pos.clear();
-
-    std::vector<float> tmp_force;
-    tmp_force.assign(3,0.0);
-
-    m_estimated_pos.assign(3,0.0);
+    m_gripper_inside_touched_at.clear();
 
     std::vector<float> whisker_measurements = m_p_robot_status->getWhiskerMeasurements();
 
@@ -96,17 +77,13 @@ void WhiskerInterpreter::readWhiskers()
         return;
     }
 
-    for(uint i = 0; i < m_whisker_forces.size(); ++i)
+    for(uint i = 0; i < m_n_whiskers; ++i)
     {
-        m_estimated_pos[0] += m_whisker_forces[i][0];
-        m_estimated_pos[1] += m_whisker_forces[i][1];
+        if(fabs(whisker_measurements[i]-m_nominal_whisker_values[i]) > m_whisker_touched_threshold)
+            m_gripper_inside_touched_at.push_back((m_min_whisker_area_covered[i]+m_max_whisker_area_covered[i])/2.0f);
     }
 
-    if( m_whisker_forces.size() > 0 )
-    {
-        m_estimated_pos[0] /= m_whisker_forces.size();
-        m_estimated_pos[1] /= m_whisker_forces.size();
-    }
+    return;
 }
 
 WhiskerInterpreter::~WhiskerInterpreter()

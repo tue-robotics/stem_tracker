@@ -37,7 +37,6 @@ public:
 
     const int getUpdateRate(tue::Configuration& config);
     const std::string getBaseFrame(tue::Configuration& config);
-    const int getLoglevel(tue::Configuration& config);
     const bool getUseLeft(tue::Configuration& config);
 
     ~StemTrackConfigurer();

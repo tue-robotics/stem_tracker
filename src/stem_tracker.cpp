@@ -16,7 +16,7 @@
 // KNOWN-BUGS
 //- hangen bij hele lage z-snelheid ref
 //- in config: een spatie na een int werkt wel maar een tab na een int zorgt ervoor dat type niet meer herkend
-
+//- whisker arrow in rviz stays, also when no touch detected anymore (removeAllArrows does not work)
 
 int main(int argc, char** argv)
 {
@@ -156,7 +156,6 @@ int main(int argc, char** argv)
 
                 /* simulate and show whisker sensor output */
                 TomatoWhiskerGripper.simulateWhiskerGripper(AmigoStatus.getGripperXYZ(), TomatoStem.getNearestXYZ() );
-//                RvizInterface.showArrow(TomatoWhiskerGripper.getWhiskerNetForce(), AmigoStatus.getGripperXYZ(), whisker_net_force);
 
                 /* update position setpoint in cartesian space */
                 TomatoControl.updateCartSetpoint(AmigoStatus.getGripperXYZ(), TomatoWhiskerGripper.getEstimatedPosError());
@@ -175,7 +174,10 @@ int main(int argc, char** argv)
             if(TomatoMonitor.getState() == END)
             {
                 TomatoWhiskerGripper.readWhiskers();
-                RvizInterface.showArrow(TomatoWhiskerGripper.getEstimatedPosError(), AmigoStatus.getGripperXYZ(), whisker_net_force);
+                RvizInterface.removeAllArrows();
+                RvizInterface.showArrows(TomatoWhiskerGripper.getWhiskersTouchedAt(), 0.005, 0.03, AmigoStatus.getGripperXYZ(), whisker_touch);
+                printVector(TomatoWhiskerGripper.getWhiskersTouchedAt());
+
             }
 
             if(!AmigoStatus.jointStatusIsUpToDate())

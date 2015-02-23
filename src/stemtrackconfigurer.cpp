@@ -46,11 +46,6 @@ const int StemTrackConfigurer::getUpdateRate(tue::Configuration& config)
     return getConfigPar<int>(config, "update_rate");
 }
 
-const int StemTrackConfigurer::getLoglevel(tue::Configuration& config)
-{
-    return getConfigPar<int>(config,"loglevel");
-}
-
 const bool StemTrackConfigurer::getUseLeft(tue::Configuration& config)
 {
     return getConfigPar<bool>(config, "use_leftarm");
@@ -79,12 +74,11 @@ void StemTrackConfigurer::configureStemRepresentation(tue::Configuration& config
     if( !getUseLeft(config) )
         stem_representation.flipNodes();
 
-    if( getLoglevel(config) > 0 )
-    {
-        INFO_STREAM("===================================================");
-        INFO_STREAM("Configured stem representation object for stem " << stem_representation.getStemID() );
-        stem_representation.printAll();
-    }
+
+    INFO_STREAM("===================================================");
+    INFO_STREAM("Configured stem representation object for stem " << stem_representation.getStemID() );
+    stem_representation.printAll();
+
 }
 
 void StemTrackConfigurer::configureWhiskerInterpreter(tue::Configuration& config, WhiskerInterpreter& whisker_interpreter)
@@ -94,14 +88,30 @@ void StemTrackConfigurer::configureWhiskerInterpreter(tue::Configuration& config
 
     whisker_interpreter.setWhiskerLength( getConfigPar<float>(config, "whisker_length") );
     whisker_interpreter.setGripperDiameter( getConfigPar<float>(config, "gripper_diameter") );
-    whisker_interpreter.setMaxWhiskerForce( getConfigPar<float>(config, "max_whisker_force") );
     whisker_interpreter.setNumberOfSamplesForInitialization( getConfigPar<int>(config,"n_samples_for_initialization") );
 
-    if( getLoglevel(config) > 0 )
+    std::vector<float> min,max;
+    std::vector<bool> grasper;
+    if (config.readArray("whisker_coverage"))
     {
-        INFO_STREAM("=====================================================");
-        INFO_STREAM("Configured whisker interpreter object" );
+        while(config.nextArrayItem())
+        {
+            min.push_back( getConfigPar<float>(config, "min") );
+            max.push_back( getConfigPar<float>(config, "max") );
+            grasper.push_back( getConfigPar<bool>(config, "grasp_check") );
+        }
+        config.endArray();
     }
+    whisker_interpreter.setWhiskerCoversAreaMin(min);
+    whisker_interpreter.setWhiskerCoversAreaMax(max);
+    whisker_interpreter.setWhiskerIsGraspCheck(grasper);
+
+    whisker_interpreter.setWhiskerTouchedThreshold( getConfigPar<float>(config,"whisker_touched_threshold") );
+    whisker_interpreter.setPressureSensorTouchedThreshold( getConfigPar<float>(config,"pressure_sensor_touched_threshold") );
+
+    INFO_STREAM("=====================================================");
+    INFO_STREAM("Configured whisker interpreter object" );
+
 }
 
 void StemTrackConfigurer::configureRobotRepresentation(tue::Configuration& config, RobotRepresentation& robot_representation)
@@ -131,12 +141,11 @@ void StemTrackConfigurer::configureRobotRepresentation(tue::Configuration& confi
     }
     robot_representation.setInitialPoseJointRefs( tmp );
 
-    if( getLoglevel(config) > 0 )
-    {
-        INFO_STREAM("====================================================");
-        INFO_STREAM("Configured robot representation object of robot " << robot_representation.getName().c_str() );
-        robot_representation.printAll();
-    }
+
+    INFO_STREAM("====================================================");
+    INFO_STREAM("Configured robot representation object of robot " << robot_representation.getName().c_str() );
+    robot_representation.printAll();
+
 }
 
 void StemTrackConfigurer::configureRobotStatus(tue::Configuration& config, RobotStatus& robot_status)
@@ -149,11 +158,10 @@ void StemTrackConfigurer::configureRobotStatus(tue::Configuration& config, Robot
     robot_status.setNumberOfPressureSensors( getConfigArrayLength(config, "pressure_sensor_location") );
     robot_status.setNumberOfWhiskers( getConfigArrayLength(config, "whisker_coverage") );
 
-    if( getLoglevel(config) > 0 )
-    {
-        INFO_STREAM("=====================================");
-        INFO_STREAM("Configured robot status object");
-    }
+
+    INFO_STREAM("=====================================");
+    INFO_STREAM("Configured robot status object");
+
 }
 
 void StemTrackConfigurer::configureStemTrackController(tue::Configuration& config, StemTrackController& stem_track_controller)
@@ -164,11 +172,10 @@ void StemTrackConfigurer::configureStemTrackController(tue::Configuration& confi
     stem_track_controller.setDebugIKsolver( getConfigPar<bool>(config, "debug_ik_solver") );
     stem_track_controller.setUseInverseVelocitySolverOnly( getConfigPar<bool>(config, "ik_vel_only") );
 
-    if( getLoglevel(config) > 0 )
-    {
-        INFO_STREAM("=============================================");
-        INFO_STREAM("Configured stem track controller object");
-    }
+
+    INFO_STREAM("=============================================");
+    INFO_STREAM("Configured stem track controller object");
+
 }
 
 void StemTrackConfigurer::configureRobotInterface(tue::Configuration& config, RobotInterface& robot_interface)
@@ -178,35 +185,31 @@ void StemTrackConfigurer::configureRobotInterface(tue::Configuration& config, Ro
     robot_interface.connectToWhiskers();
     robot_interface.connectToPressureSensors();
 
-    if( getLoglevel(config) > 0 )
-    {
-        INFO_STREAM("=============================================");
-        INFO_STREAM("Configured robot interface object");
-    }
+
+    INFO_STREAM("=============================================");
+    INFO_STREAM("Configured robot interface object");
+
 }
 
 void StemTrackConfigurer::configureStemTrackMonitor(tue::Configuration& config, StemTrackMonitor& stemtrack_monitor)
 {
     stemtrack_monitor.setDebugStateParameter( getConfigPar<bool>(config, "debug_state_par") );
 
-    if( getLoglevel(config) > 0 )
-    {
-        INFO_STREAM("=============================================");
-        INFO_STREAM("Configured stemtrack monitor object");
-    }
+
+    INFO_STREAM("=============================================");
+    INFO_STREAM("Configured stemtrack monitor object");
+
 }
 
 void StemTrackConfigurer::configureVisualizationInterface(tue::Configuration& config, VisualizationInterface& visualization_interface)
 {
-    visualization_interface.connectToRos( getConfigPar<std::string>(config, "topic_name"), getConfigPar<int>(config, "buffer_size") );
+    visualization_interface.connectToRos( getConfigPar<int>(config, "buffer_size") );
 
-    if( getLoglevel(config) > 0 )
-    {
-        INFO_STREAM("=============================================");
-        INFO_STREAM("Configured visualization object");
-        INFO_STREAM("=============================================");
 
-    }
+    INFO_STREAM("=============================================");
+    INFO_STREAM("Configured visualization object");
+    INFO_STREAM("=============================================");
+
 }
 
 StemTrackConfigurer::~StemTrackConfigurer()
