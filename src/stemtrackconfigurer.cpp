@@ -204,7 +204,7 @@ void StemTrackConfigurer::configureStemTrackMonitor(tue::Configuration& config, 
 void StemTrackConfigurer::configureVisualizationInterface(tue::Configuration& config, VisualizationInterface& visualization_interface)
 {
     visualization_interface.connectToRos( getConfigPar<int>(config, "buffer_size") );
-
+touched_arrow_liftime
 
     INFO_STREAM("=============================================");
     INFO_STREAM("Configured visualization object");

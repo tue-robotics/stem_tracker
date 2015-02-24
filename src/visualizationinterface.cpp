@@ -12,35 +12,6 @@ void VisualizationInterface::connectToRos( const int &buffer_size)
     m_vis_markerarray_pub = m_node.advertise<visualization_msgs::MarkerArray>( "stem_track_markerarray", buffer_size );
 }
 
-void VisualizationInterface::addMarkerArrowId( int id )
-{
-    for(uint i = 0; i < m_marker_ids_arrows.size(); ++i)
-    {
-        if(m_marker_ids_arrows[i] == i)
-            return;
-    }
-
-    m_marker_ids_arrows.push_back(id);
-    return;
-}
-
-void VisualizationInterface::removeAllArrows()
-{
-    visualization_msgs::MarkerArray marker_array;
-    for(uint i = 0; i < m_marker_ids_arrows.size(); ++i)
-    {
-        visualization_msgs::Marker marker;
-        marker.header.frame_id = m_frame;
-        marker.header.stamp = ros::Time().now();
-        marker.id = m_marker_ids_arrows[i];
-        marker.action = visualization_msgs::Marker::DELETE;
-        marker_array.markers.push_back(marker);
-    }
-    m_vis_markerarray_pub.publish(marker_array);
-    m_marker_ids_arrows.clear();
-    return;
-}
-
 bool VisualizationInterface::configureSelf(const MarkerIDs& marker_id)
 {
 
@@ -234,6 +205,8 @@ void VisualizationInterface::showArrowsInRviz(const std::vector< std::vector<flo
         marker.color.r = m_rgb.at(0);
         marker.color.g = m_rgb.at(1);
         marker.color.b = m_rgb.at(2);
+        ros::Duration x_seconds(m_show_arrow_lifetime);
+        marker.lifetime = x_seconds;
 
         /* construct nodes point */
         geometry_msgs::Point p_start, p_end;

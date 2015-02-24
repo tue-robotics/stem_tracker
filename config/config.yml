@@ -34,7 +34,7 @@ initial_pose:               # pose used as preposition, length should be equal t
 
 n_samples_for_initialization:	100             # number of samples we take to average whisker and pressure sensor values during
                                                  # initialization (the average will be used as nominal value)
-whisker_touched_threshold:     0.2              # consider whisker touched if current value differs from nominal value for more than
+whisker_touched_threshold:     0.3              # consider whisker touched if current value differs from nominal value for more than
                                                  # this threshold
 
 whisker_coverage:                                                 # Angular 'piece of the pie' covered by a whisker in the xy plane
@@ -106,4 +106,5 @@ debug_state_par:                1             # if true (1) state will be printe
 # VISUALIZATION CONFIG
 ##########################
 
-buffer_size:                    100                             # buffer size for rviz marker topic
+buffer_size:                    100         # buffer size for rviz marker topic
+touched_arrow_liftime:          1           # when whisker touched show an arrow for x seconds
