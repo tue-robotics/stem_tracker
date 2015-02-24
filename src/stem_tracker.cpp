@@ -125,12 +125,11 @@ int main(int argc, char** argv)
 
             if(TomatoMonitor.getState() == GRASP && AmigoStatus.isUpToDate()  )
             {
-                /* find and show nearest intersection with stem */
-                TomatoStem.updateNearestXYZ(AmigoStatus.getGripperXYZ());
-                RvizInterface.showXYZ(TomatoStem.getNearestXYZ(), nearest_stem_intersection);
+                TomatoWhiskerGripper.readWhiskers();
+                RvizInterface.showArrows(TomatoWhiskerGripper.getWhiskersTouchedAt(), 0.005, 0.03, AmigoStatus.getGripperXYZ(), whisker_touch);
 
-                /* set reference to nearest stem intersection */
-                TomatoControl.updateCartSetpoint(TomatoStem.getNearestXYZ());
+                /* set reference to forward in same plane */
+                TomatoControl.setPointMoveForward(AmigoStatus.getGripperXYZ(), 0.05, 0.53);
 
                 /* translate cartesian setpoint to joint coordinates */
                 TomatoControl.updateJointPosReferences();
@@ -147,16 +146,15 @@ int main(int argc, char** argv)
                 /* forward kinematics */
                 RvizInterface.showXYZ(AmigoStatus.getGripperXYZ(), gripper_center);
 
-                /* find and show nearest intersection with stem */
-                TomatoStem.updateNearestXYZ(AmigoStatus.getGripperXYZ());
-                RvizInterface.showXYZ(TomatoStem.getNearestXYZ(), nearest_stem_intersection);
+                TomatoWhiskerGripper.readWhiskers();
+                RvizInterface.showArrows(TomatoWhiskerGripper.getWhiskersTouchedAt(), 0.005, 0.03, AmigoStatus.getGripperXYZ(), whisker_touch);
 
-                /* simulate and show whisker sensor output */
-                TomatoWhiskerGripper.simulateWhiskerGripper(AmigoStatus.getGripperXYZ(), TomatoStem.getNearestXYZ() );
+                TomatoWhiskerGripper.updateEstimatedPosError();
+                RvizInterface.showXYZ(TomatoWhiskerGripper.getEstimatedPosError(),nearest_stem_intersection);
 
                 /* update position setpoint in cartesian space */
                 TomatoControl.updateCartSetpoint(AmigoStatus.getGripperXYZ(), TomatoWhiskerGripper.getEstimatedPosError());
-                RvizInterface.showArrow(TomatoStem.getCurrentTangent(), TomatoStem.getNearestXYZ(), stem_tangent);
+                RvizInterface.showArrow(TomatoStem.getCurrentTangent(), AmigoStatus.getGripperXYZ(), stem_tangent);
 
                 /* translate cartesian setpoint to joint coordinates */
                 TomatoControl.updateJointPosReferences();
@@ -172,8 +170,6 @@ int main(int argc, char** argv)
             {
                 TomatoWhiskerGripper.readWhiskers();
                 RvizInterface.showArrows(TomatoWhiskerGripper.getWhiskersTouchedAt(), 0.005, 0.03, AmigoStatus.getGripperXYZ(), whisker_touch);
-                printVector(TomatoWhiskerGripper.getWhiskersTouchedAt());
-
             }
 
             if(!AmigoStatus.jointStatusIsUpToDate())

@@ -1,3 +1,4 @@
+#include "debugfunctions.h"
 #include "whiskergripperinterpreter.h"
 #include "loggingmacros.h"
 #include <cmath>
@@ -80,10 +81,64 @@ void WhiskerGripperInterpreter::readWhiskers()
     for(uint i = 0; i < m_n_whiskers; ++i)
     {
         if(fabs(whisker_measurements[i]-m_nominal_whisker_values[i]) > m_whisker_touched_threshold)
-            m_gripper_inside_touched_at.push_back((m_min_whisker_area_covered[i]+m_max_whisker_area_covered[i])/2.0f);
+        {
+            if(m_min_whisker_area_covered[i] > m_max_whisker_area_covered[i])
+                m_gripper_inside_touched_at.push_back( fmod((m_min_whisker_area_covered[i]+m_max_whisker_area_covered[i]+360.0)/2.0f,360.0) );
+            else
+                m_gripper_inside_touched_at.push_back( (m_min_whisker_area_covered[i]+m_max_whisker_area_covered[i])/2.0f );
+        }
     }
 
     return;
+}
+
+std::vector< std::vector<float> > WhiskerGripperInterpreter::touchAngleToVect(const std::vector<float>& angles, const float& length) const
+{
+    std::vector<float> vec;
+    std::vector< std::vector<float> > vecs;
+
+    for(uint i = 0; i < angles.size(); ++i)
+    {
+        float angle_rad = angles[i]/360.0f*2.0f*3.141592f;
+        vec.push_back(- cos(angle_rad)*length);
+        vec.push_back(- sin(angle_rad)*length);
+        vecs.push_back(vec);
+        vec.clear();
+    }
+    return vecs;
+}
+
+void WhiskerGripperInterpreter::updateEstimatedPosError()
+{
+    m_estimated_pos.clear();
+    m_estimated_pos.assign(3,0.0);
+
+    std::vector< std::vector<float> > touch_vec = touchAngleToVect( getWhiskersTouchedAt(), 1.0);
+
+    for(uint i = 0; i < touch_vec.size(); ++i)
+    {
+        m_estimated_pos[0] += touch_vec[i][0] / ((float) touch_vec.size() );
+        m_estimated_pos[1] += touch_vec[i][1] / ((float) touch_vec.size() );
+    }
+}
+
+bool WhiskerGripperInterpreter::graspWhiskerIsTouched()
+{
+    std::vector<float> whisker_measurements = m_p_robot_status->getWhiskerMeasurements();
+
+    if( whisker_measurements.size() != m_n_whiskers)
+    {
+        ERROR_STREAM("In WhiskerGripperInterpreter we expect " << m_n_whiskers << " whiskers while RobotStatus provides " << whisker_measurements.size());
+        return false;
+    }
+
+    for(uint i = 0; i < m_n_whiskers; ++i)
+    {
+        if(fabs(whisker_measurements[i]-m_nominal_whisker_values[i]) > m_whisker_touched_threshold && m_whisker_is_grasp_check[i] == true)
+            return true;
+    }
+
+    return false;
 }
 
 WhiskerGripperInterpreter::~WhiskerGripperInterpreter()

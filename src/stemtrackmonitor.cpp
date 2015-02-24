@@ -60,7 +60,7 @@ void StemTrackMonitor::updateState()
         INFO_STREAM("==> Initializing");
         break;
     case CALIBRATE:
-        if( m_p_whisker_interpreter->isInitialized())
+        if( m_p_whisker_gripper_interpreter->isInitialized())
         {
             m_state = PREPOS;
             INFO_STREAM("=============================================");
@@ -78,7 +78,7 @@ void StemTrackMonitor::updateState()
         break;
 
     case GRASP:
-        if( m_p_robot_status->reachedPosition(m_p_stem_representation->getNearestXYZ()) )
+        if( m_p_whisker_gripper_interpreter->graspWhiskerIsTouched() )
         {
             m_state = FOLLOW;
             INFO_STREAM("=============================================");
@@ -87,7 +87,7 @@ void StemTrackMonitor::updateState()
         break;
 
     case FOLLOW:
-        if( reachedEndOfStem() )
+        if( m_p_robot_status->getGripperXYZ()[2] > 1.3 )
         {
             m_state = END;
             INFO_STREAM("=============================================");

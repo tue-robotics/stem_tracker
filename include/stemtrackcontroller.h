@@ -45,6 +45,7 @@ public:
     void updateJointPosReferences();
     void updateJointVelReferences();
     void turnVelRefInPosRef();
+    void setPointMoveForward(const std::vector<float> gripper_xyz, float dist, float z);
 
     KDL::Vector getCartSetpointKDLVect();
     KDL::Frame getCartSetpointKDLFrame();

@@ -34,11 +34,11 @@ initial_pose:               # pose used as preposition, length should be equal t
 
 n_samples_for_initialization:	100             # number of samples we take to average whisker and pressure sensor values during
                                                  # initialization (the average will be used as nominal value)
-whisker_touched_threshold:     0.3              # consider whisker touched if current value differs from nominal value for more than
+whisker_touched_threshold:     0.1              # consider whisker touched if current value differs from nominal value for more than
                                                  # this threshold
 
 whisker_coverage:                                                 # Angular 'piece of the pie' covered by a whisker in the xy plane
-    - {min: 350, max: 40, grasp_check: 0}   # label 13 port 8      # of the gripper. Positive is rotating x towards y. Direction of x
+    - {min: 350, max: 40, grasp_check: 1}   # label 13 port 8      # of the gripper. Positive is rotating x towards y. Direction of x
     - {min: 20, max: 70, grasp_check: 0}    # label 7 port 6       # is zero. Unit: degrees between 0 and 360 (integers). The order is
     - {min: 70, max: 90, grasp_check: 0}    # label 2 port 7       # the order at which the whisker values are stored in RobotStatus. If
     - {min: 90, max: 110, grasp_check: 0}   # label 14 port 9      # a whisker is used to check whether the stem enters/leaves the gripper
@@ -87,14 +87,14 @@ stem_nodes:                                   # stem nodes, defined in root_link
 # TRACKING CONTROL CONFIG
 ##########################
 
-max_z_dot:                      0.5           # max gripper velocity in vertical direction during stem tracking (m/s)
+max_z_dot:                      0.05          # max gripper velocity in vertical direction during stem tracking (m/s)
 tilt_with_stem:                 0             # if true (1) tilt gripper based on local derivative of stem
-debug_ik_solver:                0             # if true (1) status of kdl ik solver will be printed
+debug_ik_solver:                1             # if true (1) status of kdl ik solver will be printed
 ik_vel_only:                    0             # if true (1) after initialization we only use kdl ik velocity solver, no
                                                # fk or ik position solvers
 xyz_reached_threshold:          0.05          # if cartesian position error of the gripper in robot-status is below this
                                                # threshold position is considered reached
-pos_reached_threshold:          0.1           # if absolute position error for each of the joints in robot-status is below
+pos_reached_threshold:          0.01          # if absolute position error for each of the joints in robot-status is below
                                                # this threshold position is considered reached
 ##########################
 # TRACKING MONITOR CONFIG

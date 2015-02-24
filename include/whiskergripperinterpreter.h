@@ -42,6 +42,9 @@ public:
 
     void readWhiskers();
     void obtainNominalValues();
+    bool graspWhiskerIsTouched();
+    void updateEstimatedPosError();
+    std::vector< std::vector<float> > touchAngleToVect(const std::vector<float>& angles, const float& length) const;
 
     inline const bool isInitialized() const { return m_has_nominal_values; }
     inline const std::vector<float>& getWhiskersTouchedAt() const { return m_gripper_inside_touched_at; }
