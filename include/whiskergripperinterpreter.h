@@ -1,12 +1,12 @@
-#ifndef WHISKERINTERPRETER_H
-#define WHISKERINTERPRETER_H
+#ifndef WHISKERGRIPPERINTERPRETER_H
+#define WHISKERGRIPPERINTERPRETER_H
 
 #include <vector>
 #include <string>
 
 class RobotStatus;
 
-class WhiskerInterpreter
+class WhiskerGripperInterpreter
 {
 
 private:
@@ -27,7 +27,7 @@ private:
 
 public:
 
-    WhiskerInterpreter(RobotStatus* p_robot_status) : m_p_robot_status(p_robot_status), m_has_nominal_values(false), m_took_n_samples_for_initialization(0) {}
+    WhiskerGripperInterpreter(RobotStatus* p_robot_status) : m_p_robot_status(p_robot_status), m_has_nominal_values(false), m_took_n_samples_for_initialization(0) {}
 
     inline void setGripperDiameter(const float& gripper_diameter) { m_gripper_radius = gripper_diameter / 2.0f; }
     inline void setWhiskerLength(const float& whisker_length) { m_whisker_length = whisker_length; }
@@ -51,7 +51,7 @@ public:
 
     void simulateWhiskerGripper(const std::vector<float>& gripper_center, const std::vector<float>& stem_center);
 
-    virtual ~WhiskerInterpreter();
+    virtual ~WhiskerGripperInterpreter();
 };
 
-#endif // WHISKERINTERPRETER_H
+#endif // WHISKERGRIPPERINTERPRETER_H

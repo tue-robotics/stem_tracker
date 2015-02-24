@@ -36,7 +36,7 @@ public:
     VisualizationInterface(ros::NodeHandle node, std::string base_frame) : m_node(node), m_base_frame(base_frame) {}
 
     void connectToRos(const int& buffer_size);
-    inline setShowArrowLifetime(float seconds) { m_show_arrow_lifetime = seconds; }
+    inline void setShowArrowLifetime(float seconds) { m_show_arrow_lifetime = seconds; }
     bool configureSelf(const MarkerIDs& marker_id);
     void showLineStrip(const std::vector<float>& x_coordinates, const std::vector<float>& y_coordinates, const std::vector<float>& z_coordinates, const MarkerIDs& marker_id);
     void showLineStripInRviz(const std::vector<float>& x_coordinates, const std::vector<float>& y_coordinates, const std::vector<float>& z_coordinates);

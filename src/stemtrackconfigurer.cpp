@@ -4,7 +4,7 @@
 #include "robotrepresentation.h"
 #include "robotstatus.h"
 #include "robotinterface.h"
-#include "whiskerinterpreter.h"
+#include "whiskergripperinterpreter.h"
 #include "stemtrackcontroller.h"
 #include "stemtrackmonitor.h"
 #include "visualizationinterface.h"
@@ -81,14 +81,14 @@ void StemTrackConfigurer::configureStemRepresentation(tue::Configuration& config
 
 }
 
-void StemTrackConfigurer::configureWhiskerInterpreter(tue::Configuration& config, WhiskerInterpreter& whisker_interpreter)
+void StemTrackConfigurer::configureWhiskerGripperInterpreter(tue::Configuration& config, WhiskerGripperInterpreter& whisker_gripper_interpreter)
 {
-    whisker_interpreter.setNumberOfWhiskers( getConfigArrayLength(config, "whisker_coverage") );
-    whisker_interpreter.setNumberOfPressureSensors( getConfigArrayLength(config, "pressure_sensor_location" ) );
+    whisker_gripper_interpreter.setNumberOfWhiskers( getConfigArrayLength(config, "whisker_coverage") );
+    whisker_gripper_interpreter.setNumberOfPressureSensors( getConfigArrayLength(config, "pressure_sensor_location" ) );
 
-    whisker_interpreter.setWhiskerLength( getConfigPar<float>(config, "whisker_length") );
-    whisker_interpreter.setGripperDiameter( getConfigPar<float>(config, "gripper_diameter") );
-    whisker_interpreter.setNumberOfSamplesForInitialization( getConfigPar<int>(config,"n_samples_for_initialization") );
+    whisker_gripper_interpreter.setWhiskerLength( getConfigPar<float>(config, "whisker_length") );
+    whisker_gripper_interpreter.setGripperDiameter( getConfigPar<float>(config, "gripper_diameter") );
+    whisker_gripper_interpreter.setNumberOfSamplesForInitialization( getConfigPar<int>(config,"n_samples_for_initialization") );
 
     std::vector<float> min,max;
     std::vector<bool> grasper;
@@ -102,15 +102,15 @@ void StemTrackConfigurer::configureWhiskerInterpreter(tue::Configuration& config
         }
         config.endArray();
     }
-    whisker_interpreter.setWhiskerCoversAreaMin(min);
-    whisker_interpreter.setWhiskerCoversAreaMax(max);
-    whisker_interpreter.setWhiskerIsGraspCheck(grasper);
+    whisker_gripper_interpreter.setWhiskerCoversAreaMin(min);
+    whisker_gripper_interpreter.setWhiskerCoversAreaMax(max);
+    whisker_gripper_interpreter.setWhiskerIsGraspCheck(grasper);
 
-    whisker_interpreter.setWhiskerTouchedThreshold( getConfigPar<float>(config,"whisker_touched_threshold") );
-    whisker_interpreter.setPressureSensorTouchedThreshold( getConfigPar<float>(config,"pressure_sensor_touched_threshold") );
+    whisker_gripper_interpreter.setWhiskerTouchedThreshold( getConfigPar<float>(config,"whisker_touched_threshold") );
+    whisker_gripper_interpreter.setPressureSensorTouchedThreshold( getConfigPar<float>(config,"pressure_sensor_touched_threshold") );
 
     INFO_STREAM("=====================================================");
-    INFO_STREAM("Configured whisker interpreter object" );
+    INFO_STREAM("Configured whiskergripper interpreter object" );
 
 }
 
@@ -204,7 +204,7 @@ void StemTrackConfigurer::configureStemTrackMonitor(tue::Configuration& config, 
 void StemTrackConfigurer::configureVisualizationInterface(tue::Configuration& config, VisualizationInterface& visualization_interface)
 {
     visualization_interface.connectToRos( getConfigPar<int>(config, "buffer_size") );
-touched_arrow_liftime
+    visualization_interface.setShowArrowLifetime( getConfigPar<float>(config, "touched_arrow_liftime") );
 
     INFO_STREAM("=============================================");
     INFO_STREAM("Configured visualization object");

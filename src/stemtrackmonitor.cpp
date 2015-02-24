@@ -5,7 +5,7 @@
 #include "robotrepresentation.h"
 #include "robotstatus.h"
 #include "stemtrackcontroller.h"
-#include "whiskerinterpreter.h"
+#include "whiskergripperinterpreter.h"
 #include "debugfunctions.h"
 
 bool StemTrackMonitor::reachedEndOfStem()

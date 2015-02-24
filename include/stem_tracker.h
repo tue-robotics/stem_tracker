@@ -15,7 +15,7 @@
 
 /* stem tracking includes */
 #include "debugfunctions.h"
-#include "whiskerinterpreter.h"
+#include "whiskergripperinterpreter.h"
 #include "stemrepresentation.h"
 #include "robotrepresentation.h"
 #include "robotstatus.h"

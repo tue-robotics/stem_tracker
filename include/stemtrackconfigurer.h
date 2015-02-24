@@ -11,7 +11,7 @@ class StemRepresentation;
 class RobotRepresentation;
 class RobotStatus;
 class RobotInterface;
-class WhiskerInterpreter;
+class WhiskerGripperInterpreter;
 class StemTrackController;
 class StemTrackMonitor;
 class VisualizationInterface;
@@ -30,7 +30,7 @@ public:
     void configureStemRepresentation(tue::Configuration& config, StemRepresentation& stem);
     void configureRobotRepresentation(tue::Configuration& config, RobotRepresentation& robot_representation);
     void configureRobotStatus(tue::Configuration& config, RobotStatus& robot_status);
-    void configureWhiskerInterpreter(tue::Configuration& config, WhiskerInterpreter& whisker_interpreter);
+    void configureWhiskerGripperInterpreter(tue::Configuration& config, WhiskerGripperInterpreter& whisker_gripper_interpreter);
     void configureRobotInterface(tue::Configuration& config, RobotInterface& robot_interface);
     void configureStemTrackMonitor(tue::Configuration& config, StemTrackMonitor& stemtrack_monitor);
     void configureVisualizationInterface(tue::Configuration& config, VisualizationInterface& visualization_interface);

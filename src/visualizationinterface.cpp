@@ -194,7 +194,6 @@ void VisualizationInterface::showArrowsInRviz(const std::vector< std::vector<flo
         marker.header.frame_id = m_frame;
         marker.header.stamp = ros::Time().now();
         marker.id   = i + ARROW_IDS_OFFSET;
-        addMarkerArrowId(marker.id);
         marker.type = visualization_msgs::Marker::ARROW;
         marker.action = visualization_msgs::Marker::ADD;
         marker.pose.orientation.w = 1.0;

@@ -60,8 +60,8 @@ int main(int argc, char** argv)
     TomatoConfigurer.configureRobotStatus(config, AmigoStatus);
 
     /* initialize and configure whisker interpretation object */
-    WhiskerInterpreter TomatoWhiskerGripper(&AmigoStatus);
-    TomatoConfigurer.configureWhiskerInterpreter(config, TomatoWhiskerGripper);
+    WhiskerGripperInterpreter TomatoWhiskerGripper(&AmigoStatus);
+    TomatoConfigurer.configureWhiskerGripperInterpreter(config, TomatoWhiskerGripper);
 
     /* initialize and configure stem tracking controller object */
     StemTrackController TomatoControl(&AmigoRepresentation, &AmigoStatus, &TomatoStem);
@@ -93,7 +93,7 @@ int main(int argc, char** argv)
             TomatoConfigurer.configureStemRepresentation(config, TomatoStem);
             TomatoConfigurer.configureRobotRepresentation(config, AmigoRepresentation);
             TomatoConfigurer.configureRobotStatus(config, AmigoStatus);
-            TomatoConfigurer.configureWhiskerInterpreter(config, TomatoWhiskerGripper);
+            TomatoConfigurer.configureWhiskerGripperInterpreter(config, TomatoWhiskerGripper);
             TomatoConfigurer.configureStemTrackController(config, TomatoControl);
             TomatoConfigurer.configureRobotInterface(config, AmigoInterface);
             TomatoConfigurer.configureStemTrackMonitor(config, TomatoMonitor);

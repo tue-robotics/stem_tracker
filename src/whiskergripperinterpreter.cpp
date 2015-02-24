@@ -1,9 +1,9 @@
-#include "whiskerinterpreter.h"
+#include "whiskergripperinterpreter.h"
 #include "loggingmacros.h"
 #include <cmath>
 #include "robotstatus.h"
 
-void WhiskerInterpreter::simulateWhiskerGripper(const std::vector<float>& gripper_center, const std::vector<float>& stem_center)
+void WhiskerGripperInterpreter::simulateWhiskerGripper(const std::vector<float>& gripper_center, const std::vector<float>& stem_center)
 {
     m_estimated_pos.clear();
 
@@ -34,7 +34,7 @@ void WhiskerInterpreter::simulateWhiskerGripper(const std::vector<float>& grippe
     return;
 }
 
-void WhiskerInterpreter::obtainNominalValues()
+void WhiskerGripperInterpreter::obtainNominalValues()
 {
     for( uint i = 0; i < m_n_whiskers; ++i)
         m_nominal_whisker_values.at(i) += m_p_robot_status->getWhiskerMeasurements().at(i) / (float) m_n_samples_for_initialization;
@@ -65,7 +65,7 @@ void WhiskerInterpreter::obtainNominalValues()
     return;
 }
 
-void WhiskerInterpreter::readWhiskers()
+void WhiskerGripperInterpreter::readWhiskers()
 {
     m_gripper_inside_touched_at.clear();
 
@@ -73,7 +73,7 @@ void WhiskerInterpreter::readWhiskers()
 
     if( whisker_measurements.size() != m_n_whiskers)
     {
-        ERROR_STREAM("In WhiskerInterpreter we expect " << m_n_whiskers << " whiskers while RobotStatus provides " << whisker_measurements.size());
+        ERROR_STREAM("In WhiskerGripperInterpreter we expect " << m_n_whiskers << " whiskers while RobotStatus provides " << whisker_measurements.size());
         return;
     }
 
@@ -86,7 +86,7 @@ void WhiskerInterpreter::readWhiskers()
     return;
 }
 
-WhiskerInterpreter::~WhiskerInterpreter()
+WhiskerGripperInterpreter::~WhiskerGripperInterpreter()
 {
     //destructor
 }
