@@ -93,3 +93,18 @@ void printVector(std::vector<bool> vect)
     return;
 }
 
+void printVector(std::vector<int> vect)
+{
+    if(vect.size() == 0)
+    {
+        INFO_STREAM("vector empty");
+        return;
+    }
+
+    std::stringstream tmp;
+    for(uint i = 0; i < vect.size(); ++i)
+        tmp << "vect[" << i << "] = " << vect.at(i) << "  ";
+
+    INFO_STREAM(tmp.str());
+    return;
+}

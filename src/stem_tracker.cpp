@@ -125,6 +125,7 @@ int main(int argc, char** argv)
 
             if(TomatoMonitor.getState() == GRASP && AmigoStatus.isUpToDate()  )
             {
+
                 TomatoWhiskerGripper.readWhiskers();
                 RvizInterface.showArrows(TomatoWhiskerGripper.getWhiskersTouchedAt(), 0.005, 0.03, AmigoStatus.getGripperXYZ(), whisker_touch);
 

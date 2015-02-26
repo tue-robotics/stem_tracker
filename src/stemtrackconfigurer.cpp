@@ -46,6 +46,30 @@ const int StemTrackConfigurer::getUpdateRate(tue::Configuration& config)
     return getConfigPar<int>(config, "update_rate");
 }
 
+const int StemTrackConfigurer::getNumberOfWhiskers(tue::Configuration& config)
+{
+    std::vector<int> n_whiskers_per_unit;
+    float dummy; bool dummy2;
+    if (config.readArray("whisker_coverage"))
+    {
+        while(config.nextArrayItem())
+        {
+            dummy = getConfigPar<float>(config, "min");
+            dummy = getConfigPar<float>(config, "max");
+            n_whiskers_per_unit.push_back( getConfigPar<int>(config, "n_whiskers") );
+            dummy2 = getConfigPar<bool>(config, "grasp_check");
+        }
+        config.endArray();
+    }
+
+    uint n_whiskers = 0;
+    for(uint i = 0; i < n_whiskers_per_unit.size(); ++i)
+        n_whiskers += n_whiskers_per_unit[i];
+
+    return n_whiskers;
+
+}
+
 const bool StemTrackConfigurer::getUseLeft(tue::Configuration& config)
 {
     return getConfigPar<bool>(config, "use_leftarm");
@@ -83,31 +107,69 @@ void StemTrackConfigurer::configureStemRepresentation(tue::Configuration& config
 
 void StemTrackConfigurer::configureWhiskerGripperInterpreter(tue::Configuration& config, WhiskerGripperInterpreter& whisker_gripper_interpreter)
 {
-    whisker_gripper_interpreter.setNumberOfWhiskers( getConfigArrayLength(config, "whisker_coverage") );
+    whisker_gripper_interpreter.setNumberOfWhiskerUnits( getConfigArrayLength(config, "whisker_coverage") );
     whisker_gripper_interpreter.setNumberOfPressureSensors( getConfigArrayLength(config, "pressure_sensor_location" ) );
 
     whisker_gripper_interpreter.setWhiskerLength( getConfigPar<float>(config, "whisker_length") );
     whisker_gripper_interpreter.setGripperDiameter( getConfigPar<float>(config, "gripper_diameter") );
-    whisker_gripper_interpreter.setNumberOfSamplesForInitialization( getConfigPar<int>(config,"n_samples_for_initialization") );
+    whisker_gripper_interpreter.setNumberOfSamplesForInitialization( (int) (getConfigPar<float>(config,"n_seconds_for_initialization") *
+                                                                     (float)getConfigPar<int>(config,"update_rate")) );
 
     std::vector<float> min,max;
     std::vector<bool> grasper;
+    std::vector<int> n_whiskers_per_unit;
     if (config.readArray("whisker_coverage"))
     {
         while(config.nextArrayItem())
         {
             min.push_back( getConfigPar<float>(config, "min") );
             max.push_back( getConfigPar<float>(config, "max") );
+            n_whiskers_per_unit.push_back( getConfigPar<int>(config, "n_whiskers") );
             grasper.push_back( getConfigPar<bool>(config, "grasp_check") );
         }
         config.endArray();
     }
-    whisker_gripper_interpreter.setWhiskerCoversAreaMin(min);
-    whisker_gripper_interpreter.setWhiskerCoversAreaMax(max);
-    whisker_gripper_interpreter.setWhiskerIsGraspCheck(grasper);
+    whisker_gripper_interpreter.setWhiskerUnitCoversAreaMin(min);
+    whisker_gripper_interpreter.setWhiskerUnitCoversAreaMax(max);
+    whisker_gripper_interpreter.setWhiskerUnitIsGraspCheck(grasper);
+    whisker_gripper_interpreter.setNumberOfWhiskersPerUnit(n_whiskers_per_unit);
+    whisker_gripper_interpreter.setNumberOfSamplesForMovingAverage( (int)(getConfigPar<float>(config,"n_sec_for_moving_av")
+                                                                 *(float)getConfigPar<int>(config,"update_rate")), getNumberOfWhiskers(config) );
+    whisker_gripper_interpreter.setNumberOfWhiskers( getNumberOfWhiskers(config) );
 
-    whisker_gripper_interpreter.setWhiskerTouchedThreshold( getConfigPar<float>(config,"whisker_touched_threshold") );
+    std::vector<float> touched_max;
+    if (config.readArray("whisker_touched_max"))
+    {
+        while(config.nextArrayItem())
+            touched_max.push_back( getConfigPar<float>(config,"max") );
+        config.endArray();
+    }
+    whisker_gripper_interpreter.setWhiskerTouchedMax( touched_max );
+    whisker_gripper_interpreter.setNormalizedWhiskerTouchThreshold( getConfigPar<float>(config,"whisker_normalized_threshold") );
     whisker_gripper_interpreter.setPressureSensorTouchedThreshold( getConfigPar<float>(config,"pressure_sensor_touched_threshold") );
+
+    min.clear(); max.clear();
+    if (config.readArray("pressure_sensor_strip_coverage"))
+    {
+        while(config.nextArrayItem())
+        {
+            min.push_back( getConfigPar<float>(config, "min") );
+            max.push_back( getConfigPar<float>(config, "max") );
+        }
+        config.endArray();
+    }
+    whisker_gripper_interpreter.setPressureSensorCoversMax(max);
+    whisker_gripper_interpreter.setPressureSensorCoversMin(min);
+
+    std::vector<float> ang;
+    if (config.readArray("pressure_sensor_location"))
+    {
+        while(config.nextArrayItem())
+            ang.push_back( getConfigPar<float>(config, "ang") );
+
+        config.endArray();
+    }
+    whisker_gripper_interpreter.setPressureSensorsAt(ang);
 
     INFO_STREAM("=====================================================");
     INFO_STREAM("Configured whiskergripper interpreter object" );
@@ -156,7 +218,7 @@ void StemTrackConfigurer::configureRobotStatus(tue::Configuration& config, Robot
     robot_status.setPressureSensorsUpToDateThreshold( getConfigPar<double>(config, "pressure_sensors_up_to_date_threshold") );
     robot_status.setPosReachedThreshold( getConfigPar<double>(config, "pos_reached_threshold") );
     robot_status.setNumberOfPressureSensors( getConfigArrayLength(config, "pressure_sensor_location") );
-    robot_status.setNumberOfWhiskers( getConfigArrayLength(config, "whisker_coverage") );
+    robot_status.setNumberOfWhiskers( getNumberOfWhiskers( config ) );
 
 
     INFO_STREAM("=====================================");

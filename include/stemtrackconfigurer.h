@@ -38,6 +38,7 @@ public:
     const int getUpdateRate(tue::Configuration& config);
     const std::string getBaseFrame(tue::Configuration& config);
     const bool getUseLeft(tue::Configuration& config);
+    const int getNumberOfWhiskers(tue::Configuration& config);
 
     ~StemTrackConfigurer();
 
