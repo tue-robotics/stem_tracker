@@ -6,6 +6,12 @@
 #include <visualization_msgs/Marker.h>
 #include <visualization_msgs/MarkerArray.h>
 
+ros::Duration VisualizationInterface::getRosDuration(float seconds)
+{
+    ros::Duration sec_dur(seconds);
+    return sec_dur;
+}
+
 void VisualizationInterface::connectToRos( const int &buffer_size)
 {
     m_vis_marker_pub = m_node.advertise<visualization_msgs::Marker>( "stem_track_markers", buffer_size );
@@ -27,6 +33,21 @@ bool VisualizationInterface::configureSelf(const MarkerIDs& marker_id)
         m_ros_marker_id = 0;
         m_sphere_radius = 0.015;
         m_name = "gripper_center";
+        m_lifetime = m_show_setpoint_lifetime;
+
+        return true;
+
+    case nearest_stem_intersection:
+
+        m_frame = m_base_frame;
+        m_rgb.clear();
+        m_rgb.push_back(0.0f);
+        m_rgb.push_back(1.0f);
+        m_rgb.push_back(0.0f);
+        m_ros_marker_id = 2;
+        m_sphere_radius = 0.015;
+        m_lifetime = m_show_setpoint_lifetime;
+        m_name = "nearest_stem_intersection";
         return true;
 
     case whisker_touch:
@@ -40,18 +61,8 @@ bool VisualizationInterface::configureSelf(const MarkerIDs& marker_id)
         m_arrow_diam = 0.01;
         m_arrowhead_diam = 0.02;
         m_name = "whisker_touch";
-        return true;
+        m_lifetime = m_show_whisker_arrow_lifetime;
 
-    case nearest_stem_intersection:
-
-        m_frame = m_base_frame;
-        m_rgb.clear();
-        m_rgb.push_back(0.0f);
-        m_rgb.push_back(1.0f);
-        m_rgb.push_back(0.0f);
-        m_ros_marker_id = 2;
-        m_sphere_radius = 0.015;
-        m_name = "nearest_stem_intersection";
         return true;
 
     case stem:
@@ -62,6 +73,7 @@ bool VisualizationInterface::configureSelf(const MarkerIDs& marker_id)
         m_rgb.push_back(0.65f);
         m_rgb.push_back(0.35f);
         m_linestrip_diam = 0.02;
+        m_lifetime = -1.0;
         m_ros_marker_id = 3;
         m_name = "stem";
         return true;
@@ -76,6 +88,7 @@ bool VisualizationInterface::configureSelf(const MarkerIDs& marker_id)
         m_ros_marker_id = 4;
         m_arrow_diam = 0.01;
         m_arrowhead_diam = 0.02;
+        m_lifetime = m_show_stem_tangent_lifetime;
         m_name = "stem_tangent";
         return true;
 
@@ -110,6 +123,9 @@ void VisualizationInterface::showLineStripInRviz(const std::vector<float>& x_coo
     marker.color.r = m_rgb.at(0);
     marker.color.g = m_rgb.at(1);
     marker.color.b = m_rgb.at(2);
+
+    if(m_lifetime >= 0.0)
+        marker.lifetime = getRosDuration(m_lifetime);
 
     for(int i=0; i<x_coordinates.size(); ++i)
     {
@@ -204,8 +220,9 @@ void VisualizationInterface::showArrowsInRviz(const std::vector< std::vector<flo
         marker.color.r = m_rgb.at(0);
         marker.color.g = m_rgb.at(1);
         marker.color.b = m_rgb.at(2);
-        ros::Duration x_seconds(m_show_arrow_lifetime);
-        marker.lifetime = x_seconds;
+
+        if(m_lifetime >= 0.0)
+            marker.lifetime = getRosDuration(m_lifetime);
 
         /* construct nodes point */
         geometry_msgs::Point p_start, p_end;
@@ -243,6 +260,9 @@ void VisualizationInterface::showArrowInRviz(const std::vector<float>& xyz, cons
     marker.color.g = m_rgb.at(1);
     marker.color.b = m_rgb.at(2);
 
+    if(m_lifetime >= 0.0)
+        marker.lifetime = getRosDuration(m_lifetime);
+
     /* construct nodes point */
     geometry_msgs::Point p_start, p_end;
 
@@ -258,6 +278,15 @@ void VisualizationInterface::showArrowInRviz(const std::vector<float>& xyz, cons
 
     /* publish marker */
     m_vis_marker_pub.publish( marker );
+}
+void VisualizationInterface::showXYZ(const std::vector<float>& xyz, const std::vector<float> xyz_2, const MarkerIDs& marker_id)
+{
+    std::vector<float> sum;
+    sum.assign(3,0.0);
+    for(uint i = 0; i < 3; ++i)
+        sum[i] = xyz[i] + xyz_2[i];
+    showXYZ(sum, marker_id);
+    return;
 }
 
 void VisualizationInterface::showXYZ(const std::vector<float>& xyz, const MarkerIDs& marker_id)
@@ -292,6 +321,9 @@ void VisualizationInterface::showXYZInRviz(const std::vector<float>& xyz)
     marker.scale.x = m_sphere_radius;
     marker.scale.y = m_sphere_radius;
     marker.scale.z = m_sphere_radius;
+
+    if(m_lifetime >= 0.0)
+        marker.lifetime = getRosDuration(m_lifetime);
 
     marker.type = visualization_msgs::Marker::SPHERE;
 

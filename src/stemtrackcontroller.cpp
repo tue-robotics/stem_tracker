@@ -30,7 +30,7 @@ void StemTrackController::setTiltWithStem(bool tilt_with_stem)
     m_tilt_with_stem = tilt_with_stem;
 }
 
-void StemTrackController::updateCartSetpoint(std::vector<float> setpoint_xyz)
+void StemTrackController::updateCartSetpoint(const std::vector<float> setpoint_xyz)
 {
     if(setpoint_xyz.size() != 3)
         ERROR_STREAM("Unexpected vector length in update cart setpoint, setpoint_xyz.size() = " << setpoint_xyz.size() << ".");
@@ -38,12 +38,12 @@ void StemTrackController::updateCartSetpoint(std::vector<float> setpoint_xyz)
     m_setpoint_vector = KDL::Vector( setpoint_xyz[0], setpoint_xyz[1], setpoint_xyz[2]);
     m_setpoint_frame = KDL::Frame( KDL::Rotation::Identity(), m_setpoint_vector);
 
-    // todo: clever pose/rotation for stem grasping
+    // note: pose is set to identity here
 
     return;
 }
 
-void StemTrackController::setPointMoveForward(const std::vector<float> gripper_xyz, float dist, float z)
+void StemTrackController::setPointMoveForward(const std::vector<float> gripper_xyz, const float dist, const float z)
 {
     if(!gripper_xyz.size() == 3)
     {
@@ -56,7 +56,7 @@ void StemTrackController::setPointMoveForward(const std::vector<float> gripper_x
     return;
 }
 
-void StemTrackController::updateCartSetpoint(std::vector<float> gripper_xyz, std::vector<float> xyz_err)
+void StemTrackController::updateCartSetpoint(const std::vector<float> gripper_xyz, const std::vector<float> xyz_err)
 {
     if(gripper_xyz.size() != 3 || xyz_err.size() != 3)
         ERROR_STREAM("Unexpected vector length in update cart setpoint, grippper_xyz.size() = " << gripper_xyz.size() << " xyz_err.size() = " << xyz_err.size() << ".");
@@ -84,6 +84,12 @@ void StemTrackController::updateCartSetpoint(std::vector<float> gripper_xyz, std
 
     return;
 }
+
+//void StemTrackController::updateCartSetpoint(std::vector gripper_xyz, std::vector xyz_err, float RotZ)
+//{
+
+//    return;
+//}
 
 KDL::Vector StemTrackController::getCartSetpointKDLVect()
 {

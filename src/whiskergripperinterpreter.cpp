@@ -231,11 +231,19 @@ void WhiskerGripperInterpreter::updateEstimatedPosError()
 
     std::vector< std::vector<float> > touch_vec = touchAngleToVect( getWhiskersTouchedAt(), 1.0);
 
+    INFO_STREAM("in updateEstimatedPosErr");
     for(uint i = 0; i < touch_vec.size(); ++i)
     {
+        printVector(touch_vec[i]);
+        printVector(m_estimated_pos);
+
         m_estimated_pos[0] += touch_vec[i][0] / ((float) touch_vec.size() );
         m_estimated_pos[1] += touch_vec[i][1] / ((float) touch_vec.size() );
+
+        printVector(m_estimated_pos);
     }
+
+    return;
 }
 
 WhiskerGripperInterpreter::~WhiskerGripperInterpreter()

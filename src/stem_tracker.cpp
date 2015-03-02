@@ -1,7 +1,6 @@
 #include "stem_tracker.h"
 
 // TODO:
-//- reageren op combinatie van whisker forces ipv naar bekende intersection
 //- rekening houden met joint limits als alleen ik vel solver, nulruimte term toevoegen
 //- tilt met stem fixen als alleen ik vel solver
 //- z verplaatsing functie van error
@@ -10,6 +9,7 @@
 //- use stem length instead of distance in z for lin_tan_d
 //- use rotation around z to increase reachable space
 //- ints ipv array voor analoginsgeneric
+//- add namespaces
 
 // KNOWN-BUGS
 //- hangen bij hele lage z-snelheid ref
@@ -151,7 +151,7 @@ int main(int argc, char** argv)
                 RvizInterface.showArrows(TomatoWhiskerGripper.getWhiskersTouchedAt(), 0.005, 0.03, AmigoStatus.getGripperXYZ(), whisker_touch);
 
                 TomatoWhiskerGripper.updateEstimatedPosError();
-                RvizInterface.showXYZ(TomatoWhiskerGripper.getEstimatedPosError(),nearest_stem_intersection);
+                RvizInterface.showXYZ(AmigoStatus.getGripperXYZ(), TomatoWhiskerGripper.getEstimatedPosError(), nearest_stem_intersection);
 
                 /* update position setpoint in cartesian space */
                 TomatoControl.updateCartSetpoint(AmigoStatus.getGripperXYZ(), TomatoWhiskerGripper.getEstimatedPosError());

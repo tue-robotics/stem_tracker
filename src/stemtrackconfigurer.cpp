@@ -266,7 +266,9 @@ void StemTrackConfigurer::configureStemTrackMonitor(tue::Configuration& config, 
 void StemTrackConfigurer::configureVisualizationInterface(tue::Configuration& config, VisualizationInterface& visualization_interface)
 {
     visualization_interface.connectToRos( getConfigPar<int>(config, "buffer_size") );
-    visualization_interface.setShowArrowLifetime( getConfigPar<float>(config, "touched_arrow_liftime") );
+    visualization_interface.setShowWhiskerArrowLifetime( getConfigPar<float>(config, "touched_arrow_liftime") );
+    visualization_interface.setShowSetPointLifetime( getConfigPar<float>(config, "show_setpoint_lifetime") );
+    visualization_interface.setShowStemTangentLifetime( getConfigPar<float>(config, "show_stem_tangent_lifetime") );
 
     INFO_STREAM("=============================================");
     INFO_STREAM("Configured visualization object");

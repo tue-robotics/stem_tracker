@@ -98,7 +98,7 @@ stem_nodes:                                   # stem nodes, defined in root_link
 # TRACKING CONTROL CONFIG
 ##########################
 
-max_z_dot:                      0.05          # max gripper velocity in vertical direction during stem tracking (m/s)
+max_z_dot:                      0.0005          # max gripper velocity in vertical direction during stem tracking (m/s)
 tilt_with_stem:                 0             # if true (1) tilt gripper based on local derivative of stem
 debug_ik_solver:                0             # if true (1) status of kdl ik solver will be printed
 ik_vel_only:                    0             # if true (1) after initialization we only use kdl ik velocity solver, no
@@ -118,4 +118,9 @@ debug_state_par:                1             # if true (1) state will be printe
 ##########################
 
 buffer_size:                    100         # buffer size for rviz marker topic
-touched_arrow_liftime:          0.02        # when whisker touched show an arrow for x seconds
+touched_arrow_liftime:          0.02        # when whisker touched show an arrow for x seconds, set to -1.0 to show until
+                                             # next msg
+show_setpoint_lifetime:         0.02        # show cartesian setpoint and current pos of gripper for x seconds, set to
+                                             # -1.0 to show until next msg
+show_stem_tangent_lifetime:     3.0         # show estimated tangent of stem at current gripper pos for x seconds, set to
+                                             # -1.0 to show until next msg

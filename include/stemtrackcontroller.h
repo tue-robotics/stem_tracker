@@ -40,12 +40,13 @@ public:
     void setUseInverseVelocitySolverOnly(bool use_ik_vel_only);
     void setTiltWithStem(bool tilt_with_stem);
 
-    void updateCartSetpoint(std::vector<float> setpoint_xyz);
-    void updateCartSetpoint(std::vector<float> gripper_xyz, std::vector<float> xyz_err);
+    void updateCartSetpoint(const std::vector<float> setpoint_xyz);
+    void updateCartSetpoint(const std::vector<float> gripper_xyz, const std::vector<float> xyz_err);
+//    void updateCartSetpoint(const std::vector<float> gripper_xyz, const std::vector<float> xyz_err, const float RotZ);
     void updateJointPosReferences();
     void updateJointVelReferences();
     void turnVelRefInPosRef();
-    void setPointMoveForward(const std::vector<float> gripper_xyz, float dist, float z);
+    void setPointMoveForward(const std::vector<float> gripper_xyz, const float dist, const float z);
 
     KDL::Vector getCartSetpointKDLVect();
     KDL::Frame getCartSetpointKDLFrame();
