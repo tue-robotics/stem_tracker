@@ -10,26 +10,6 @@
 #include "robotstatus.h"
 #include "loggingmacros.h"
 
-void StemTrackController::setDebugIKsolver(bool debug_ik_solver)
-{
-    m_debug_ik_solver = debug_ik_solver;
-}
-
-void StemTrackController::setMaxZvelocity(float max_z_dot)
-{
-    m_max_z_dot = max_z_dot;
-}
-
-void StemTrackController::setUpdateRate(int update_rate)
-{
-    m_update_rate = update_rate;
-}
-
-void StemTrackController::setTiltWithStem(bool tilt_with_stem)
-{
-    m_tilt_with_stem = tilt_with_stem;
-}
-
 void StemTrackController::setCartSetpoint(const std::vector<float> setpoint_xyz)
 {
     /* sets setpoint for the gripper (xyz defined in the baseframe) to setpoint_xyz */
@@ -93,21 +73,6 @@ void StemTrackController::setCartSetpoint(const std::vector<float> gripper_xyz, 
     return;
 }
 
-KDL::Vector StemTrackController::getCartSetpointKDLVect()
-{
-    return m_setpoint_vector;
-}
-
-KDL::Frame StemTrackController::getCartSetpointKDLFrame()
-{
-    return m_setpoint_frame;
-}
-
-void StemTrackController::setUseInverseVelocitySolverOnly(bool use_ik_vel_only)
-{
-    m_use_ik_velocity_solver_only = use_ik_vel_only;
-}
-
 void StemTrackController::updateJointPosReferences()
 {
     if(m_use_ik_velocity_solver_only){
@@ -161,17 +126,6 @@ void StemTrackController::turnVelRefInPosRef()
             m_joint_pos_refs(i) = tmp;
     }
 }
-
-KDL::JntArray StemTrackController::getJointPosRefs()
-{
-    return m_joint_pos_refs;
-}
-
-KDL::JntArray StemTrackController::getJointVelRefs()
-{
-    return m_joint_vel_refs;
-}
-
 
 StemTrackController::~StemTrackController()
 {
