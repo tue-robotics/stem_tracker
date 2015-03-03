@@ -82,7 +82,6 @@ int main(int argc, char** argv)
     /* initialize profiling */
     sp.initialize();
 
-
     /* main update loop */
     while(ros::ok())
     {

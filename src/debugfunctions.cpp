@@ -1,6 +1,4 @@
 #include "debugfunctions.h"
-#include "loggingmacros.h"
-
 
 void printKDLframe(KDL::Frame kdl_frame)
 {
@@ -58,53 +56,4 @@ void printKDLVelframe(KDL::FrameVel kdl_vel_frame)
         frame_stream << vec(i) << "\t";
     }
     INFO_STREAM(frame_stream.str());
-}
-
-
-void printVector(std::vector<float> vect)
-{
-    if(vect.size() == 0)
-    {
-        INFO_STREAM("vector empty");
-        return;
-    }
-
-    std::stringstream tmp;
-    for(uint i = 0; i < vect.size(); ++i)
-        tmp << "vect[" << i << "] = " << vect.at(i) << "  ";
-
-    INFO_STREAM(tmp.str());
-    return;
-}
-
-void printVector(std::vector<bool> vect)
-{
-    if(vect.size() == 0)
-    {
-        INFO_STREAM("vector empty");
-        return;
-    }
-
-    std::stringstream tmp;
-    for(uint i = 0; i < vect.size(); ++i)
-        tmp << "vect[" << i << "] = " << vect.at(i) << "  ";
-
-    INFO_STREAM(tmp.str());
-    return;
-}
-
-void printVector(std::vector<int> vect)
-{
-    if(vect.size() == 0)
-    {
-        INFO_STREAM("vector empty");
-        return;
-    }
-
-    std::stringstream tmp;
-    for(uint i = 0; i < vect.size(); ++i)
-        tmp << "vect[" << i << "] = " << vect.at(i) << "  ";
-
-    INFO_STREAM(tmp.str());
-    return;
 }
