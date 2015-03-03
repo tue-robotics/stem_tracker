@@ -125,8 +125,14 @@ void WhiskerGripperInterpreter::findWhiskerMaxTouchedValues()
     return;
 }
 
-void WhiskerGripperInterpreter::readWhiskers()
+void WhiskerGripperInterpreter::checkForWhiskersTouched()
 {
+    /* Takes latest whisker measurements from RobotStatus and checkes which whiskers are
+       touched. If a whisker is touched, the angle it makes wrt the gripper center in the
+       gripper xy plane (x-direction is zero) is stored in m_gripper_inside_touched. This
+       function also updates the moving average over stored whisker values and sets
+       m_grasp_whisker_touched. */
+
     m_gripper_inside_touched_at.clear();
     m_grasp_whisker_touched = false;
 
@@ -171,6 +177,45 @@ void WhiskerGripperInterpreter::readWhiskers()
     return;
 }
 
+void WhiskerGripperInterpreter::updateWhiskersTouchedVectors()
+{
+    /* Takes list of angles defined in gripper frame (around z-axis, x-direction is zero) and turns this
+       in a list of vectors containing the origin of each touch vector (xyz at the whisker root) and a list of vectors
+       containing the tip of each touched vector (xyz). Uses config par 'gripper radius' to determine
+       origin and config par 'whisker length' to determine tip wrt origin */
+
+    for(uint i = 0; i < getWhiskersTouchedAtAngles().size(); ++i)
+    {
+        if(getWhiskersTouchedAtAngles()[i]>360.0 || getWhiskersTouchedAtAngles()[i]<0.0)
+        {
+            WARNING_STREAM("Unknown angle in updateWhiskersTouchedAtVectors!");
+            return;
+        }
+    }
+    m_whiskers_touched_tips.clear();
+    m_whiskers_touched_origins.clear();
+
+    for(uint i = 0; i < getWhiskersTouchedAtAngles().size(); ++i)
+    {
+        std::vector<float> tip, origin;
+        float angle_rad = getWhiskersTouchedAtAngles()[i]/360.0f*2.0f*3.141592f;
+
+        origin.push_back( cos(angle_rad) * ( getWhiskerLength() + getGripperRadius() ) );
+        origin.push_back( sin(angle_rad) * ( getWhiskerLength() + getGripperRadius() ) );
+        origin.push_back( 0.0 );
+
+        m_whiskers_touched_origins.push_back(origin);
+
+        tip.assign( 3, 0.0 );
+        tip.push_back( -cos(angle_rad) * getWhiskerLength() );
+        tip.push_back( -sin(angle_rad) * getWhiskerLength() );
+
+        m_whiskers_touched_tips.push_back(tip);
+    }
+
+    return;
+}
+
 void WhiskerGripperInterpreter::readTopSensor()
 {
     //    m_gripper_top_touched_at.clear();
@@ -207,40 +252,51 @@ void WhiskerGripperInterpreter::readTopSensor()
     //    }
 
 }
-
-std::vector< std::vector<float> > WhiskerGripperInterpreter::touchAngleToVect(const std::vector<float>& angles, const float& length) const
+void WhiskerGripperInterpreter::updateWhiskerInterpretation()
 {
-    std::vector<float> vec;
-    std::vector< std::vector<float> > vecs;
+    checkForWhiskersTouched();
+    updateWhiskersTouchedVectors();
+    updateWhiskerPosErrVecs();
+    updateEstimatedPosError();
+}
 
-    for(uint i = 0; i < angles.size(); ++i)
+void WhiskerGripperInterpreter::updateWhiskerPosErrVecs()
+{
+    /* Takes list of angles defined in gripper frame (around z-axis, x-direction is zero) and turns this
+       in a list of vectors xyz pointing from the current gripper center to the point of touch. Uses
+       config par 'gripper radius' and config par 'whisker length' to determine point of touch given
+       a touch angle, assuming a whiskers is pushed to half its original length when touched, assuming
+       touch takes place in z = 0 plane */
+
+    m_whisker_pos_err_vectors.clear();
+    std::vector<float> vec;
+    float angle_rad;
+
+    for(uint i = 0; i < getWhiskersTouchedAtAngles().size(); ++i)
     {
-        float angle_rad = angles[i]/360.0f*2.0f*3.141592f;
-        vec.push_back(- cos(angle_rad)*length);
-        vec.push_back(- sin(angle_rad)*length);
-        vecs.push_back(vec);
+        angle_rad = getWhiskersTouchedAtAngles()[i]/360.0f*2.0f*3.141592f;
+        vec.push_back(- cos(angle_rad) * (getGripperRadius()-0.5*getWhiskerLength()) );
+        vec.push_back(- sin(angle_rad) * (getGripperRadius()-0.5*getWhiskerLength()) );
+        vec.push_back( 0.0 );
+        m_whisker_pos_err_vectors.push_back(vec);
         vec.clear();
     }
-    return vecs;
+    return;
 }
 
 void WhiskerGripperInterpreter::updateEstimatedPosError()
 {
+    /* averages all position errors in m_whisker_pos_err_vectors (possibly multiple because of multiple
+       simultaneous whisker touches) to obtain a single position error, assumed to be in the z = 0 plane of the
+       gripper */
+
     m_estimated_pos.clear();
-    m_estimated_pos.assign(3,0.0);
+    m_estimated_pos.assign( 3, 0.0 );
 
-    std::vector< std::vector<float> > touch_vec = touchAngleToVect( getWhiskersTouchedAt(), 1.0);
-
-    INFO_STREAM("in updateEstimatedPosErr");
-    for(uint i = 0; i < touch_vec.size(); ++i)
+    for(uint i = 0; i < getWhiskersPosErrVectors().size(); ++i)
     {
-        printVector(touch_vec[i]);
-        printVector(m_estimated_pos);
-
-        m_estimated_pos[0] += touch_vec[i][0] / ((float) touch_vec.size() );
-        m_estimated_pos[1] += touch_vec[i][1] / ((float) touch_vec.size() );
-
-        printVector(m_estimated_pos);
+        m_estimated_pos[0] += getWhiskersPosErrVectors()[i][0] / ((float) getWhiskersPosErrVectors().size() );
+        m_estimated_pos[1] += getWhiskersPosErrVectors()[i][1] / ((float) getWhiskersPosErrVectors().size() );
     }
 
     return;

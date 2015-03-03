@@ -247,6 +247,18 @@ void RobotStatus::updateGripperXYZ()
     return;
 }
 
+const KDL::Rotation RobotStatus::getGripperRotation()
+{
+    KDL::Frame cartpos = getGripperKDLframe();
+    return cartpos.M;
+}
+
+const std::vector<float> RobotStatus::gripperFrameVectorToBaseFrameVector(std::vector<float> gripper_vector)
+{
+    /* takes a vector (xy or xyz) in the frame of the gripper and returns a vector xyz in the base frame */
+
+}
+
 const KDL::Frame& RobotStatus::getGripperKDLframe()
 {
     KDL::ChainFkSolverPos_recursive forward_kinematics_solver = KDL::ChainFkSolverPos_recursive(m_p_robot_representation->getKinematicChain());

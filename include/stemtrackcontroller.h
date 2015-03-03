@@ -42,7 +42,6 @@ public:
 
     void updateCartSetpoint(const std::vector<float> setpoint_xyz);
     void updateCartSetpoint(const std::vector<float> gripper_xyz, const std::vector<float> xyz_err);
-//    void updateCartSetpoint(const std::vector<float> gripper_xyz, const std::vector<float> xyz_err, const float RotZ);
     void updateJointPosReferences();
     void updateJointVelReferences();
     void turnVelRefInPosRef();

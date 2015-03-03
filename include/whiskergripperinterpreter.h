@@ -27,8 +27,15 @@ private:
     std::vector<float> m_whisker_touched_max;
     std::vector<int> m_n_whiskers_per_unit;
     bool m_firsttime_in_init;
-
+    std::vector< std::vector<float> > m_whisker_pos_err_vectors;
+    std::vector< std::vector<float> > m_whiskers_touched_tips, m_whiskers_touched_origins;
     RobotStatus* m_p_robot_status;
+
+    void checkForWhiskersTouched();
+    void updateEstimatedPosError();
+    void updateAverageWhiskerValues(const std::vector<float>& whisker_val);
+    void updateWhiskersTouchedVectors();
+    void updateWhiskerPosErrVecs();
 
 public:
 
@@ -54,20 +61,22 @@ public:
     inline void setNumberOfSamplesForMovingAverage(const int n_samples, const int n_whiskers) { m_n_samples_for_average = n_samples;
                                                            m_whisker_values_for_average.assign(n_samples,std::vector<float>(n_whiskers,0.0)); }
 
-    void readWhiskers();
+    void updateWhiskerInterpretation();
     void readTopSensor();
     void obtainNominalValues();
-    void updateEstimatedPosError();
-    void updateAverageWhiskerValues(const std::vector<float>& whisker_val);
     void findWhiskerMaxTouchedValues();
-    std::vector< std::vector<float> > touchAngleToVect(const std::vector<float>& angles, const float& length) const;
 
     inline bool graspWhiskerIsTouched() { return m_grasp_whisker_touched; }
     inline const bool isInitialized() const { return m_has_nominal_values; }
-    inline const std::vector<float>& getWhiskersTouchedAt() const { return m_gripper_inside_touched_at; }
+    inline const std::vector<float>& getWhiskersTouchedAtAngles() const { return m_gripper_inside_touched_at; }
     inline const std::vector<float>& getPressureSensorsTouchedAt() const { return m_gripper_top_touched_at; }
     inline const std::vector<float>& getEstimatedPosError() const { return m_estimated_pos; }
     inline const int& getNumberOfWhiskers() const { return m_n_whiskers; }
+    inline const float& getGripperRadius() const { return m_gripper_radius; }
+    inline const float& getWhiskerLength() const { return m_whisker_length; }
+    inline const std::vector< std::vector<float> >& getWhiskersPosErrVectors() const { return m_whisker_pos_err_vectors; }
+    inline const std::vector< std::vector<float> >& getTouchedWhiskerVectorOrigins() const { return m_whiskers_touched_origins; }
+    inline const std::vector< std::vector<float> >& getTouchedWhiskerVectorTips() const { return m_whiskers_touched_tips; }
 
     void simulateWhiskerGripper(const std::vector<float>& gripper_center, const std::vector<float>& stem_center);
 

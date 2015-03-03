@@ -50,9 +50,9 @@ public:
     void showXYZ(const std::vector<float>& xyz, const std::vector<float> xyz_2, const MarkerIDs& marker_id);
     void showXYZInRviz(const std::vector<float>& xyz);
     void showArrow(const std::vector<float>& force, const std::vector<float>& origin, const MarkerIDs& marker_id);
-    void showArrows(std::vector<float> angle, float offset, float length, const std::vector<float>& origin, const MarkerIDs& marker_id);
-    void showArrowInRviz(const std::vector<float>& force, const std::vector<float>& origin);
-    void showArrowsInRviz(const std::vector< std::vector<float> > & xyz, const std::vector< std::vector<float> >& origin);
+    void showArrows(const std::vector< std::vector<float> >& tips, const std::vector< std::vector<float> >& origins, const MarkerIDs& marker_id);
+    void showArrowInRviz(const std::vector<float>& tip, const std::vector<float>& origin);
+    void showArrowsInRviz(const std::vector< std::vector<float> >& tips, const std::vector< std::vector<float> >& origins);
 
     virtual ~VisualizationInterface();
 };

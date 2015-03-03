@@ -42,6 +42,7 @@ class RobotStatus
         bool reachedPosition(KDL::JntArray reference);
         bool reachedPosition(std::vector<float> reference);
         void updateJointStatus(KDL::JntArray updated_joint_status, std::vector<int> joints_updated);
+        const KDL::Rotation getGripperRotation();
         void updateWhiskerMeasurements(std::vector<float> updated_whisker_measurements);
         void updatePressureSensorMeasurements(std::vector<float> updated_pressure_sensor_measurements);
         bool waitingForFirstJointStatusUpdate();
@@ -53,11 +54,12 @@ class RobotStatus
         const bool jointStatusIsUpToDate();
         const bool whiskerMeasurementsAreUpToDate();
         const bool pressureSensorMeasurementsAreUpToDate();
+        const std::vector<float> gripperFrameVectorToBaseFrameVector(std::vector<float> gripper_vector);
 
+        const KDL::Frame& getGripperKDLframe();
         inline const KDL::JntArray& getJointStatus() const { return m_joints_to_monitor; }
         inline const int& getNjointsMonitoring() const { return m_n_joints_monitoring; }
         const std::vector<float>& getGripperXYZ();
-        const KDL::Frame& getGripperKDLframe();
         const long int getWorstCaseTimeSinceLastJointUpdate() const;
         const long int getTimeSinceLastWhiskersUpdate() const;
         const long int getTimeSinceLastPressureSensorsUpdate() const;

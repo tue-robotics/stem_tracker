@@ -80,8 +80,8 @@ pressure_sensor_touched_threshold:  0.03        # consider pressure sensor cover
 # WHISKER SIM CONFIG
 #######################
 
-whisker_length:                 0.05          # length of a single whisker, in meters (used only for sim)
-gripper_diameter:               0.1           # diameter of gripper at whisker-root, in meters (used only for sim)
+whisker_length:                 0.03          # length of a single whisker, in meters (used only for sim)
+gripper_diameter:               0.01           # diameter of gripper at whisker-root, in meters (used only for sim)
 
 #######################
 # TOMATO STEM CONFIG

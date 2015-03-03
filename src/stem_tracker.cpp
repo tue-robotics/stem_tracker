@@ -126,8 +126,9 @@ int main(int argc, char** argv)
             if(TomatoMonitor.getState() == GRASP && AmigoStatus.isUpToDate()  )
             {
 
-                TomatoWhiskerGripper.readWhiskers();
-                RvizInterface.showArrows(TomatoWhiskerGripper.getWhiskersTouchedAt(), 0.005, 0.03, AmigoStatus.getGripperXYZ(), whisker_touch);
+                TomatoWhiskerGripper.updateWhiskerInterpretation();
+                RvizInterface.showArrows(TomatoWhiskerGripper.getTouchedWhiskerVectorTips(),
+                                         TomatoWhiskerGripper.getTouchedWhiskerVectorOrigins(), whisker_touch);
 
                 /* set reference to forward in same plane */
                 TomatoControl.setPointMoveForward(AmigoStatus.getGripperXYZ(), 0.05, 0.53);
@@ -147,10 +148,10 @@ int main(int argc, char** argv)
                 /* forward kinematics */
                 RvizInterface.showXYZ(AmigoStatus.getGripperXYZ(), gripper_center);
 
-                TomatoWhiskerGripper.readWhiskers();
-                RvizInterface.showArrows(TomatoWhiskerGripper.getWhiskersTouchedAt(), 0.005, 0.03, AmigoStatus.getGripperXYZ(), whisker_touch);
+                TomatoWhiskerGripper.updateWhiskerInterpretation();
+                RvizInterface.showArrows(TomatoWhiskerGripper.getTouchedWhiskerVectorTips(),
+                                         TomatoWhiskerGripper.getTouchedWhiskerVectorOrigins(), whisker_touch);
 
-                TomatoWhiskerGripper.updateEstimatedPosError();
                 RvizInterface.showXYZ(AmigoStatus.getGripperXYZ(), TomatoWhiskerGripper.getEstimatedPosError(), nearest_stem_intersection);
 
                 /* update position setpoint in cartesian space */
@@ -169,8 +170,9 @@ int main(int argc, char** argv)
 
             if(TomatoMonitor.getState() == END)
             {
-                TomatoWhiskerGripper.readWhiskers();
-                RvizInterface.showArrows(TomatoWhiskerGripper.getWhiskersTouchedAt(), 0.005, 0.03, AmigoStatus.getGripperXYZ(), whisker_touch);
+                TomatoWhiskerGripper.updateWhiskerInterpretation();
+                RvizInterface.showArrows(TomatoWhiskerGripper.getTouchedWhiskerVectorTips(),
+                                         TomatoWhiskerGripper.getTouchedWhiskerVectorOrigins(), whisker_touch);
             }
 
             if(!AmigoStatus.jointStatusIsUpToDate())

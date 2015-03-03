@@ -160,51 +160,18 @@ void VisualizationInterface::showArrow(const std::vector<float>& xyz, const std:
     return;
 }
 
-void VisualizationInterface::showArrows(std::vector<float> angles, float offset, float length, const std::vector<float>& origin, const MarkerIDs& marker_id)
+void VisualizationInterface::showArrows(const std::vector< std::vector<float> >& tips, const std::vector< std::vector<float> >& origins, const MarkerIDs& marker_id)
 {
-    if(origin.size() != 3)
-    {
-        WARNING_STREAM("Unknown origin vector in showArrow!");
-        return;
-    }
-
-    for(uint i = 0; i < angles.size(); ++i)
-    {
-        if(angles[i]>360.0 || angles[i]<0.0)
-        {
-            WARNING_STREAM("Unknown angle in showArrow!");
-            return;
-        }
-    }
-
-    std::vector< std::vector<float> > xyz_s, origins;
-
-    for(uint i = 0; i < angles.size(); ++i)
-    {
-        std::vector<float> xyz, origin_shifted; xyz.assign(3,0.0);
-        float angle_rad = angles[i]/360.0f*2.0f*3.141592f;
-
-        origin_shifted.push_back(origin[0] + cos(angle_rad)*(length+offset));
-        origin_shifted.push_back(origin[1] + sin(angle_rad)*(length+offset));
-        origin_shifted.push_back(origin[2]);
-
-        xyz[0] = - cos(angle_rad)*length;
-        xyz[1] = - sin(angle_rad)*length;
-
-        xyz_s.push_back(xyz);
-        origins.push_back(origin_shifted);
-    }
-
     if(configureSelf(marker_id))
-        showArrowsInRviz(xyz_s, origins);
+        showArrowsInRviz(tips, origins);
 
     return;
 }
 
-void VisualizationInterface::showArrowsInRviz(const std::vector< std::vector<float> > & xyz, const std::vector< std::vector<float> >& origin)
+void VisualizationInterface::showArrowsInRviz(const std::vector< std::vector<float> >& tips, const std::vector< std::vector<float> >& origins)
 {
     visualization_msgs::MarkerArray marker_array;
-    for(uint i = 0; i < xyz.size(); ++i)
+    for(uint i = 0; i < tips.size(); ++i)
     {
         visualization_msgs::Marker marker;
         marker.header.frame_id = m_frame;
@@ -227,14 +194,14 @@ void VisualizationInterface::showArrowsInRviz(const std::vector< std::vector<flo
         /* construct nodes point */
         geometry_msgs::Point p_start, p_end;
 
-        p_start.x = origin[i].at(0) - xyz[i].at(0);
-        p_start.y = origin[i].at(1) - xyz[i].at(1);
-        p_start.z = origin[i].at(2) - xyz[i].at(2);
+        p_start.x = origins[i].at(0) - tips[i].at(0);
+        p_start.y = origins[i].at(1) - tips[i].at(1);
+        p_start.z = origins[i].at(2) - tips[i].at(2);
         marker.points.push_back(p_start);
 
-        p_end.x = origin[i].at(0);
-        p_end.y = origin[i].at(1);
-        p_end.z = origin[i].at(2);
+        p_end.x = origins[i].at(0);
+        p_end.y = origins[i].at(1);
+        p_end.z = origins[i].at(2);
         marker.points.push_back(p_end);
 
         marker_array.markers.push_back(marker);
@@ -242,7 +209,7 @@ void VisualizationInterface::showArrowsInRviz(const std::vector< std::vector<flo
     m_vis_markerarray_pub.publish(marker_array);
 }
 
-void VisualizationInterface::showArrowInRviz(const std::vector<float>& xyz, const std::vector<float>& origin)
+void VisualizationInterface::showArrowInRviz(const std::vector<float>& tip, const std::vector<float>& origin)
 {
     /* construct line strip marker object */
     visualization_msgs::Marker marker;
@@ -266,9 +233,9 @@ void VisualizationInterface::showArrowInRviz(const std::vector<float>& xyz, cons
     /* construct nodes point */
     geometry_msgs::Point p_start, p_end;
 
-    p_start.x = origin.at(0) - xyz.at(0);
-    p_start.y = origin.at(1) - xyz.at(1);
-    p_start.z = origin.at(2) - xyz.at(2);
+    p_start.x = origin.at(0) - tip.at(0);
+    p_start.y = origin.at(1) - tip.at(1);
+    p_start.z = origin.at(2) - tip.at(2);
     marker.points.push_back(p_start);
 
     p_end.x = origin.at(0);

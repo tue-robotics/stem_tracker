@@ -36,32 +36,6 @@ void StemTrackController::updateCartSetpoint(const std::vector<float> setpoint_x
         ERROR_STREAM("Unexpected vector length in update cart setpoint, setpoint_xyz.size() = " << setpoint_xyz.size() << ".");
 
     m_setpoint_vector = KDL::Vector( setpoint_xyz[0], setpoint_xyz[1], setpoint_xyz[2]);
-    m_setpoint_frame = KDL::Frame( KDL::Rotation::Identity(), m_setpoint_vector);
-
-    // note: pose is set to identity here
-
-    return;
-}
-
-void StemTrackController::setPointMoveForward(const std::vector<float> gripper_xyz, const float dist, const float z)
-{
-    if(!gripper_xyz.size() == 3)
-    {
-        WARNING_STREAM("In setPointMoveForward gripper_xyz contains " << gripper_xyz.size() << " elements. I need xyz.");
-        return;
-    }
-
-    m_setpoint_vector = KDL::Vector(gripper_xyz[0]+dist, gripper_xyz[1], z);
-    m_setpoint_frame = KDL::Frame( KDL::Rotation::Identity(), m_setpoint_vector);
-    return;
-}
-
-void StemTrackController::updateCartSetpoint(const std::vector<float> gripper_xyz, const std::vector<float> xyz_err)
-{
-    if(gripper_xyz.size() != 3 || xyz_err.size() != 3)
-        ERROR_STREAM("Unexpected vector length in update cart setpoint, grippper_xyz.size() = " << gripper_xyz.size() << " xyz_err.size() = " << xyz_err.size() << ".");
-
-    m_setpoint_vector = KDL::Vector( gripper_xyz[0] - xyz_err[0], gripper_xyz[1] - xyz_err[1], gripper_xyz[2] + m_max_z_dot / (double) m_update_rate );
 
     KDL::Rotation gripper_rotation = KDL::Rotation::Identity();
 
@@ -85,11 +59,34 @@ void StemTrackController::updateCartSetpoint(const std::vector<float> gripper_xy
     return;
 }
 
-//void StemTrackController::updateCartSetpoint(std::vector gripper_xyz, std::vector xyz_err, float RotZ)
-//{
+void StemTrackController::setPointMoveForward(const std::vector<float> gripper_xyz, const float dist, const float z)
+{
+    if(!gripper_xyz.size() == 3)
+    {
+        WARNING_STREAM("In setPointMoveForward gripper_xyz contains " << gripper_xyz.size() << " elements. I need xyz.");
+        return;
+    }
 
-//    return;
-//}
+    m_setpoint_vector = KDL::Vector(gripper_xyz[0]+dist, gripper_xyz[1], z);
+    m_setpoint_frame = KDL::Frame( KDL::Rotation::Identity(), m_setpoint_vector);
+    return;
+}
+
+void StemTrackController::updateCartSetpoint(const std::vector<float> gripper_xyz, const std::vector<float> xyz_err)
+{
+    if(gripper_xyz.size() != 3 || xyz_err.size() != 3)
+        ERROR_STREAM("Unexpected vector length in update cart setpoint, grippper_xyz.size() = " << gripper_xyz.size() << " xyz_err.size() = " << xyz_err.size() << ".");
+
+    std::vector<float> setpoint_vector;
+    setpoint_vector.assign(3,0.0);
+    setpoint_vector[0] = gripper_xyz[0] - xyz_err[0];
+    setpoint_vector[1] =  gripper_xyz[1] - xyz_err[1];
+    setpoint_vector[2] = gripper_xyz[2] + m_max_z_dot / (double) m_update_rate;
+
+    updateCartSetpoint(setpoint_vector);
+
+    return;
+}
 
 KDL::Vector StemTrackController::getCartSetpointKDLVect()
 {
