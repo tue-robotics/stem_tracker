@@ -127,8 +127,9 @@ int main(int argc, char** argv)
             {
 
                 TomatoWhiskerGripper.updateWhiskerInterpretation();
-                RvizInterface.showArrows(TomatoWhiskerGripper.getTouchedWhiskerVectorTips(),
-                                         TomatoWhiskerGripper.getTouchedWhiskerVectorOrigins(), whisker_touch);
+                RvizInterface.showArrows( AmigoStatus.gripperFrameVectorsToBaseFrameVectors( TomatoWhiskerGripper.getTouchedWhiskerVectorTips() ),
+                                          AmigoStatus.gripperFrameVectorsToBaseFrameVectors( TomatoWhiskerGripper.getTouchedWhiskerVectorOrigins() ),
+                                          whisker_touch );
 
                 /* set reference to forward in same plane */
                 TomatoControl.setPointMoveForward(AmigoStatus.getGripperXYZ(), 0.05, 0.53);
@@ -149,13 +150,14 @@ int main(int argc, char** argv)
                 RvizInterface.showXYZ(AmigoStatus.getGripperXYZ(), gripper_center);
 
                 TomatoWhiskerGripper.updateWhiskerInterpretation();
-                RvizInterface.showArrows(TomatoWhiskerGripper.getTouchedWhiskerVectorTips(),
-                                         TomatoWhiskerGripper.getTouchedWhiskerVectorOrigins(), whisker_touch);
+                RvizInterface.showArrows( AmigoStatus.gripperFrameVectorsToBaseFrameVectors( TomatoWhiskerGripper.getTouchedWhiskerVectorTips() ),
+                                          AmigoStatus.gripperFrameVectorsToBaseFrameVectors( TomatoWhiskerGripper.getTouchedWhiskerVectorOrigins() ),
+                                          whisker_touch );
 
                 RvizInterface.showXYZ(AmigoStatus.getGripperXYZ(), TomatoWhiskerGripper.getEstimatedPosError(), nearest_stem_intersection);
 
                 /* update position setpoint in cartesian space */
-                TomatoControl.updateCartSetpoint(AmigoStatus.getGripperXYZ(), TomatoWhiskerGripper.getEstimatedPosError());
+                TomatoControl.setCartSetpoint( AmigoStatus.gripperFrameVectorToBaseFrameVector( TomatoWhiskerGripper.getEstimatedPosError() ) );
                 RvizInterface.showArrow(TomatoStem.getCurrentTangent(), AmigoStatus.getGripperXYZ(), stem_tangent);
 
                 /* translate cartesian setpoint to joint coordinates */
@@ -171,8 +173,9 @@ int main(int argc, char** argv)
             if(TomatoMonitor.getState() == END)
             {
                 TomatoWhiskerGripper.updateWhiskerInterpretation();
-                RvizInterface.showArrows(TomatoWhiskerGripper.getTouchedWhiskerVectorTips(),
-                                         TomatoWhiskerGripper.getTouchedWhiskerVectorOrigins(), whisker_touch);
+                RvizInterface.showArrows( AmigoStatus.gripperFrameVectorsToBaseFrameVectors( TomatoWhiskerGripper.getTouchedWhiskerVectorTips() ),
+                                          AmigoStatus.gripperFrameVectorsToBaseFrameVectors( TomatoWhiskerGripper.getTouchedWhiskerVectorOrigins() ),
+                                          whisker_touch );
             }
 
             if(!AmigoStatus.jointStatusIsUpToDate())

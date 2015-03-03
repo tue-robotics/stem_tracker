@@ -40,8 +40,8 @@ public:
     void setUseInverseVelocitySolverOnly(bool use_ik_vel_only);
     void setTiltWithStem(bool tilt_with_stem);
 
-    void updateCartSetpoint(const std::vector<float> setpoint_xyz);
-    void updateCartSetpoint(const std::vector<float> gripper_xyz, const std::vector<float> xyz_err);
+    void setCartSetpoint(const std::vector<float> setpoint_xyz);
+    void setCartSetpoint(const std::vector<float> gripper_xyz, const std::vector<float> xyz_err);
     void updateJointPosReferences();
     void updateJointVelReferences();
     void turnVelRefInPosRef();

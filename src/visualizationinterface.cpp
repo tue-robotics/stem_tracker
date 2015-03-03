@@ -194,14 +194,14 @@ void VisualizationInterface::showArrowsInRviz(const std::vector< std::vector<flo
         /* construct nodes point */
         geometry_msgs::Point p_start, p_end;
 
-        p_start.x = origins[i].at(0) - tips[i].at(0);
-        p_start.y = origins[i].at(1) - tips[i].at(1);
-        p_start.z = origins[i].at(2) - tips[i].at(2);
+        p_start.x = origins[i].at(0);
+        p_start.y = origins[i].at(1);
+        p_start.z = origins[i].at(2);
         marker.points.push_back(p_start);
 
-        p_end.x = origins[i].at(0);
-        p_end.y = origins[i].at(1);
-        p_end.z = origins[i].at(2);
+        p_end.x = tips[i].at(0);
+        p_end.y = tips[i].at(1);
+        p_end.z = tips[i].at(2);
         marker.points.push_back(p_end);
 
         marker_array.markers.push_back(marker);

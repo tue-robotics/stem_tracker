@@ -54,7 +54,8 @@ class RobotStatus
         const bool jointStatusIsUpToDate();
         const bool whiskerMeasurementsAreUpToDate();
         const bool pressureSensorMeasurementsAreUpToDate();
-        const std::vector<float> gripperFrameVectorToBaseFrameVector(std::vector<float> gripper_vector);
+        const std::vector<float> gripperFrameVectorToBaseFrameVector(const std::vector<float>& vector_in_gripper_frame );
+        const std::vector< std::vector<float> > gripperFrameVectorsToBaseFrameVectors(const std::vector< std::vector<float> > vectors_in_gripper_frame);
 
         const KDL::Frame& getGripperKDLframe();
         inline const KDL::JntArray& getJointStatus() const { return m_joints_to_monitor; }

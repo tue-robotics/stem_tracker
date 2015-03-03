@@ -30,8 +30,10 @@ void StemTrackController::setTiltWithStem(bool tilt_with_stem)
     m_tilt_with_stem = tilt_with_stem;
 }
 
-void StemTrackController::updateCartSetpoint(const std::vector<float> setpoint_xyz)
+void StemTrackController::setCartSetpoint(const std::vector<float> setpoint_xyz)
 {
+    /* sets setpoint for the gripper (xyz defined in the baseframe) to setpoint_xyz */
+
     if(setpoint_xyz.size() != 3)
         ERROR_STREAM("Unexpected vector length in update cart setpoint, setpoint_xyz.size() = " << setpoint_xyz.size() << ".");
 
@@ -72,8 +74,11 @@ void StemTrackController::setPointMoveForward(const std::vector<float> gripper_x
     return;
 }
 
-void StemTrackController::updateCartSetpoint(const std::vector<float> gripper_xyz, const std::vector<float> xyz_err)
+void StemTrackController::setCartSetpoint(const std::vector<float> gripper_xyz, const std::vector<float> xyz_err)
 {
+    /* sets the setpoint, defined in the base frame, to gripper_xyz - xyz_err
+       (note that gripper_xyz is defined in the base frame while xyz_err is defined in the gripper frame) */
+
     if(gripper_xyz.size() != 3 || xyz_err.size() != 3)
         ERROR_STREAM("Unexpected vector length in update cart setpoint, grippper_xyz.size() = " << gripper_xyz.size() << " xyz_err.size() = " << xyz_err.size() << ".");
 
@@ -83,7 +88,7 @@ void StemTrackController::updateCartSetpoint(const std::vector<float> gripper_xy
     setpoint_vector[1] =  gripper_xyz[1] - xyz_err[1];
     setpoint_vector[2] = gripper_xyz[2] + m_max_z_dot / (double) m_update_rate;
 
-    updateCartSetpoint(setpoint_vector);
+    setCartSetpoint(setpoint_vector);
 
     return;
 }

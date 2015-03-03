@@ -5,6 +5,7 @@
 #include "robotstatus.h"
 #include "loggingmacros.h"
 #include "robotrepresentation.h"
+#include "debugfunctions.h"
 
 RobotStatus::RobotStatus(RobotRepresentation* p_robot_representation)
 {
@@ -253,9 +254,36 @@ const KDL::Rotation RobotStatus::getGripperRotation()
     return cartpos.M;
 }
 
-const std::vector<float> RobotStatus::gripperFrameVectorToBaseFrameVector(std::vector<float> gripper_vector)
+const std::vector< std::vector<float> > RobotStatus::gripperFrameVectorsToBaseFrameVectors(const std::vector< std::vector<float> > vectors_in_gripper_frame)
 {
-    /* takes a vector (xy or xyz) in the frame of the gripper and returns a vector xyz in the base frame */
+    /* takes a vector of vectors (xyz) defined in the frame of the gripper and returns a vector of vectors (xyz) defined in the base frame */
+    std::vector< std::vector<float> > ret_vecs;
+
+    for(uint i = 0; i < vectors_in_gripper_frame.size(); ++i)
+        ret_vecs.push_back( gripperFrameVectorToBaseFrameVector(vectors_in_gripper_frame[i]) );
+
+    return ret_vecs;
+}
+
+const std::vector<float> RobotStatus::gripperFrameVectorToBaseFrameVector(const std::vector<float>& vector_in_gripper_frame )
+{
+    /* takes a vector (xyz) defined in the frame of the gripper and returns a vector (xyz) defined in the base frame */
+
+    std::vector<float> ret_vec;
+    if(!vector_in_gripper_frame.size() == 3)
+    {
+        ERROR_STREAM("Size of gripper_vector is " << vector_in_gripper_frame.size() << ", I need xyz");
+        return ret_vec;
+    }
+
+    KDL::Vector vec_to_transform( vector_in_gripper_frame[0], vector_in_gripper_frame[1], vector_in_gripper_frame[2] );
+    KDL::Vector vec_transformed( getGripperKDLframe() * vec_to_transform );
+
+    ret_vec.push_back( vec_transformed.x() );
+    ret_vec.push_back( vec_transformed.y() );
+    ret_vec.push_back( vec_transformed.z() );
+
+    return ret_vec;
 
 }
 
