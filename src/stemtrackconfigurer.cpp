@@ -78,7 +78,7 @@ const bool StemTrackConfigurer::getUseLeft(tue::Configuration& config)
 void StemTrackConfigurer::configureStemRepresentation(tue::Configuration& config, StemRepresentation& stem_representation)
 {
     stem_representation.setLinTangentDistance( getConfigPar<float>(config, "lin_tan_d") );
-
+    stem_representation.setStemTrackingStartHeight( getConfigPar<float>(config, "start_tracking_at_z") );
     std::vector<float> stemNodesX, stemNodesY, stemNodesZ;
 
     if (config.readArray("stem_nodes"))
@@ -233,7 +233,7 @@ void StemTrackConfigurer::configureStemTrackController(tue::Configuration& confi
     stem_track_controller.setTiltWithStem( getConfigPar<bool>(config, "tilt_with_stem") );
     stem_track_controller.setDebugIKsolver( getConfigPar<bool>(config, "debug_ik_solver") );
     stem_track_controller.setUseInverseVelocitySolverOnly( getConfigPar<bool>(config, "ik_vel_only") );
-
+    stem_track_controller.setStraightForwardRef( getConfigPar<float>(config, "straight_forward_ref") );
 
     INFO_STREAM("=============================================");
     INFO_STREAM("Configured stem track controller object");

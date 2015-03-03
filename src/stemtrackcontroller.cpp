@@ -41,7 +41,7 @@ void StemTrackController::setCartSetpoint(const std::vector<float> setpoint_xyz)
     return;
 }
 
-void StemTrackController::setPointMoveForward(const std::vector<float> gripper_xyz, const float dist, const float z)
+void StemTrackController::setPointMoveForward(const std::vector<float> gripper_xyz, const float z)
 {
     if(!gripper_xyz.size() == 3)
     {
@@ -49,7 +49,7 @@ void StemTrackController::setPointMoveForward(const std::vector<float> gripper_x
         return;
     }
 
-    m_setpoint_vector = KDL::Vector(gripper_xyz[0]+dist, gripper_xyz[1], z);
+    m_setpoint_vector = KDL::Vector(gripper_xyz[0]+m_straight_forward_ref, gripper_xyz[1], z);
     m_setpoint_frame = KDL::Frame( KDL::Rotation::Identity(), m_setpoint_vector);
     return;
 }

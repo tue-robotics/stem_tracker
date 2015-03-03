@@ -131,7 +131,7 @@ int main(int argc, char** argv)
                                           whisker_touch );
 
                 /* set reference to forward in same plane */
-                TomatoControl.setPointMoveForward(AmigoStatus.getGripperXYZ(), 0.05, 0.53);
+                TomatoControl.setPointMoveForward(AmigoStatus.getGripperXYZ(), TomatoStem.getStemTrackingStartHeight());
 
                 /* translate cartesian setpoint to joint coordinates */
                 TomatoControl.updateJointPosReferences();

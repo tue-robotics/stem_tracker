@@ -8,11 +8,6 @@ StemRepresentation::StemRepresentation(int stem_id=-1)
     initializeTangent();
 }
 
-int StemRepresentation::getStemID()
-{
-    return m_stem_id;
-}
-
 std::vector<float> StemRepresentation::getStemXYZatZ(float z)
 {
 
@@ -54,23 +49,12 @@ std::vector<float> StemRepresentation::getStemXYZatZ(float z)
     xyz.push_back(z);
 
     return xyz;
-
-}
-
-void StemRepresentation::setLinTangentDistance(float lin_tan_d)
-{
-    m_lin_tangent_d = lin_tan_d;
 }
 
 void StemRepresentation::initializeTangent()
 {
     m_rot_xyz.clear();
     m_rot_xyz.assign(3,0.0);
-}
-
-std::vector<float> StemRepresentation::getCurrentTangent()
-{
-    return m_rot_xyz;
 }
 
 void StemRepresentation::updateLocalTangent()
@@ -134,11 +118,6 @@ void StemRepresentation::updateNearestXYZ(std::vector<float> from_xyz)
     return;
 }
 
-std::vector<float> StemRepresentation::getNearestXYZ()
-{
-    return m_nearestXYZ;
-}
-
 bool StemRepresentation::isXYZonStem(std::vector<float> xyz)
 {
     if(xyz.size() != 3)
@@ -150,8 +129,6 @@ bool StemRepresentation::isXYZonStem(std::vector<float> xyz)
     {
         return false;
     }
-
-    //todo: check if really on stem
 
     return true;
 }
@@ -174,32 +151,12 @@ void StemRepresentation::loadNodesXYZ(std::vector<float> x, std::vector<float> y
 
 }
 
-int StemRepresentation::getNumberOfNodes()
-{
-    return m_n_nodes;
-}
-
 void StemRepresentation::flipNodes()
 {
     for(int i=0; i<m_y_nodes.size(); ++i)
     {
         m_y_nodes.at(i) *= -1;
     }
-}
-
-std::vector<float> StemRepresentation::getNodesX()
-{
-    return m_x_nodes;
-}
-
-std::vector<float> StemRepresentation::getNodesY()
-{
-    return m_y_nodes;
-}
-
-std::vector<float> StemRepresentation::getNodesZ()
-{
-    return m_z_nodes;
 }
 
 void StemRepresentation::printAll()

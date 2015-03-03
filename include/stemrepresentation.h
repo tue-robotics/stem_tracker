@@ -20,27 +20,32 @@ class StemRepresentation
         std::vector<float> m_nearestXYZ;
         std::vector<float> m_xyz_below;
         std::vector<float> m_rot_xyz;
-        float m_lin_tangent_d;
+        float m_lin_tangent_d, m_start_at_height;
 
     public:
         StemRepresentation(int stem_id);
 
-        int getStemID();
         void initializeTangent();
-        std::vector<float> getCurrentTangent();
+
         std::vector<float> getStemXYZatZ(float z);
-        std::vector<float> getNodesX();
-        std::vector<float> getNodesY();
-        std::vector<float> getNodesZ();
+
+        inline const int getStemID() { return m_stem_id; }
+        inline const int getNumberOfNodes() { return m_n_nodes; }
+        inline const std::vector<float>& getNodesX() { return m_x_nodes; }
+        inline const std::vector<float>& getNodesY() { return m_y_nodes; }
+        inline const std::vector<float>& getNodesZ() { return m_z_nodes; }
+        inline const float getStemTrackingStartHeight() const { return m_start_at_height; }
+        inline const std::vector<float>& getNearestXYZ() { return m_nearestXYZ; }
+        inline const std::vector<float>& getCurrentTangent() { return m_rot_xyz; }
+
+        inline void setStemTrackingStartHeight(float height) { m_start_at_height = height; }
+        inline void setLinTangentDistance(float lin_tan_d) { m_lin_tangent_d = lin_tan_d; }
 
         bool isXYZonStem(std::vector<float> xyz);
         void updateNearestXYZ(std::vector<float> from_xyz);
-        std::vector<float> getNearestXYZ();
-        void setLinTangentDistance(float lin_tan_d);
         void updateLocalTangent();
         void updateXYZbelow();
         void loadNodesXYZ(std::vector<float> x, std::vector<float> y, std::vector<float> z);
-        int getNumberOfNodes();
         void flipNodes();
         void printAll();
 

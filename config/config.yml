@@ -89,6 +89,7 @@ gripper_diameter:               0.01           # diameter of gripper at whisker-
 
 lin_tan_d:                      0.1           # distance in z we use to calculate local linear tangent of stem
 stem_nodes:                                   # stem nodes, defined in root_link
+start_tracking_at_z:            0.53          # meters, defined in amigo base frame
 #   - {x: 0.55, y: 0.35, z: 0.62}
 #   - {x: 0.2, y: 0.6, z: 0.62}
     - {x: 0.55, y: 0.3, z: 1.0}
@@ -107,6 +108,9 @@ xyz_reached_threshold:          0.05          # if cartesian position error of t
                                                # threshold position is considered reached
 pos_reached_threshold:          0.01          # if absolute position error for each of the joints in robot-status is below
                                                # this threshold position is considered reached
+straight_forward_ref:           0.05          # put xyz ref forward for x meters when asked to move forward in x (when
+                                               approaching stem in grasp state for instance)
+
 ##########################
 # TRACKING MONITOR CONFIG
 ##########################

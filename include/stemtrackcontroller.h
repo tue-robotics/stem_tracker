@@ -28,6 +28,7 @@ private:
     RobotStatus* m_p_robot_status;
     KDL::JntArray m_joint_pos_refs;
     KDL::JntArray m_joint_vel_refs;
+    float m_straight_forward_ref;
 
 public:
 
@@ -39,13 +40,14 @@ public:
     inline void setUpdateRate(int update_rate) { m_update_rate = update_rate; }
     inline void setTiltWithStem(bool tilt_with_stem) { m_tilt_with_stem = tilt_with_stem; }
     inline void setUseInverseVelocitySolverOnly(bool use_ik_vel_only) { m_use_ik_velocity_solver_only = use_ik_vel_only; }
+    inline void setStraightForwardRef(float ref) { m_straight_forward_ref = ref; }
 
     void setCartSetpoint(const std::vector<float> setpoint_xyz);
     void setCartSetpoint(const std::vector<float> gripper_xyz, const std::vector<float> xyz_err);
     void updateJointPosReferences();
     void updateJointVelReferences();
     void turnVelRefInPosRef();
-    void setPointMoveForward(const std::vector<float> gripper_xyz, const float dist, const float z);
+    void setPointMoveForward(const std::vector<float> gripper_xyz, const float z);
 
     inline KDL::JntArray getJointPosRefs() { return m_joint_pos_refs; }
     KDL::JntArray getJointVelRefs() { return m_joint_vel_refs; }
