@@ -86,11 +86,11 @@ int main(int argc, char** argv)
     bool prev_sample_joint_status_up_to_date = true;
     bool prev_sample_whisker_status_up_to_date = true;
     bool prev_sample_pressure_sensors_up_to_date = true;
+    bool prev_sample_config_was_ok = true;
 
     /* main update loop */
     while(ros::ok())
     {
-
         if (config.sync())
         {
             /* config file changed */
@@ -109,6 +109,8 @@ int main(int argc, char** argv)
 
         if (!config.hasError())
         {
+            prev_sample_config_was_ok = true;
+
             /* visualize stem */
             RvizInterface.showLineStrip(TomatoStem.getNodesX(), TomatoStem.getNodesY(), TomatoStem.getNodesZ(), stem);
 
@@ -218,7 +220,13 @@ int main(int argc, char** argv)
         }
 
         else
-            ERROR_STREAM("Error in config file: " << config.error());
+        {
+            if(prev_sample_config_was_ok)
+            {
+                ERROR_STREAM("Error in config file: " << config.error());
+                prev_sample_config_was_ok = false;
+            }
+        }
 
         /* wait for next sample */
         r.sleep();
