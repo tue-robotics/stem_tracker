@@ -10,6 +10,34 @@
 #include "robotstatus.h"
 #include "loggingmacros.h"
 
+void StemTrackController::updateCartSetpoint(const std::vector<float>& gripper_pos_err)
+{
+    /* Check position error from gripper (touch), if no touch error than move upward, else
+       move in direction to undo touch. gripper_pos_error is defined in the frame of the gripper */
+
+    for(uint i = 0; i < 3; ++i)
+    {
+        if(gripper_pos_err[i] > 0.0)
+        {
+            setCartSetpoint(m_p_robot_status->gripperFrameVectorToBaseFrameVector(gripper_pos_err));
+            return;
+        }
+    }
+    setPointMoveUp();
+    return;
+}
+
+void StemTrackController::setPointMoveUp()
+{
+    /*todo: add case for tilt_with stem
+            take current stem tangent into account when moving up */
+
+    m_setpoint_vector = KDL::Vector(m_p_robot_status->getGripperXYZ()[0], m_p_robot_status->getGripperXYZ()[1],
+                                    m_p_robot_status->getGripperXYZ()[2]+m_move_up_ref);
+    m_setpoint_frame = KDL::Frame( KDL::Rotation::Identity(), m_setpoint_vector);
+    return;
+}
+
 void StemTrackController::setCartSetpoint(const std::vector<float> setpoint_xyz)
 {
     /* sets setpoint for the gripper (xyz defined in the baseframe) to setpoint_xyz */
@@ -51,25 +79,6 @@ void StemTrackController::setPointMoveForward(const std::vector<float> gripper_x
 
     m_setpoint_vector = KDL::Vector(gripper_xyz[0]+m_straight_forward_ref, gripper_xyz[1], z);
     m_setpoint_frame = KDL::Frame( KDL::Rotation::Identity(), m_setpoint_vector);
-    return;
-}
-
-void StemTrackController::setCartSetpoint(const std::vector<float> gripper_xyz, const std::vector<float> xyz_err)
-{
-    /* sets the setpoint, defined in the base frame, to gripper_xyz - xyz_err
-       (note that gripper_xyz is defined in the base frame while xyz_err is defined in the gripper frame) */
-
-    if(gripper_xyz.size() != 3 || xyz_err.size() != 3)
-        ERROR_STREAM("Unexpected vector length in update cart setpoint, grippper_xyz.size() = " << gripper_xyz.size() << " xyz_err.size() = " << xyz_err.size() << ".");
-
-    std::vector<float> setpoint_vector;
-    setpoint_vector.assign(3,0.0);
-    setpoint_vector[0] = gripper_xyz[0] - xyz_err[0];
-    setpoint_vector[1] =  gripper_xyz[1] - xyz_err[1];
-    setpoint_vector[2] = gripper_xyz[2] + m_max_z_dot / (double) m_update_rate;
-
-    setCartSetpoint(setpoint_vector);
-
     return;
 }
 

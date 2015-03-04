@@ -43,6 +43,7 @@ class StemTrackMonitor
     void updateState();
     const std::string stateToString(stemtrack_state_t state) const;
 
+    inline void resetState() { m_state = INIT; }
     inline const stemtrack_state_t getState() { updateState(); return m_state; }
     inline void setDebugStateParameter(bool debug_state_par) { m_debug_state_par = debug_state_par; }
 

@@ -79,6 +79,7 @@ void StemTrackConfigurer::configureStemRepresentation(tue::Configuration& config
 {
     stem_representation.setLinTangentDistance( getConfigPar<float>(config, "lin_tan_d") );
     stem_representation.setStemTrackingStartHeight( getConfigPar<float>(config, "start_tracking_at_z") );
+
     std::vector<float> stemNodesX, stemNodesY, stemNodesZ;
 
     if (config.readArray("stem_nodes"))
@@ -228,7 +229,7 @@ void StemTrackConfigurer::configureRobotStatus(tue::Configuration& config, Robot
 
 void StemTrackConfigurer::configureStemTrackController(tue::Configuration& config, StemTrackController& stem_track_controller)
 {
-    stem_track_controller.setMaxZvelocity( getConfigPar<float>(config, "max_z_dot") );
+    stem_track_controller.setMoveUpRef( getConfigPar<float>(config, "move_up_ref") );
     stem_track_controller.setUpdateRate( getConfigPar<int>(config, "update_rate") );
     stem_track_controller.setTiltWithStem( getConfigPar<bool>(config, "tilt_with_stem") );
     stem_track_controller.setDebugIKsolver( getConfigPar<bool>(config, "debug_ik_solver") );

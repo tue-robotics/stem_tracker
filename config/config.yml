@@ -35,7 +35,7 @@ initial_pose:               # pose used as preposition, length should be equal t
 n_seconds_for_initialization:	5.0             # number of seconds we take to average whisker and pressure sensor values during
                                                  # initialization (the average will be used as nominal value)
 
-n_sec_for_moving_av:    3.0
+n_sec_for_moving_av:    4.0
 
 whisker_coverage:                                                 # Angular 'piece of the pie' covered by a whisker in the xy plane
     - {min: 10, max: 65, n_whiskers: 2, grasp_check: 1}            # of the gripper. Positive is rotating x towards y. Direction of x
@@ -46,7 +46,7 @@ whisker_coverage:                                                 # Angular 'pie
     - {min: 270, max: 300, n_whiskers: 2, grasp_check: 0}
     - {min: 300, max: 360, n_whiskers: 2, grasp_check: 1}
 
-whisker_normalized_threshold: 0.02
+whisker_normalized_threshold: 0.1
 
 whisker_touched_max:
     - {max: 2.01817}
@@ -100,7 +100,8 @@ stem_nodes:                                   # stem nodes, defined in root_link
 # TRACKING CONTROL CONFIG
 ##########################
 
-max_z_dot:                      0.0005          # max gripper velocity in vertical direction during stem tracking (m/s)
+move_up_ref:                    0.002         # put xyz ref up (in direction of stem tangent) for x meters when moving
+                                               # up (state FOLLOW)
 tilt_with_stem:                 0             # if true (1) tilt gripper based on local derivative of stem
 debug_ik_solver:                0             # if true (1) status of kdl ik solver will be printed
 ik_vel_only:                    0             # if true (1) after initialization we only use kdl ik velocity solver, no
@@ -109,8 +110,7 @@ xyz_reached_threshold:          0.05          # if cartesian position error of t
                                                # threshold position is considered reached
 pos_reached_threshold:          0.01          # if absolute position error for each of the joints in robot-status is below
                                                # this threshold position is considered reached
-straight_forward_ref:           0.05          # put xyz ref forward for x meters when asked to move forward in x (when
-                                               # approaching stem in grasp state for instance)
+straight_forward_ref:           0.001         # put xyz ref forward for x meters when asked moving forward (state GRASP)
 
 ##########################
 # TRACKING MONITOR CONFIG

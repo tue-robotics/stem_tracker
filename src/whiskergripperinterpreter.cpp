@@ -57,6 +57,15 @@ void WhiskerGripperInterpreter::updateAverageWhiskerValues(const std::vector<flo
     return;
 }
 
+void WhiskerGripperInterpreter::resetInitialization()
+{
+    m_has_nominal_values = false;
+    m_took_n_samples_for_initialization = 0;
+    m_firsttime_in_init = true;
+    m_grasp_whisker_touched = false;
+    return;
+}
+
 void WhiskerGripperInterpreter::obtainNominalValues()
 {
     updateAverageWhiskerValues(m_p_robot_status->getWhiskerMeasurements());
@@ -68,8 +77,8 @@ void WhiskerGripperInterpreter::obtainNominalValues()
 
     if(m_firsttime_in_init)
     {
-        INFO_STREAM("===============================");
-        INFO_STREAM("Initializing...");
+        INFO_STREAM("=================================");
+        INFO_STREAM("Storing whisker measurements for moving average...");
         m_firsttime_in_init = false;
     }
 
@@ -77,7 +86,6 @@ void WhiskerGripperInterpreter::obtainNominalValues()
     {
         m_has_nominal_values = true;
 
-        INFO_STREAM("===============================");
         INFO_STREAM("Moving average whisker values: ");
         std::stringstream tmp;
         for( uint i = 0; i < m_n_whiskers; ++i)

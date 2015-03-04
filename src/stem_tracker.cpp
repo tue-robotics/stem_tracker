@@ -97,6 +97,8 @@ int main(int argc, char** argv)
             TomatoConfigurer.configureRobotInterface(config, AmigoInterface);
             TomatoConfigurer.configureStemTrackMonitor(config, TomatoMonitor);
             TomatoConfigurer.configureVisualizationInterface(config, RvizInterface);
+            TomatoWhiskerGripper.resetInitialization();
+            TomatoMonitor.resetState();
             AmigoStatus.resetUpToDateStatus();
         }
 
@@ -108,17 +110,17 @@ int main(int argc, char** argv)
             /* start timer, for profiling */
             sp.startTimer("main");
 
-            /* obtain nominal whisker values */
-            if(TomatoMonitor.getState() == CALIBRATE && AmigoStatus.whiskerMeasurementsAreUpToDate() && AmigoStatus.pressureSensorMeasurementsAreUpToDate())
-            {
-                TomatoWhiskerGripper.obtainNominalValues();
-                TomatoMonitor.updateState();
-            }
-
             /* bring arm to preposition */
             if(TomatoMonitor.getState() == PREPOS && AmigoStatus.jointStatusIsUpToDate())
             {
                 AmigoInterface.publishAmigoJointPosRefs(AmigoRepresentation.getInitialPoseJointRefs());
+                TomatoMonitor.updateState();
+            }
+
+            /* obtain nominal whisker values */
+            if(TomatoMonitor.getState() == CALIBRATE && AmigoStatus.whiskerMeasurementsAreUpToDate() && AmigoStatus.pressureSensorMeasurementsAreUpToDate())
+            {
+                TomatoWhiskerGripper.obtainNominalValues();
                 TomatoMonitor.updateState();
             }
 
@@ -156,7 +158,7 @@ int main(int argc, char** argv)
                 RvizInterface.showXYZ(AmigoStatus.getGripperXYZ(), TomatoWhiskerGripper.getEstimatedPosError(), nearest_stem_intersection);
 
                 /* update position setpoint in cartesian space */
-                TomatoControl.setCartSetpoint( AmigoStatus.gripperFrameVectorToBaseFrameVector( TomatoWhiskerGripper.getEstimatedPosError() ) );
+                TomatoControl.updateCartSetpoint( TomatoWhiskerGripper.getEstimatedPosError() );
                 RvizInterface.showArrow(TomatoStem.getCurrentTangent(), AmigoStatus.getGripperXYZ(), stem_tangent);
 
                 /* translate cartesian setpoint to joint coordinates */

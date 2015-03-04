@@ -65,6 +65,7 @@ public:
     void readTopSensor();
     void obtainNominalValues();
     void findWhiskerMaxTouchedValues();
+    void resetInitialization();
 
     inline bool graspWhiskerIsTouched() { return m_grasp_whisker_touched; }
     inline const bool isInitialized() const { return m_has_nominal_values; }

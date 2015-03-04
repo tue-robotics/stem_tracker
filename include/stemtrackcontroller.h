@@ -16,7 +16,7 @@ class StemTrackController
 
 private:
 
-    float m_max_z_dot;
+    float m_move_up_ref;
     int m_update_rate;
     bool m_tilt_with_stem;
     bool m_debug_ik_solver;
@@ -36,18 +36,19 @@ public:
         : m_p_robot_representation(p_robot_representation), m_p_stem_representation(p_stem_representation), m_p_robot_status(p_robot_status), m_debug_ik_solver(false) {}
 
     inline void setDebugIKsolver(bool debug_ik_solver) { m_debug_ik_solver = debug_ik_solver; }
-    inline void setMaxZvelocity(float max_z_dot) { m_max_z_dot = max_z_dot; }
+    inline void setMoveUpRef(float ref) { m_move_up_ref = ref; }
     inline void setUpdateRate(int update_rate) { m_update_rate = update_rate; }
     inline void setTiltWithStem(bool tilt_with_stem) { m_tilt_with_stem = tilt_with_stem; }
     inline void setUseInverseVelocitySolverOnly(bool use_ik_vel_only) { m_use_ik_velocity_solver_only = use_ik_vel_only; }
     inline void setStraightForwardRef(float ref) { m_straight_forward_ref = ref; }
 
     void setCartSetpoint(const std::vector<float> setpoint_xyz);
-    void setCartSetpoint(const std::vector<float> gripper_xyz, const std::vector<float> xyz_err);
     void updateJointPosReferences();
     void updateJointVelReferences();
     void turnVelRefInPosRef();
     void setPointMoveForward(const std::vector<float> gripper_xyz, const float z);
+    void updateCartSetpoint(const std::vector<float>& gripper_pos_err);
+    void setPointMoveUp();
 
     inline KDL::JntArray getJointPosRefs() { return m_joint_pos_refs; }
     KDL::JntArray getJointVelRefs() { return m_joint_vel_refs; }

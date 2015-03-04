@@ -56,24 +56,24 @@ void StemTrackMonitor::updateState()
     switch (m_state)
     {
     case INIT:
-        m_state = CALIBRATE;
-        INFO_STREAM("==> Initializing");
-        break;
-    case CALIBRATE:
-        if( m_p_whisker_gripper_interpreter->isInitialized())
-        {
-            m_state = PREPOS;
-            INFO_STREAM("=============================================");
-            INFO_STREAM("==> Obtained nominal whisker values, going to my preposition now");
-        }
+        m_state = PREPOS;
         break;
 
     case PREPOS:
         if( m_p_robot_status->reachedPosition( m_p_robot_representation->getInitialPoseJointRefs() ) )
         {
+            m_state = CALIBRATE;
+            INFO_STREAM("=============================================");
+            INFO_STREAM("==> Arrived at my pre position, going to calibrate now");
+        }
+        break;
+
+    case CALIBRATE:
+        if( m_p_whisker_gripper_interpreter->isInitialized())
+        {
             m_state = GRASP;
             INFO_STREAM("=============================================");
-            INFO_STREAM("==> I am going to grasp the stem, hihaa");
+            INFO_STREAM("==> Obtained nominal whisker values, going to grasp the stem now");
         }
         break;
 
