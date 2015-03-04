@@ -146,8 +146,8 @@ void StemTrackConfigurer::configureWhiskerGripperInterpreter(tue::Configuration&
         config.endArray();
     }
     whisker_gripper_interpreter.setWhiskerTouchedMax( touched_max );
-    whisker_gripper_interpreter.setNormalizedWhiskerTouchThreshold( getConfigPar<float>(config,"whisker_normalized_threshold") );
-    whisker_gripper_interpreter.setPressureSensorTouchedThreshold( getConfigPar<float>(config,"pressure_sensor_touched_threshold") );
+    whisker_gripper_interpreter.setWhiskerTouchedNormalizedThreshold( getConfigPar<float>(config,"whisker_touched_normalized_threshold") );
+    whisker_gripper_interpreter.setPressureSensorTouchedNormalizedThreshold( getConfigPar<float>(config,"pressure_sensor_touched_normalized_threshold") );
 
     min.clear(); max.clear();
     if (config.readArray("pressure_sensor_strip_coverage"))
@@ -171,6 +171,15 @@ void StemTrackConfigurer::configureWhiskerGripperInterpreter(tue::Configuration&
         config.endArray();
     }
     whisker_gripper_interpreter.setPressureSensorsAt(ang);
+
+    touched_max.clear();
+    if( config.readArray("pressure_sensor_touched_max"))
+    {
+        while(config.nextArrayItem())
+            touched_max.push_back( getConfigPar<float>(config, "max") );
+        config.endArray();
+    }
+    whisker_gripper_interpreter.setPressureSensorTouchedMax(touched_max);
 
     INFO_STREAM("=====================================================");
     INFO_STREAM("Configured whiskergripper interpreter object" );
@@ -257,7 +266,7 @@ void StemTrackConfigurer::configureRobotInterface(tue::Configuration& config, Ro
 void StemTrackConfigurer::configureStemTrackMonitor(tue::Configuration& config, StemTrackMonitor& stemtrack_monitor)
 {
     stemtrack_monitor.setDebugStateParameter( getConfigPar<bool>(config, "debug_state_par") );
-
+    stemtrack_monitor.setFindMaxTouchedValues( getConfigPar<bool>(config, "find_max_touched_values") );
 
     INFO_STREAM("=============================================");
     INFO_STREAM("Configured stemtrack monitor object");

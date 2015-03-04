@@ -60,7 +60,7 @@ void StemTrackMonitor::updateState()
         break;
 
     case PREPOS:
-        if( m_p_robot_status->reachedPosition( m_p_robot_representation->getInitialPoseJointRefs() ) )
+        if( m_p_robot_status->reachedPosition( m_p_robot_representation->getInitialPoseJointRefs() ) && !m_find_max_touched_values)
         {
             m_state = CALIBRATE;
             INFO_STREAM("=============================================");
@@ -87,7 +87,7 @@ void StemTrackMonitor::updateState()
         break;
 
     case FOLLOW:
-        if( m_p_robot_status->getGripperXYZ()[2] > 1.3 )
+        if( m_p_whisker_gripper_interpreter->pressureSensorIsTouched() )
         {
             m_state = END;
             INFO_STREAM("=============================================");

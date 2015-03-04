@@ -66,6 +66,7 @@ void WhiskerGripperInterpreter::resetInitialization()
     m_firsttime_in_init = true;
     m_grasp_whisker_touched = false;
     m_prev_sample_whisker_touched = false;
+    m_pressure_sensor_is_touched = false;
     return;
 }
 
@@ -135,6 +136,39 @@ void WhiskerGripperInterpreter::findWhiskerMaxTouchedValues()
 
     return;
 }
+
+void WhiskerGripperInterpreter::findPressureSensorMaxTouchedValues()
+{
+    if( m_p_robot_status->getPressureSensorMeasurements().size() != m_n_pressure_sensors)
+    {
+        ERROR_STREAM("In WhiskerGripperInterpreter we expect " << m_n_pressure_sensors << " pressure sensors while RobotStatus provides "
+                     << m_p_robot_status->getPressureSensorMeasurements().size());
+        return;
+    }
+
+    float err;
+    std::stringstream ps_max_vals;
+    bool changed = false;
+
+    for(uint i = 0; i < m_n_pressure_sensors; ++i)
+    {
+        err = fabs(m_p_robot_status->getPressureSensorMeasurements()[i]-m_nominal_pressure_sensor_values[i]);
+
+        if( err > m_pressure_sensor_touched_max[i])
+        {
+            m_pressure_sensor_touched_max[i] = err;
+            changed = true;
+        }
+
+        ps_max_vals << "p_" << i << "_max: " << m_pressure_sensor_touched_max[i] << "  ";
+    }
+
+    if(changed)
+        INFO_STREAM(ps_max_vals.str());
+
+    return;
+}
+
 
 void WhiskerGripperInterpreter::checkForWhiskersTouched()
 {
@@ -235,41 +269,25 @@ void WhiskerGripperInterpreter::updateWhiskersTouchedVectors()
     return;
 }
 
-void WhiskerGripperInterpreter::readTopSensor()
+void WhiskerGripperInterpreter::checkForTopSensorTouched()
 {
-    //    m_gripper_top_touched_at.clear();
-    //    std::vector<float> topsensor_measurements = m_p_robot_status->getPressureSensorMeasurements();
-    //    if( topsensor_measurements.size() != m_n_pressure_sensors)
-    //    {
-    //        ERROR_STREAM("In WhiskerGripperInterpreter we expect " << m_n_pressure_sensors << " pressure sensors while RobotStatus provided " << topsensor_measurements.size());
-    //        return;
-    //    }
+        m_gripper_top_touched_at.clear();
+        std::vector<float> topsensor_measurements = m_p_robot_status->getPressureSensorMeasurements();
+        if( topsensor_measurements.size() != m_n_pressure_sensors)
+        {
+            ERROR_STREAM("In WhiskerGripperInterpreter we expect " << m_n_pressure_sensors << " pressure sensors while RobotStatus provided "
+                         << topsensor_measurements.size());
+            return;
+        }
 
-    //    float frac;
-    //    float max_pressuresensor_reach = 1.0;
-
-    //    /* left cover */
-    //    if( fabs(topsensor_measurements[0]-m_nominal_pressure_sensor_values[0])>m_pressure_sensor_touched_thresholds ||
-    //            fabs(topsensor_measurements[1]-m_nominal_pressure_sensor_values[1])>m_pressure_sensor_touched_thresholds )
-    //    {
-    //        frac = (fabs(topsensor_measurements[0]-m_nominal_pressure_sensor_values[0])-fabs(topsensor_measurements[1]-
-    //                                                                                         m_nominal_pressure_sensor_values[1]))/max_pressuresensor_reach;
-
-    //    }
-
-    //    /* middle cover */
-    //    if( fabs(topsensor_measurements[2]-m_nominal_pressure_sensor_values[2])>m_pressure_sensor_touched_thresholds)
-    //    {
-    //        m_gripper_top_touched_at.push_back( (m_pressure_sensor_covers_min + m_pressure_sensor_covers_max)/2.0f );
-    //    }
-
-    //    /* rear cover */
-    //    if( fabs(topsensor_measurements[3]-m_nominal_pressure_sensor_values[3])>m_pressure_sensor_touched_thresholds ||
-    //            fabs(topsensor_measurements[4]-m_nominal_pressure_sensor_values[4])>m_pressure_sensor_touched_thresholds )
-    //    {
-
-    //    }
-
+        m_pressure_sensor_is_touched = false;
+        for(uint i = 0; i < m_n_pressure_sensors; ++i)
+        {
+            if( fabs(topsensor_measurements[i]-m_nominal_pressure_sensor_values[i])/m_pressure_sensor_touched_max[i]
+                    > m_pressure_sensor_touched_normalized_threshold  )
+                m_pressure_sensor_is_touched = true;
+        }
+       return;
 }
 void WhiskerGripperInterpreter::updateWhiskerInterpretation()
 {

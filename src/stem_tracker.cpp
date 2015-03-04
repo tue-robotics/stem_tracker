@@ -121,6 +121,13 @@ int main(int argc, char** argv)
             if(TomatoMonitor.getState() == PREPOS && AmigoStatus.jointStatusIsUpToDate())
             {
                 AmigoInterface.publishAmigoJointPosRefs(AmigoRepresentation.getInitialPoseJointRefs());
+
+                if(TomatoMonitor.lookingForMaxTouchedValues())
+                {
+                    TomatoWhiskerGripper.findPressureSensorMaxTouchedValues();
+                    TomatoWhiskerGripper.findWhiskerMaxTouchedValues();
+                }
+
                 TomatoMonitor.updateState();
             }
 
@@ -174,7 +181,8 @@ int main(int argc, char** argv)
                 /* send references to joint controllers */
                 AmigoInterface.publishAmigoJointPosRefs(TomatoControl.getJointPosRefs());
 
-                /* check if end of stem reached */
+                /* check if bumped into side branch */
+                TomatoWhiskerGripper.checkForTopSensorTouched();
                 TomatoMonitor.updateState();
             }
 
