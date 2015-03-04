@@ -82,6 +82,11 @@ int main(int argc, char** argv)
     /* initialize profiling */
     sp.initialize();
 
+    /* initialize up to date states */
+    bool prev_sample_joint_status_up_to_date = true;
+    bool prev_sample_whisker_status_up_to_date = true;
+    bool prev_sample_pressure_sensors_up_to_date = true;
+
     /* main update loop */
     while(ros::ok())
     {
@@ -180,10 +185,31 @@ int main(int argc, char** argv)
             }
 
             if(!AmigoStatus.jointStatusIsUpToDate())
-                INFO_STREAM("Waiting for up to date joint status information");
+            {
+                if(prev_sample_joint_status_up_to_date)
+                        INFO_STREAM("Waiting for up to date joint status information");
+                prev_sample_joint_status_up_to_date = false;
+            }
+            else
+                prev_sample_joint_status_up_to_date = true;
 
-            if(!AmigoStatus.whiskerMeasurementsAreUpToDate() || !AmigoStatus.pressureSensorMeasurementsAreUpToDate())
-                INFO_STREAM("Waiting for up to date whiskergripper status information");
+            if(!AmigoStatus.whiskerMeasurementsAreUpToDate())
+            {
+                if(prev_sample_whisker_status_up_to_date)
+                    INFO_STREAM("Waiting for up to date whisker status information");
+                prev_sample_whisker_status_up_to_date = false;
+            }
+            else
+                prev_sample_whisker_status_up_to_date = true;
+
+            if(!AmigoStatus.pressureSensorMeasurementsAreUpToDate())
+            {
+                if(prev_sample_pressure_sensors_up_to_date)
+                    INFO_STREAM("Waiting for up to date pressure sensor status information");
+                prev_sample_pressure_sensors_up_to_date = false;
+            }
+            else
+                prev_sample_pressure_sensors_up_to_date = true;
 
             /* stop and publish timer */
             sp.stopTimer("main");
