@@ -299,8 +299,6 @@ void VisualizationInterface::showXYZInRviz(const std::vector<float>& xyz)
     marker.color.b = m_rgb.at(2);
     marker.color.a = 1.0;
 
-    marker.lifetime = ros::Duration();
-
     m_vis_marker_pub.publish( marker );
 
 }
