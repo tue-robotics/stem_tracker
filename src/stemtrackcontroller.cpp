@@ -19,7 +19,16 @@ void StemTrackController::updateCartSetpoint(const std::vector<float>& gripper_p
     {
         if(gripper_pos_err[i] > 0.0)
         {
-            setCartSetpoint(m_p_robot_status->gripperFrameVectorToBaseFrameVector(gripper_pos_err));
+            std::vector<float> setpoint;
+            setpoint.push_back(m_p_robot_status->gripperFrameVectorToBaseFrameVector(gripper_pos_err)[0]);
+            setpoint.push_back(m_p_robot_status->gripperFrameVectorToBaseFrameVector(gripper_pos_err)[1]);
+            if(m_touch_started_at_xyz.size() != 3)
+            {
+                ERROR_STREAM("Touched but xyz not stored in m_touch_started_at_xyz!");
+                return;
+            }
+            setpoint.push_back(m_touch_started_at_xyz[2]);
+            setCartSetpoint(setpoint);
             return;
         }
     }

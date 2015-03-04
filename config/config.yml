@@ -100,7 +100,7 @@ stem_nodes:                                   # stem nodes, defined in root_link
 # TRACKING CONTROL CONFIG
 ##########################
 
-move_up_ref:                    0.002         # put xyz ref up (in direction of stem tangent) for x meters when moving
+move_up_ref:                    0.0         # put xyz ref up (in direction of stem tangent) for x meters when moving
                                                # up (state FOLLOW)
 tilt_with_stem:                 0             # if true (1) tilt gripper based on local derivative of stem
 debug_ik_solver:                0             # if true (1) status of kdl ik solver will be printed

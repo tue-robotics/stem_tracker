@@ -29,6 +29,7 @@ private:
     KDL::JntArray m_joint_pos_refs;
     KDL::JntArray m_joint_vel_refs;
     float m_straight_forward_ref;
+    std::vector<float> m_touch_started_at_xyz;
 
 public:
 
@@ -41,6 +42,7 @@ public:
     inline void setTiltWithStem(bool tilt_with_stem) { m_tilt_with_stem = tilt_with_stem; }
     inline void setUseInverseVelocitySolverOnly(bool use_ik_vel_only) { m_use_ik_velocity_solver_only = use_ik_vel_only; }
     inline void setStraightForwardRef(float ref) { m_straight_forward_ref = ref; }
+    inline void setTouchStartedAtXYZ( const std::vector<float>& xyz ) { m_touch_started_at_xyz = xyz; }
 
     void setCartSetpoint(const std::vector<float> setpoint_xyz);
     void updateJointPosReferences();

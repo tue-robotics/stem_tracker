@@ -2,7 +2,9 @@
 #include "whiskergripperinterpreter.h"
 #include "loggingmacros.h"
 #include <cmath>
+
 #include "robotstatus.h"
+#include "stemtrackcontroller.h"
 
 void WhiskerGripperInterpreter::simulateWhiskerGripper(const std::vector<float>& gripper_center, const std::vector<float>& stem_center)
 {
@@ -63,6 +65,7 @@ void WhiskerGripperInterpreter::resetInitialization()
     m_took_n_samples_for_initialization = 0;
     m_firsttime_in_init = true;
     m_grasp_whisker_touched = false;
+    m_prev_sample_whisker_touched = false;
     return;
 }
 
@@ -181,6 +184,14 @@ void WhiskerGripperInterpreter::checkForWhiskersTouched()
         }
 
     }
+
+    if(!m_prev_sample_whisker_touched && m_gripper_inside_touched_at.size() > 0)
+        m_p_stemtrack_controller->setTouchStartedAtXYZ(m_p_robot_status->getGripperXYZ());
+
+    if(m_gripper_inside_touched_at.size() > 0)
+        m_prev_sample_whisker_touched = true;
+    else
+        m_prev_sample_whisker_touched = false;
 
     return;
 }

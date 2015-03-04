@@ -5,6 +5,7 @@
 #include <string>
 
 class RobotStatus;
+class StemTrackController;
 
 class WhiskerGripperInterpreter
 {
@@ -14,7 +15,7 @@ private:
     int m_n_whiskers, m_n_pressure_sensors, m_n_whisker_units, m_n_samples_for_average;
     std::vector< std::vector<float> > m_whisker_values_for_average;
     float m_whisker_length, m_gripper_radius, m_normalized_whisker_touched_threshold;
-    bool m_has_nominal_values, m_grasp_whisker_touched;
+    bool m_has_nominal_values, m_grasp_whisker_touched, m_prev_sample_whisker_touched;
     std::vector<float> m_nominal_pressure_sensor_values, m_averaged_whisker_values;
     std::vector<float> m_min_whisker_unit_area_covered, m_max_whisker_unit_area_covered;
     std::vector<float> m_gripper_inside_touched_at, m_gripper_top_touched_at;
@@ -29,7 +30,9 @@ private:
     bool m_firsttime_in_init;
     std::vector< std::vector<float> > m_whisker_pos_err_vectors;
     std::vector< std::vector<float> > m_whiskers_touched_tips, m_whiskers_touched_origins;
+
     RobotStatus* m_p_robot_status;
+    StemTrackController* m_p_stemtrack_controller;
 
     void checkForWhiskersTouched();
     void updateEstimatedPosError();
@@ -39,8 +42,9 @@ private:
 
 public:
 
-    WhiskerGripperInterpreter(RobotStatus* p_robot_status) : m_p_robot_status(p_robot_status), m_has_nominal_values(false),
-        m_took_n_samples_for_initialization(0), m_firsttime_in_init(true), m_grasp_whisker_touched(false) {}
+    WhiskerGripperInterpreter(RobotStatus* p_robot_status, StemTrackController* p_stemtrack_controller) : m_p_robot_status(p_robot_status),
+        m_p_stemtrack_controller(p_stemtrack_controller), m_has_nominal_values(false), m_took_n_samples_for_initialization(0), m_firsttime_in_init(true),
+        m_grasp_whisker_touched(false), m_prev_sample_whisker_touched(false) {}
 
     inline void setGripperDiameter(const float& gripper_diameter) { m_gripper_radius = gripper_diameter / 2.0f; }
     inline void setWhiskerLength(const float& whisker_length) { m_whisker_length = whisker_length; }

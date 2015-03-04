@@ -37,7 +37,8 @@ class RobotStatus
         inline void setPressureSensorsUpToDateThreshold(double threshold) {     m_pressure_sensors_up_to_date_threshold = threshold; }
         inline void setPosReachedThreshold(float pos_reached_threshold) {  m_pos_reached_threshold = pos_reached_threshold; }
         inline void setNumberOfWhiskers(uint n_whiskers) { m_n_whiskers = n_whiskers; m_whisker_measurements.assign(m_n_whiskers,0.0); }
-        inline void setNumberOfPressureSensors(uint n_pressure_sensors) { m_n_pressure_sensors = n_pressure_sensors; m_pressure_sensor_measurements.assign(m_n_pressure_sensors,0.0); }
+        inline void setNumberOfPressureSensors(uint n_pressure_sensors) { m_n_pressure_sensors = n_pressure_sensors;
+                                                                          m_pressure_sensor_measurements.assign(m_n_pressure_sensors,0.0); }
 
         bool reachedPosition(KDL::JntArray reference);
         bool reachedPosition(std::vector<float> reference);
