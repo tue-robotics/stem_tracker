@@ -62,9 +62,6 @@ int main(int argc, char** argv)
     VisualizationInterface RvizInterface(n, TomatoConfigurer.getBaseFrame());
     TomatoConfigurer.configureVisualizationInterface(RvizInterface);
 
-    std::vector<float> test; test.assign(3,5.6);
-    TomatoConfigurer.storeVectorInYmlFile("/tmp/testymlfile","testvector","testitem",test);
-
     /* initialize profiling */
     sp.initialize();
 
@@ -109,6 +106,8 @@ int main(int argc, char** argv)
                 {
                     TomatoWhiskerGripper.findPressureSensorMaxTouchedValues();
                     TomatoWhiskerGripper.findWhiskerMaxTouchedValues();
+                    TomatoConfigurer.storePressureSensorTouchedMaxValues( TomatoWhiskerGripper.getPressureSensorTouchedMax() );
+                    TomatoConfigurer.storeWhiskerTouchedMaxValues( TomatoWhiskerGripper.getWhiskersTouchedMax() );
                 }
 
                 TomatoMonitor.updateState();

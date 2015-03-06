@@ -46,22 +46,10 @@ whisker_coverage:                                                 # Angular 'pie
     - {min: 270, max: 300, n_whiskers: 2, grasp_check: 0}
     - {min: 300, max: 360, n_whiskers: 2, grasp_check: 1}
 
-whisker_touched_normalized_threshold: 0.1      # Whisker deviations are normalized based on whisker_touched_max. We consider a whisker unit
+whisker_touched_normalized_threshold: 0.1      # Whisker deviations are normalized based on config_file_whisker_touched_max. We consider a whisker unit
                                                 # touched when the normalized error is larger than this threshold
 
-whisker_touched_max:
-    - max: 2.01817
-    - max: 1.34795
-    - max: 1.36247
-    - max: 1.53378
-    - max: 1.16193
-    - max: 0.40856
-    - max: 2.45861
-    - max: 0.952206
-    - max: 0.534892
-    - max: 1.06684
-    - max: 0.825003
-    - max: 1.79269
+config_file_whiskers_touched_max:   "whisker_touched_max.yml"
 
 pressure_sensor_strip_coverage:      # Angular 'piece of the pie' covered by a single pressure sensor sensor in the xy plane of the gripper.
     - {min: 40, max: 140}             # Positive is rotating x towards y. Direction of x is zero. Unit: degrees between 0 and 360 (integers).
@@ -75,15 +63,10 @@ pressure_sensor_location:      # Angular location of the pressure sensors in the
     - ang: 250
     - ang: 295
 
-pressure_sensor_touched_normalized_threshold:  0.02   # Pressure sensor deviations are normalized based on pressure_sensor_max_touched. We consider
-                                                       # a pressure sensor coverage touched when the normalized deviation is larger than this value
+pressure_sensor_touched_normalized_threshold:  0.02   # Pressure sensor deviations are normalized based on config_file_pressure_sensor_touched_max. We
+                                                       # consider a pressure sensor coverage touched when the normalized deviation is larger than this value
 
-pressure_sensor_touched_max:
-    - max: 1.83575
-    - max: 1.89297
-    - max: 0.961392
-    - max: 1.90908
-    - max: 1.73179
+config_file_pressure_sensor_touched_max: "pressure_sensor_touched_max.yml"
 
 #######################
 # WHISKER SIM CONFIG
@@ -126,7 +109,7 @@ straight_forward_ref:           0.001         # put xyz ref forward for x meters
 ##########################
 
 debug_state_par:                1             # if true (1) state will be printed every time it changes
-find_max_touched_values:        1             # if true (1) robot will move to preposition and stay there while printing
+find_max_touched_values:        0             # if true (1) robot will move to preposition and stay there while printing
                                                # the maximum values it knows for whiskers deflection for each whisker and
                                                # for pressure sensing for each pressure sensor
 

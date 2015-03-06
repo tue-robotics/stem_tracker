@@ -25,6 +25,8 @@ private:
     const T getConfigPar(tue::Configuration& config, const std::string& name);
     const int getConfigArrayLength(tue::Configuration& config, const std::string& name);
     std::string m_default_config_path;
+    void storeVectorInYmlFile(const std::string& file_name, const std::string& vector_name,
+                                                   const std::string& item_name, const std::vector<float>& vector);
 
 public:
 
@@ -45,8 +47,11 @@ public:
     const bool useLeftArm();
     const int getNumberOfWhiskers();
 
-    void storeVectorInYmlFile(const std::string& file_name, const std::string& vector_name,
-                                                   const std::string& item_name, std::vector<float> vector);
+    void storePressureSensorTouchedMaxValues(const std::vector<float>& pressure_sensor_touched_max);
+    void storeWhiskerTouchedMaxValues(const std::vector<float>& whiskers_touched_max);
+    void loadPressureSensorTouchedMaxValues(WhiskerGripperInterpreter& whisker_gripper_interpreter);
+    void loadWhiskerTouchedMaxValues(WhiskerGripperInterpreter& whisker_gripper_interpreter);
+
     ~StemTrackConfigurer();
 
 };

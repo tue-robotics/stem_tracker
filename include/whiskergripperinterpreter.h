@@ -67,6 +67,7 @@ public:
     inline void setNumberOfSamplesForMovingAverage(const int n_samples, const int n_whiskers) { m_n_samples_for_average = n_samples;
                                                            m_whisker_values_for_average.assign(n_samples,std::vector<float>(n_whiskers,0.0)); }
 
+
     void updateWhiskerInterpretation();
     void checkForTopSensorTouched();
     void obtainNominalValues();
@@ -86,6 +87,8 @@ public:
     inline const std::vector< std::vector<float> >& getTouchedWhiskerVectorOrigins() const { return m_whiskers_touched_origins; }
     inline const std::vector< std::vector<float> >& getTouchedWhiskerVectorTips() const { return m_whiskers_touched_tips; }
     inline const bool& pressureSensorIsTouched() const { return m_pressure_sensor_is_touched; }
+    inline std::vector<float> getPressureSensorTouchedMax() const { return m_pressure_sensor_touched_max; }
+    inline std::vector<float> getWhiskersTouchedMax() const { return m_whisker_touched_max; }
 
     void simulateWhiskerGripper(const std::vector<float>& gripper_center, const std::vector<float>& stem_center);
 

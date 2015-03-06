@@ -170,14 +170,6 @@ void StemTrackConfigurer::configureWhiskerGripperInterpreter(WhiskerGripperInter
                                                                  *(float)getConfigPar<int>(m_general_config,"update_rate")), getNumberOfWhiskers() );
     whisker_gripper_interpreter.setNumberOfWhiskers( getNumberOfWhiskers() );
 
-    std::vector<float> touched_max;
-    if (m_general_config.readArray("whisker_touched_max"))
-    {
-        while(m_general_config.nextArrayItem())
-            touched_max.push_back( getConfigPar<float>(m_general_config,"max") );
-        m_general_config.endArray();
-    }
-    whisker_gripper_interpreter.setWhiskerTouchedMax( touched_max );
     whisker_gripper_interpreter.setWhiskerTouchedNormalizedThreshold( getConfigPar<float>(m_general_config,"whisker_touched_normalized_threshold") );
     whisker_gripper_interpreter.setPressureSensorTouchedNormalizedThreshold( getConfigPar<float>(m_general_config,"pressure_sensor_touched_normalized_threshold") );
 
@@ -204,18 +196,56 @@ void StemTrackConfigurer::configureWhiskerGripperInterpreter(WhiskerGripperInter
     }
     whisker_gripper_interpreter.setPressureSensorsAt(ang);
 
-    touched_max.clear();
-    if( m_general_config.readArray("pressure_sensor_touched_max"))
+    if(!getConfigPar<bool>(m_general_config, "find_max_touched_values") )
     {
-        while(m_general_config.nextArrayItem())
-            touched_max.push_back( getConfigPar<float>(m_general_config, "max") );
-        m_general_config.endArray();
+       loadPressureSensorTouchedMaxValues(whisker_gripper_interpreter);
+       loadWhiskerTouchedMaxValues(whisker_gripper_interpreter);
     }
-    whisker_gripper_interpreter.setPressureSensorTouchedMax(touched_max);
 
     INFO_STREAM("=====================================================");
     INFO_STREAM("Configured whiskergripper interpreter object" );
 
+}
+
+void StemTrackConfigurer::loadPressureSensorTouchedMaxValues(WhiskerGripperInterpreter& whisker_gripper_interpreter)
+{
+    std::vector<float> touched_max;
+    tue::Configuration config;
+    config.loadFromYAMLFile( m_default_config_path + getConfigPar<std::string>(m_general_config, "config_file_pressure_sensor_touched_max") );
+
+    if( config.readArray("pressure_sensor_touched_max"))
+    {
+        while(config.nextArrayItem())
+            touched_max.push_back( getConfigPar<float>(config, "max") );
+        config.endArray();
+    }
+    if(touched_max.size() != getConfigArrayLength(m_general_config, "pressure_sensor_location") )
+    {
+        ERROR_STREAM("I got " << touched_max.size() << " max pressure sensor values while n_pressure sensors is " <<
+                     getConfigArrayLength(m_general_config, "pressure_sensor_location") );
+        return;
+    }
+    whisker_gripper_interpreter.setPressureSensorTouchedMax(touched_max);
+}
+
+void StemTrackConfigurer::loadWhiskerTouchedMaxValues(WhiskerGripperInterpreter& whisker_gripper_interpreter)
+{
+    std::vector<float> touched_max;
+    tue::Configuration config;
+    config.loadFromYAMLFile( m_default_config_path + getConfigPar<std::string>(m_general_config, "config_file_whiskers_touched_max") );
+
+    if(config.readArray("whiskers_touched_max"))
+    {
+        while(config.nextArrayItem())
+            touched_max.push_back( getConfigPar<float>(config,"max") );
+        config.endArray();
+    }
+    if(touched_max.size() != getNumberOfWhiskers())
+    {
+        ERROR_STREAM("I got " << touched_max.size() << " max values while n_whiskers is " << getNumberOfWhiskers());
+        return;
+    }
+    whisker_gripper_interpreter.setWhiskerTouchedMax( touched_max );
 }
 
 void StemTrackConfigurer::configureRobotRepresentation(RobotRepresentation& robot_representation)
@@ -282,8 +312,22 @@ void StemTrackConfigurer::configureStemTrackController(StemTrackController& stem
 
 }
 
+void StemTrackConfigurer::storePressureSensorTouchedMaxValues(const std::vector<float>& pressure_sensor_touched_max)
+{
+    storeVectorInYmlFile( getConfigPar<std::string>(m_general_config, "config_file_pressure_sensor_touched_max"), "pressure_sensor_touched_max",
+                          "max", pressure_sensor_touched_max);
+    return;
+}
+
+void StemTrackConfigurer::storeWhiskerTouchedMaxValues(const std::vector<float>& whiskers_touched_max)
+{
+    storeVectorInYmlFile( getConfigPar<std::string>(m_general_config, "config_file_whiskers_touched_max"), "whiskers_touched_max",
+                          "max", whiskers_touched_max);
+    return;
+}
+
 void StemTrackConfigurer::storeVectorInYmlFile(const std::string& file_name, const std::string& vector_name,
-                                               const std::string& item_name, std::vector<float> vector)
+                                               const std::string& item_name, const std::vector<float>& vector)
 {
     tue::Configuration cfg;
     cfg.writeArray(vector_name);
@@ -296,7 +340,8 @@ void StemTrackConfigurer::storeVectorInYmlFile(const std::string& file_name, con
     cfg.endArray();
 
     std::ofstream f_out;
-    f_out.open(file_name.c_str());
+    std::string tmp = m_default_config_path + file_name;
+    f_out.open(tmp.c_str());
 
     tue::config::YAMLEmitter emitter;
     emitter.emit(cfg.data(), f_out);
