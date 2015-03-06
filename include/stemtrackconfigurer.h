@@ -24,10 +24,11 @@ private:
     template <class T>
     const T getConfigPar(tue::Configuration& config, const std::string& name);
     const int getConfigArrayLength(tue::Configuration& config, const std::string& name);
+    std::string m_default_config_path;
 
 public:
 
-    void loadConfig(const int argc, char** argv, const std::string& default_config_file);
+    void loadConfig(const int argc, char** argv, const std::string& default_config_path, const std::string& default_config_file);
     void configureStemTrackController(StemTrackController& stem_track_controller);
     void configureStemRepresentation(StemRepresentation& stem);
     void configureRobotRepresentation(RobotRepresentation& robot_representation);

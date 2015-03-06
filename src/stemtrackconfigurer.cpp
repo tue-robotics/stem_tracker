@@ -82,13 +82,14 @@ const bool StemTrackConfigurer::useLeftArm()
     return getConfigPar<bool>(m_general_config, "use_leftarm");
 }
 
-void StemTrackConfigurer::loadConfig(const int argc, char** argv, const std::string& default_config_file)
+void StemTrackConfigurer::loadConfig(const int argc, char** argv, const std::string& default_config_path, const std::string& default_config_file)
 {
+    m_default_config_path = default_config_path;
     /* load configuration */
     if (argc >= 2)
         m_general_config.loadFromYAMLFile(argv[1]);
     else
-        m_general_config.loadFromYAMLFile(default_config_file);
+        m_general_config.loadFromYAMLFile(default_config_path + default_config_file);
 
     return;
 }

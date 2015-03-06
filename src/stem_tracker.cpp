@@ -21,7 +21,7 @@ int main(int argc, char** argv)
 
     /* initialize configuration */
     StemTrackConfigurer TomatoConfigurer;
-    TomatoConfigurer.loadConfig(argc, argv, (ros::package::getPath(THIS_PACKAGE) + "/config/config.yml") );
+    TomatoConfigurer.loadConfig(argc, argv, (ros::package::getPath(THIS_PACKAGE) + "/config/"), "config.yml" );
     if(!TomatoConfigurer.configIsOk())
         return 1;
 
