@@ -20,26 +20,32 @@ class StemTrackConfigurer
 {
 
 private:
+    tue::Configuration m_general_config;
     template <class T>
     const T getConfigPar(tue::Configuration& config, const std::string& name);
     const int getConfigArrayLength(tue::Configuration& config, const std::string& name);
 
 public:
 
-    void configureStemTrackController(tue::Configuration& config, StemTrackController& stem_track_controller);
-    void configureStemRepresentation(tue::Configuration& config, StemRepresentation& stem);
-    void configureRobotRepresentation(tue::Configuration& config, RobotRepresentation& robot_representation);
-    void configureRobotStatus(tue::Configuration& config, RobotStatus& robot_status);
-    void configureWhiskerGripperInterpreter(tue::Configuration& config, WhiskerGripperInterpreter& whisker_gripper_interpreter);
-    void configureRobotInterface(tue::Configuration& config, RobotInterface& robot_interface);
-    void configureStemTrackMonitor(tue::Configuration& config, StemTrackMonitor& stemtrack_monitor);
-    void configureVisualizationInterface(tue::Configuration& config, VisualizationInterface& visualization_interface);
+    void loadConfig(const int argc, char** argv, const std::string& default_config_file);
+    void configureStemTrackController(StemTrackController& stem_track_controller);
+    void configureStemRepresentation(StemRepresentation& stem);
+    void configureRobotRepresentation(RobotRepresentation& robot_representation);
+    void configureRobotStatus(RobotStatus& robot_status);
+    void configureWhiskerGripperInterpreter(WhiskerGripperInterpreter& whisker_gripper_interpreter);
+    void configureRobotInterface(RobotInterface& robot_interface);
+    void configureStemTrackMonitor(StemTrackMonitor& stemtrack_monitor);
+    void configureVisualizationInterface(VisualizationInterface& visualization_interface);
 
-    const int getUpdateRate(tue::Configuration& config);
-    const std::string getBaseFrame(tue::Configuration& config);
-    const bool getUseLeft(tue::Configuration& config);
-    const int getNumberOfWhiskers(tue::Configuration& config);
+    const bool configChanged() { return m_general_config.sync(); }
+    const bool configIsOk() const;
+    const int getUpdateRate();
+    const std::string getBaseFrame();
+    const bool useLeftArm();
+    const int getNumberOfWhiskers();
 
+    void storeVectorInYmlFile(const std::string& file_name, const std::string& vector_name,
+                                                   const std::string& item_name, std::vector<float> vector);
     ~StemTrackConfigurer();
 
 };

@@ -13,7 +13,6 @@
 
 // KNOWN-BUGS
 //- hangen bij hele lage z-snelheid ref
-//- in config: een spatie na een int werkt wel maar een tab na een int zorgt ervoor dat type niet meer herkend
 
 int main(int argc, char** argv)
 {
@@ -21,63 +20,50 @@ int main(int argc, char** argv)
     StatsPublisher sp;
 
     /* initialize configuration */
-    tue::Configuration config;
     StemTrackConfigurer TomatoConfigurer;
-
-    /* load configuration */
-    if (argc >= 2)
-    {
-        std::string yaml_filename = argv[1];
-        config.loadFromYAMLFile(yaml_filename);
-    }
-    else
-    {
-        std::string this_package_dir = ros::package::getPath(THIS_PACKAGE);
-        config.loadFromYAMLFile(this_package_dir + "/config/config.yml");
-    }
-
-    if (config.hasError())
-    {
-        ERROR_STREAM("Could not load configuration: " << config.error());
+    TomatoConfigurer.loadConfig(argc, argv, (ros::package::getPath(THIS_PACKAGE) + "/config/config.yml") );
+    if(!TomatoConfigurer.configIsOk())
         return 1;
-    }
 
     /* initialize node */
     ros::init(argc, argv, THIS_NODE);
     ros::NodeHandle n;
-    ros::Rate r(TomatoConfigurer.getUpdateRate(config));
+    ros::Rate r(TomatoConfigurer.getUpdateRate());
 
     /* initialize and configure stem represenation object */
     StemRepresentation TomatoStem(1);
-    TomatoConfigurer.configureStemRepresentation(config, TomatoStem);
+    TomatoConfigurer.configureStemRepresentation(TomatoStem);
 
     /* initialize and configure robot representation object */
     RobotRepresentation AmigoRepresentation("amigo");
-    TomatoConfigurer.configureRobotRepresentation(config, AmigoRepresentation);
+    TomatoConfigurer.configureRobotRepresentation(AmigoRepresentation);
 
     /* initialize and configure robot status object */
     RobotStatus AmigoStatus(&AmigoRepresentation);
-    TomatoConfigurer.configureRobotStatus(config, AmigoStatus);
+    TomatoConfigurer.configureRobotStatus(AmigoStatus);
 
     /* initialize and configure stem tracking controller object */
     StemTrackController TomatoControl(&AmigoRepresentation, &AmigoStatus, &TomatoStem);
-    TomatoConfigurer.configureStemTrackController(config, TomatoControl);
+    TomatoConfigurer.configureStemTrackController(TomatoControl);
 
     /* initialize and configure whisker interpretation object */
     WhiskerGripperInterpreter TomatoWhiskerGripper(&AmigoStatus, &TomatoControl);
-    TomatoConfigurer.configureWhiskerGripperInterpreter(config, TomatoWhiskerGripper);
+    TomatoConfigurer.configureWhiskerGripperInterpreter(TomatoWhiskerGripper);
 
     /* initialize interface to robot object */
     RobotInterface AmigoInterface(n, &AmigoRepresentation, &AmigoStatus);
-    TomatoConfigurer.configureRobotInterface(config, AmigoInterface);
+    TomatoConfigurer.configureRobotInterface(AmigoInterface);
 
     /* initialize state machine and safety monitor */
     StemTrackMonitor TomatoMonitor(&TomatoStem, &AmigoRepresentation, &AmigoStatus, &TomatoControl, &TomatoWhiskerGripper);
-    TomatoConfigurer.configureStemTrackMonitor(config, TomatoMonitor);
+    TomatoConfigurer.configureStemTrackMonitor(TomatoMonitor);
 
     /* initialize and configure visualization object */
-    VisualizationInterface RvizInterface(n, TomatoConfigurer.getBaseFrame(config));
-    TomatoConfigurer.configureVisualizationInterface(config, RvizInterface);
+    VisualizationInterface RvizInterface(n, TomatoConfigurer.getBaseFrame());
+    TomatoConfigurer.configureVisualizationInterface(RvizInterface);
+
+    std::vector<float> test; test.assign(3,5.6);
+    TomatoConfigurer.storeVectorInYmlFile("/tmp/testymlfile","testvector","testitem",test);
 
     /* initialize profiling */
     sp.initialize();
@@ -86,30 +72,27 @@ int main(int argc, char** argv)
     bool prev_sample_joint_status_up_to_date = true;
     bool prev_sample_whisker_status_up_to_date = true;
     bool prev_sample_pressure_sensors_up_to_date = true;
-    bool prev_sample_config_was_ok = true;
 
     /* main update loop */
     while(ros::ok())
     {
-        if (config.sync())
+        if ( TomatoConfigurer.configChanged() )
         {
-            /* config file changed */
-            TomatoConfigurer.configureStemRepresentation(config, TomatoStem);
-            TomatoConfigurer.configureRobotRepresentation(config, AmigoRepresentation);
-            TomatoConfigurer.configureRobotStatus(config, AmigoStatus);
-            TomatoConfigurer.configureWhiskerGripperInterpreter(config, TomatoWhiskerGripper);
-            TomatoConfigurer.configureStemTrackController(config, TomatoControl);
-            TomatoConfigurer.configureRobotInterface(config, AmigoInterface);
-            TomatoConfigurer.configureStemTrackMonitor(config, TomatoMonitor);
-            TomatoConfigurer.configureVisualizationInterface(config, RvizInterface);
+            TomatoConfigurer.configureStemRepresentation(TomatoStem);
+            TomatoConfigurer.configureRobotRepresentation(AmigoRepresentation);
+            TomatoConfigurer.configureRobotStatus(AmigoStatus);
+            TomatoConfigurer.configureWhiskerGripperInterpreter(TomatoWhiskerGripper);
+            TomatoConfigurer.configureStemTrackController(TomatoControl);
+            TomatoConfigurer.configureRobotInterface(AmigoInterface);
+            TomatoConfigurer.configureStemTrackMonitor(TomatoMonitor);
+            TomatoConfigurer.configureVisualizationInterface(RvizInterface);
             TomatoWhiskerGripper.resetInitialization();
             TomatoMonitor.resetState();
             AmigoStatus.resetUpToDateStatus();
         }
 
-        if (!config.hasError())
+        if (TomatoConfigurer.configIsOk())
         {
-            prev_sample_config_was_ok = true;
 
             /* visualize stem */
             RvizInterface.showLineStrip(TomatoStem.getNodesX(), TomatoStem.getNodesY(), TomatoStem.getNodesZ(), stem);
@@ -225,15 +208,6 @@ int main(int argc, char** argv)
             sp.stopTimer("main");
             sp.publish();
 
-        }
-
-        else
-        {
-            if(prev_sample_config_was_ok)
-            {
-                ERROR_STREAM("Error in config file: " << config.error());
-                prev_sample_config_was_ok = false;
-            }
         }
 
         /* wait for next sample */
