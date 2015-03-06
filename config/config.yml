@@ -19,14 +19,14 @@ whiskers_up_to_date_threshold:  0.1            # consider whisker status up to d
 pressure_sensors_up_to_date_threshold:  0.1    # consider pressure sensors status up to date if measurement received
                                                 # within passed x sec
 initial_pose:               # pose used as preposition, length should be equal to the number
-    - {q: 0.1}               # of joints in kinematic chain
-    - {q: -0.1}
-    - {q: -0.6}
-    - {q: 0.0}
-    - {q: 1.8}
-    - {q: -0.1}
-    - {q: 0.4}
-    - {q: 0.0}
+    - q: 0.1                 # of joints in kinematic chain
+    - q: -0.1
+    - q: -0.6
+    - q: 0.0
+    - q: 1.8
+    - q: -0.1
+    - q: 0.4
+    - q: 0.0
 
 #######################
 # WHISKERGRIPPER CONFIG
@@ -49,27 +49,19 @@ whisker_coverage:                                                 # Angular 'pie
 whisker_touched_normalized_threshold: 0.1      # Whisker deviations are normalized based on whisker_touched_max. We consider a whisker unit
                                                 # touched when the normalized error is larger than this threshold
 
-whisker_touched_madx:
-    - {max: 2.01817}
-    - {max: 1.34795}
-    - {max: 1.36247}
-    - {max: 1.53378}
-    - {max: 1.16193}
-    - {max: 0.40856}
-    - {max: 2.45861}
-    - {max: 0.952206}
-    - {max: 0.534892}
-    - {max: 1.06684}
-    - {max: 0.825003}
-    - {max: 1.79269}
-
 whisker_touched_max:
-	- {max: 2.01817}
-	- {max: 1.34795}
-	- {max: 2.83341}
-	- max: 2.13553  w_4_max: 1.46022  w_5_max: 0.56652  w_6_max: 2.45861
-	  
-w_7_max: 1.06293  w_8_max: 0.792967  w_9_max: 2.00418  w_10_max: 1.94857  w_11_max: 2.94864
+    - max: 2.01817
+    - max: 1.34795
+    - max: 1.36247
+    - max: 1.53378
+    - max: 1.16193
+    - max: 0.40856
+    - max: 2.45861
+    - max: 0.952206
+    - max: 0.534892
+    - max: 1.06684
+    - max: 0.825003
+    - max: 1.79269
 
 pressure_sensor_strip_coverage:      # Angular 'piece of the pie' covered by a single pressure sensor sensor in the xy plane of the gripper.
     - {min: 40, max: 140}             # Positive is rotating x towards y. Direction of x is zero. Unit: degrees between 0 and 360 (integers).
@@ -77,22 +69,21 @@ pressure_sensor_strip_coverage:      # Angular 'piece of the pie' covered by a s
     - {min: 220, max: 320}
 
 pressure_sensor_location:      # Angular location of the pressure sensors in the xy plane of the gripper. Positive
-    - {ang: 70}                 # is rotating x towards y. Direction of x is zero. Unit: degrees between 0 and 360 (integers).
-    - {ang: 110}                # The order is the order at which the pressure sensor values are stored in RobotStatus.
-    - {ang: 180}
-    - {ang: 250}
-    - {ang: 295}
+    - ang: 70                   # is rotating x towards y. Direction of x is zero. Unit: degrees between 0 and 360 (integers).
+    - ang: 110                  # The order is the order at which the pressure sensor values are stored in RobotStatus.
+    - ang: 180
+    - ang: 250
+    - ang: 295
 
 pressure_sensor_touched_normalized_threshold:  0.02   # Pressure sensor deviations are normalized based on pressure_sensor_max_touched. We consider
                                                        # a pressure sensor coverage touched when the normalized deviation is larger than this value
 
 pressure_sensor_touched_max:
-    - {max: 1.83575}
-    - {max: 1.89297}
-    - {max: 0.961392}
-    - {max: 1.90908}
-    - {max: 1.73179}
-p_0_max: 1.83575  p_1_max: 1.91311  p_2_max: 1.08147  p_3_max: 1.91392  p_4_max: 1.77692
+    - max: 1.83575
+    - max: 1.89297
+    - max: 0.961392
+    - max: 1.90908
+    - max: 1.73179
 
 #######################
 # WHISKER SIM CONFIG
