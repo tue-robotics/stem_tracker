@@ -35,18 +35,18 @@ initial_pose:               # pose used as preposition, length should be equal t
 n_seconds_for_initialization:	5.0             # number of seconds we take to average whisker and pressure sensor values during
                                                  # initialization (the average will be used as nominal value)
 
-n_sec_for_moving_av:    4.0
+n_sec_for_moving_av:    3.0
 
 whisker_coverage:                                                 # Angular 'piece of the pie' covered by a whisker in the xy plane
-    - {min: 10, max: 65, n_whiskers: 2, grasp_check: 1}            # of the gripper. Positive is rotating x towards y. Direction of x
+    - {min: 0, max: 65, n_whiskers: 2, grasp_check: 1}            # of the gripper. Positive is rotating x towards y. Direction of x
     - {min: 65, max: 110, n_whiskers: 2, grasp_check: 0}           # is zero. Unit: degrees between 0 and 360 (integers). The order is
     - {min: 100, max: 135, n_whiskers: 1, grasp_check: 0}          # the order at which the whisker values are stored in RobotStatus. If
     - {min: 135, max: 225, n_whiskers: 2, grasp_check: 0}          # a whisker is used to check whether the stem enters/leaves the gripper
-    - {min: 225, max: 270, n_whiskers: 1, grasp_check: 0}          # grasp_check = 1
-    - {min: 270, max: 300, n_whiskers: 2, grasp_check: 0}
-    - {min: 300, max: 360, n_whiskers: 2, grasp_check: 1}
+    - {min: 225, max: 260, n_whiskers: 1, grasp_check: 0}          # grasp_check = 1
+    - {min: 250, max: 295, n_whiskers: 2, grasp_check: 0}
+    - {min: 295, max: 360, n_whiskers: 2, grasp_check: 1}
 
-whisker_touched_normalized_threshold: 0.06      # Whisker deviations are normalized based on config_file_whisker_touched_max. We consider a whisker unit
+whisker_touched_normalized_threshold: 0.02      # Whisker deviations are normalized based on config_file_whisker_touched_max. We consider a whisker unit
                                                 # touched when the normalized error is larger than this threshold
 
 config_file_whiskers_touched_max:   "whisker_touched_max.yml"
@@ -63,7 +63,7 @@ pressure_sensor_location:      # Angular location of the pressure sensors in the
     - ang: 250
     - ang: 295
 
-pressure_sensor_touched_normalized_threshold:  0.08   # Pressure sensor deviations are normalized based on config_file_pressure_sensor_touched_max. We
+pressure_sensor_touched_normalized_threshold:  0.03   # Pressure sensor deviations are normalized based on config_file_pressure_sensor_touched_max. We
                                                        # consider a pressure sensor coverage touched when the normalized deviation is larger than this value
 
 config_file_pressure_sensor_touched_max: "pressure_sensor_touched_max.yml"
