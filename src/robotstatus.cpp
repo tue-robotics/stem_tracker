@@ -26,6 +26,17 @@ RobotStatus::RobotStatus(RobotRepresentation* p_robot_representation)
     m_last_pressure_sensors_update = 0;
 }
 
+const bool RobotStatus::gripperSensingIsUpToDate()
+{
+    if(!whiskerMeasurementsAreUpToDate())
+        return false;
+
+    if(!pressureSensorMeasurementsAreUpToDate())
+        return false;
+
+    return true;
+
+}
 void RobotStatus::updateWhiskerMeasurements(std::vector<float> updated_whisker_measurements)
 {
     if(updated_whisker_measurements.size() != m_n_whiskers)

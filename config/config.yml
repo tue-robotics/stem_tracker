@@ -109,7 +109,7 @@ straight_forward_ref:           0.001         # put xyz ref forward for x meters
 ##########################
 
 debug_state_par:                1             # if true (1) state will be printed every time it changes
-find_max_touched_values:        1             # if true (1) robot will move to preposition and stay there while storing
+find_max_touched_values:        0             # if true (1) robot will move to preposition and stay there while storing
                                                # the maximum values it knows for whiskers deflection and for pressure sensing
                                                # in config_file_whiskers_touched_max and config_file_pressure_sensor_touched_max
 

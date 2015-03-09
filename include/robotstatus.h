@@ -27,6 +27,8 @@ class RobotStatus
         double m_xyz_reached_threshold;
         std::vector<float> m_whisker_measurements, m_pressure_sensor_measurements;
         uint m_n_whiskers, m_n_pressure_sensors;
+        const bool whiskerMeasurementsAreUpToDate();
+        const bool pressureSensorMeasurementsAreUpToDate();
 
     public:
         RobotStatus(RobotRepresentation* p_robot_representation);
@@ -53,10 +55,9 @@ class RobotStatus
         void resetUpToDateStatus();
         const bool isUpToDate();
         const bool jointStatusIsUpToDate();
-        const bool whiskerMeasurementsAreUpToDate();
-        const bool pressureSensorMeasurementsAreUpToDate();
         const std::vector<float> gripperFrameVectorToBaseFrameVector(const std::vector<float>& vector_in_gripper_frame );
         const std::vector< std::vector<float> > gripperFrameVectorsToBaseFrameVectors(const std::vector< std::vector<float> > vectors_in_gripper_frame);
+        const bool gripperSensingIsUpToDate();
 
         const KDL::Frame& getGripperKDLframe();
         inline const KDL::JntArray& getJointStatus() const { return m_joints_to_monitor; }
