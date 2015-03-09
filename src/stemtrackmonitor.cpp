@@ -156,6 +156,7 @@ bool StemTrackMonitor::inputIsUpToDate()
 void StemTrackMonitor::doPreposBehavior()
 {
     m_p_robot_interface->publishAmigoJointPosRefs(m_p_robot_representation->getInitialPoseJointRefs());
+    m_p_robot_interface->publishAmigoOpenGripperMessage();
 
     if(m_find_max_touched_values)
     {

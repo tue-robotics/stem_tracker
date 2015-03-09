@@ -2,6 +2,7 @@
 #include "loggingmacros.h"
 #include "robotrepresentation.h"
 #include "robotstatus.h"
+#include "tue_msgs/GripperCommand.h"
 
 void RobotInterface::connectToWhiskers()
 {
@@ -21,6 +22,16 @@ void RobotInterface::receivedWhiskerMsg(const std_msgs::Float32MultiArray & msg)
 void RobotInterface::receivedPressureSensorMsg(const std_msgs::Float32MultiArray & msg)
 {
     m_p_robot_status->updatePressureSensorMeasurements(msg.data);
+}
+
+void RobotInterface::connectToAmigoGripper(const bool leftArmIsPreferred)
+{
+    if(leftArmIsPreferred)
+        m_gripper_ref_pub = m_node.advertise<tue_msgs::GripperCommand>("/amigo/left_arm/gripper/references",0);
+    else
+        m_gripper_ref_pub = m_node.advertise<tue_msgs::GripperCommand>("/amigo/right_arm/gripper/references",0);
+
+    return;
 }
 
 void RobotInterface::connectToAmigoArm(const bool leftArmIsPreferred)
@@ -79,6 +90,15 @@ void RobotInterface::publishAmigoArmMessage(sensor_msgs::JointState arm_message)
     return;
 }
 
+void RobotInterface::publishAmigoOpenGripperMessage()
+{
+    tue_msgs::GripperCommand msg;
+    msg.direction = tue_msgs::GripperCommand::OPEN;
+    msg.max_torque = 120;
+    m_gripper_ref_pub.publish(msg);
+    return;
+}
+
 void RobotInterface::publishAmigoJointPosRefs(KDL::JntArray q_out)
 {
     if( q_out.rows() == m_p_robot_status->getJointStatus().rows())
@@ -121,4 +141,5 @@ RobotInterface::~RobotInterface()
     m_arm_meas_sub.shutdown();
     m_arm_ref_pub.shutdown();
     m_whisker_sub.shutdown();
+    m_gripper_ref_pub.shutdown();
 }

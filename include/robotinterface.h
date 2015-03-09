@@ -17,6 +17,7 @@ private:
     ros::NodeHandle m_node;
     ros::Publisher m_arm_ref_pub;
     ros::Publisher m_torso_ref_pub;
+    ros::Publisher m_gripper_ref_pub;
     ros::Subscriber m_arm_meas_sub;
     ros::Subscriber m_torso_meas_sub;
     ros::Subscriber m_whisker_sub;
@@ -26,6 +27,7 @@ public:
         : m_node(node), m_p_robot_representation(p_robot_representation), m_p_robot_status(p_robot_status) {}
 
     void connectToAmigoArm(const bool leftArmIsPreferred);
+    void connectToAmigoGripper(const bool leftArmIsPreferred);
     void connectToAmigoTorso();
     void connectToWhiskers();
     void connectToPressureSensors();
@@ -37,6 +39,7 @@ public:
 
     void publishAmigoArmMessage(sensor_msgs::JointState arm_message);
     void publishAmigoJointPosRefs(KDL::JntArray joint_array);
+    void publishAmigoOpenGripperMessage();
 
     ~RobotInterface();
 };

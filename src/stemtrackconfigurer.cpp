@@ -356,6 +356,7 @@ void StemTrackConfigurer::configureRobotInterface(RobotInterface& robot_interfac
     robot_interface.connectToAmigoTorso();
     robot_interface.connectToWhiskers();
     robot_interface.connectToPressureSensors();
+    robot_interface.connectToAmigoGripper( useLeftArm() );
 
 
     INFO_STREAM("=============================================");
