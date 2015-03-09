@@ -63,7 +63,7 @@ pressure_sensor_location:      # Angular location of the pressure sensors in the
     - ang: 250
     - ang: 295
 
-pressure_sensor_touched_normalized_threshold:  0.03   # Pressure sensor deviations are normalized based on config_file_pressure_sensor_touched_max. We
+pressure_sensor_touched_normalized_threshold:  0.01   # Pressure sensor deviations are normalized based on config_file_pressure_sensor_touched_max. We
                                                        # consider a pressure sensor coverage touched when the normalized deviation is larger than this value
 
 config_file_pressure_sensor_touched_max: "pressure_sensor_touched_max.yml"
@@ -92,7 +92,7 @@ stem_nodes:                                   # stem nodes, defined in root_link
 # TRACKING CONTROL CONFIG
 ##########################
 
-move_up_ref:                    0.001         # put xyz ref up (in direction of stem tangent) for x meters when moving
+move_up_ref:                    0.005         # put xyz ref up (in direction of stem tangent) for x meters when moving
                                                # up (state FOLLOW)
 tilt_with_stem:                 0             # if true (1) tilt gripper based on local derivative of stem
 debug_ik_solver:                0             # if true (1) status of kdl ik solver will be printed
@@ -109,7 +109,7 @@ straight_forward_ref:           0.001         # put xyz ref forward for x meters
 ##########################
 
 debug_state_par:                1             # if true (1) state will be printed every time it changes
-find_max_touched_values:        0             # if true (1) robot will move to preposition and stay there while storing
+find_max_touched_values:        0              # if true (1) robot will move to preposition and stay there while storing
                                                # the maximum values it knows for whiskers deflection and for pressure sensing
                                                # in config_file_whiskers_touched_max and config_file_pressure_sensor_touched_max
 
