@@ -44,6 +44,7 @@ class RobotStatus
 
         bool reachedPosition(KDL::JntArray reference);
         bool reachedPosition(std::vector<float> reference);
+        const bool amigoTorsoIsAtMax() const;
         void updateJointStatus(KDL::JntArray updated_joint_status, std::vector<int> joints_updated);
         const KDL::Rotation getGripperRotation();
         void updateWhiskerMeasurements(std::vector<float> updated_whisker_measurements);

@@ -26,6 +26,19 @@ RobotStatus::RobotStatus(RobotRepresentation* p_robot_representation)
     m_last_pressure_sensors_update = 0;
 }
 
+const bool RobotStatus::amigoTorsoIsAtMax() const
+{
+    if(fabs(m_joints_to_monitor(0) - m_p_robot_representation->getJointMaxima()(0) ) < 0.2 )
+    {
+        INFO_STREAM("reached max");
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
 const bool RobotStatus::gripperSensingIsUpToDate()
 {
     if(!whiskerMeasurementsAreUpToDate())

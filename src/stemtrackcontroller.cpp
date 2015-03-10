@@ -41,8 +41,13 @@ void StemTrackController::setPointMoveUp()
     /*todo: add case for tilt_with stem
             take current stem tangent into account when moving up */
 
+    float move_up_ref = m_move_up_ref;
+    if(m_p_robot_status->amigoTorsoIsAtMax())
+    {
+        move_up_ref = 2*m_move_up_ref;
+    }
     m_setpoint_vector = KDL::Vector(m_p_robot_status->getGripperXYZ()[0], m_p_robot_status->getGripperXYZ()[1],
-                                    m_p_robot_status->getGripperXYZ()[2]+m_move_up_ref);
+                                    m_p_robot_status->getGripperXYZ()[2]+move_up_ref);
     m_setpoint_frame = KDL::Frame( KDL::Rotation::Identity(), m_setpoint_vector);
     return;
 }
