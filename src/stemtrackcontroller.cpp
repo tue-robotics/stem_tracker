@@ -44,7 +44,7 @@ void StemTrackController::setPointMoveUp()
     float move_up_ref = m_move_up_ref;
     if(m_p_robot_status->amigoTorsoIsAtMax())
     {
-        move_up_ref = 2*m_move_up_ref;
+        move_up_ref = 10*m_move_up_ref;
     }
     m_setpoint_vector = KDL::Vector(m_p_robot_status->getGripperXYZ()[0], m_p_robot_status->getGripperXYZ()[1],
                                     m_p_robot_status->getGripperXYZ()[2]+move_up_ref);
@@ -118,6 +118,12 @@ void StemTrackController::updateJointPosReferences()
         int status = ik_solver_->CartToJnt(m_p_robot_representation->getJointSeeds(), m_setpoint_frame, m_joint_pos_refs);
         if(m_debug_ik_solver)
             INFO_STREAM("Status ik_solver: " << status);
+
+        INFO_STREAM("refs:");
+        printKDLJntArray(m_joint_pos_refs);
+        INFO_STREAM("current:");
+        printKDLJntArray(m_p_robot_status->getJointStatus());
+
     }
     return;
 }

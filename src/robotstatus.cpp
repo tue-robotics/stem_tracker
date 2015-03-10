@@ -28,7 +28,7 @@ RobotStatus::RobotStatus(RobotRepresentation* p_robot_representation)
 
 const bool RobotStatus::amigoTorsoIsAtMax() const
 {
-    if(fabs(m_joints_to_monitor(0) - m_p_robot_representation->getJointMaxima()(0) ) < 0.2 )
+    if(fabs(m_joints_to_monitor(0) - m_p_robot_representation->getJointMaxima()(0) ) < 0.02 )
     {
         INFO_STREAM("reached max");
         return true;
