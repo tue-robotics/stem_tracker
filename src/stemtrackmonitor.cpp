@@ -82,7 +82,7 @@ void StemTrackMonitor::updateState()
         break;
 
     case GRASP:
-        if( m_p_whisker_gripper_interpreter->graspWhiskerIsTouched() )
+        if( m_p_robot_status->reachedPosition( m_p_stem_representation->getStemTrackingStartXYZ()) )
         {
             m_state = FOLLOW;
             INFO_STREAM("=============================================");
@@ -165,6 +165,9 @@ void StemTrackMonitor::doPreposBehavior()
         m_p_stemtrack_configurer->storePressureSensorTouchedMaxValues( m_p_whisker_gripper_interpreter->getPressureSensorTouchedMax() );
         m_p_stemtrack_configurer->storeWhiskerTouchedMaxValues( m_p_whisker_gripper_interpreter->getWhiskersTouchedMax() );
     }
+
+    INFO_STREAM("prepos:");
+    printVector(m_p_robot_status->getGripperXYZ());
     return;
 }
 
@@ -177,7 +180,7 @@ void StemTrackMonitor::doGraspBehavior()
                                                  m_p_whisker_gripper_interpreter->getTouchedWhiskerVectorOrigins() ), whisker_touch );
 
     /* set reference to forward in same plane */
-    m_p_stemtrack_control->setPointMoveForward(m_p_robot_status->getGripperXYZ(), m_p_stem_representation->getStemTrackingStartHeight());
+    m_p_stemtrack_control->setCartSetpoint( m_p_stem_representation->getStemTrackingStartXYZ() );
 
     /* translate cartesian setpoint to joint coordinates */
     m_p_stemtrack_control->updateJointPosReferences();

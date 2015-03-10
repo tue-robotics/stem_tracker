@@ -19,8 +19,8 @@ class StemRepresentation
         std::vector<float> m_z_nodes;
         std::vector<float> m_nearestXYZ;
         std::vector<float> m_xyz_below;
-        std::vector<float> m_rot_xyz;
-        float m_lin_tangent_d, m_start_at_height;
+        std::vector<float> m_rot_xyz, m_start_at_xyz;
+        float m_lin_tangent_d;
 
     public:
         StemRepresentation(int stem_id);
@@ -34,11 +34,11 @@ class StemRepresentation
         inline const std::vector<float>& getNodesX() { return m_x_nodes; }
         inline const std::vector<float>& getNodesY() { return m_y_nodes; }
         inline const std::vector<float>& getNodesZ() { return m_z_nodes; }
-        inline const float getStemTrackingStartHeight() const { return m_start_at_height; }
+        inline const std::vector<float>& getStemTrackingStartXYZ() const { return m_start_at_xyz; }
         inline const std::vector<float>& getNearestXYZ() { return m_nearestXYZ; }
         inline const std::vector<float>& getCurrentTangent() { return m_rot_xyz; }
 
-        inline void setStemTrackingStartHeight(float height) { m_start_at_height = height; }
+        inline void setStemTrackingStartXYZ(std::vector<float> start_xyz) { m_start_at_xyz = start_xyz; }
         inline void setLinTangentDistance(float lin_tan_d) { m_lin_tangent_d = lin_tan_d; }
 
         bool isXYZonStem(std::vector<float> xyz);

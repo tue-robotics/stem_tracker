@@ -110,7 +110,18 @@ const bool StemTrackConfigurer::configIsOk() const
 void StemTrackConfigurer::configureStemRepresentation(StemRepresentation& stem_representation)
 {
     stem_representation.setLinTangentDistance( getConfigPar<float>(m_general_config, "lin_tan_d") );
-    stem_representation.setStemTrackingStartHeight( getConfigPar<float>(m_general_config, "start_tracking_at_z") );
+    std::vector<float> stem_start_xyz;
+    if( m_general_config.readArray("stem_start_xyz"))
+    {
+        while(m_general_config.nextArrayItem())
+        {
+            stem_start_xyz.push_back( getConfigPar<float>(m_general_config, "x") );
+            stem_start_xyz.push_back( getConfigPar<float>(m_general_config, "y") );
+            stem_start_xyz.push_back( getConfigPar<float>(m_general_config, "z") );
+        }
+        m_general_config.endArray();
+    }
+    stem_representation.setStemTrackingStartXYZ( stem_start_xyz );
 
     std::vector<float> stemNodesX, stemNodesY, stemNodesZ;
 
