@@ -125,17 +125,13 @@ void StemTrackConfigurer::configureStemRepresentation(StemRepresentation& stem_r
 
     std::vector<float> stemNodesX, stemNodesY, stemNodesZ;
 
-    if (m_general_config.readArray("stem_nodes"))
-    {
-        while(m_general_config.nextArrayItem())
-        {
-            stemNodesX.push_back( getConfigPar<float>(m_general_config, "x") );
-            stemNodesY.push_back( getConfigPar<float>(m_general_config, "y") );
-            stemNodesZ.push_back( getConfigPar<float>(m_general_config, "z") );
-        }
-
-        m_general_config.endArray();
-    }
+    /* store initial stem nodes on stem_start_xyz and directly below */
+    stemNodesX.push_back(stem_start_xyz[0]);
+    stemNodesX.push_back(stem_start_xyz[0]);
+    stemNodesY.push_back(stem_start_xyz[1]);
+    stemNodesY.push_back(stem_start_xyz[1]);
+    stemNodesZ.push_back(stem_start_xyz[2]-getConfigPar<float>(m_general_config,"length_first_node"));
+    stemNodesZ.push_back(stem_start_xyz[2]);
 
     stem_representation.loadNodesXYZ( stemNodesX, stemNodesY, stemNodesZ);
 

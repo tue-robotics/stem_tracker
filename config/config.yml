@@ -84,9 +84,7 @@ lin_tan_d:                      0.1           # distance in z we use to calculat
 stem_start_xyz:
     - {x: 0.5, y: 0.26, z: 0.53}
 
-stem_nodes:                                   # stem nodes, defined in root_link
-    - {x: 0.55, y: 0.3, z: 1.0}
-    - {x: 0.55, y: 0.3, z: 1.2}
+length_first_node:              0.25           # first stem node is put x meters underneath stem_start_xyz
 
 ##########################
 # TRACKING CONTROL CONFIG
@@ -98,11 +96,11 @@ tilt_with_stem:                 0             # if true (1) tilt gripper based o
 debug_ik_solver:                0             # if true (1) status of kdl ik solver will be printed
 ik_vel_only:                    0             # if true (1) after initialization we only use kdl ik velocity solver, no
                                                # fk or ik position solvers
-xyz_reached_threshold:          0.05          # if cartesian position error of the gripper in robot-status is below this
+xyz_reached_threshold:          0.01          # if cartesian position error of the gripper in robot-status is below this
                                                # threshold position is considered reached
 pos_reached_threshold:          0.01          # if absolute position error for each of the joints in robot-status is below
                                                # this threshold position is considered reached
-straight_forward_ref:           0.03          # put xyz ref forward for x meters when asked moving forward (state GRASP)
+straight_forward_ref:           0.03          # put xyz ref forward for x meters when asked moving forward
 print_joint_ref_vs_current:     0             # if true (1) current joint positions and reference joint positions are printed
                                                # every time a cart setpoint is converted to joint position setpoints
 
