@@ -54,39 +54,50 @@ std::vector<float> StemRepresentation::getStemXYZatZ(float z)
 
 void StemRepresentation::initializeTangent()
 {
-    m_rot_xyz.clear();
-    m_rot_xyz.assign(3,0.0);
+    m_tangent_xyz.clear();
+    m_tangent_xyz.assign(3,0.0);
+    m_tangent_bottom_xyz.assign(3,0.0);
 }
 
-void StemRepresentation::updateLocalTangent()
+std::vector<float> StemRepresentation::getNodeXYZ(uint node)
 {
-    if(m_nearestXYZ.size() != 3)
+    std::vector<float> xyz;
+
+    if(node > m_n_nodes -1 || node < 0)
     {
-        ERROR_STREAM("Trying to find tangent while nearest stem xyz is not known!");
-        return;
+        ERROR_STREAM("Asking for node " << node << " which does not exist. N_nodes = " << m_n_nodes);
+        return xyz;
     }
 
-    updateXYZbelow();
-    if(m_xyz_below.size() == 3)
+    xyz.push_back(m_x_nodes[node]);
+    xyz.push_back(m_y_nodes[node]);
+    xyz.push_back(m_z_nodes[node]);
+
+    return xyz;
+}
+
+void StemRepresentation::updateTangent()
+{
+
+    if((m_z_nodes.back() - m_z_nodes.front()) > m_lin_tangent_d)
     {
-        if(m_nearestXYZ.at(2) - m_xyz_below.at(2) > m_lin_tangent_d)
-        {
-            for(int i=0; i<3; ++i)
-                m_rot_xyz.at(i) = m_nearestXYZ.at(i) - m_xyz_below.at(i);
-        }
+        std::vector<float> top = getNodeXYZ(m_n_nodes-1);
+        m_tangent_bottom_xyz = getStemXYZatZ(m_z_nodes.back() - m_lin_tangent_d);
+        for(int i=0; i<3; ++i)
+                m_tangent_xyz[i] = top[i] - m_tangent_bottom_xyz[i];
     }
     else
+    {
         initializeTangent();
-}
+    }
 
-void StemRepresentation::updateXYZbelow()
-{
-    if(m_nearestXYZ.at(2)-m_lin_tangent_d > m_z_nodes.front())
-        m_xyz_below = getStemXYZatZ(m_nearestXYZ.at(2)-m_lin_tangent_d);
+    return;
+
 }
 
 void StemRepresentation::updateNearestXYZ(std::vector<float> from_xyz)
 {
+    /* this function only used in simulation without gripper input */
     if(from_xyz.size() != 3)
     {
         WARNING_STREAM("Cannot updateNearestXYZ with input of length " << from_xyz.size() << ". I need xyz.");
@@ -114,7 +125,7 @@ void StemRepresentation::updateNearestXYZ(std::vector<float> from_xyz)
     else
     {
         m_nearestXYZ = getStemXYZatZ(from_xyz.at(2));
-        updateLocalTangent();
+        updateTangent();
     }
     return;
 }
@@ -223,10 +234,6 @@ void StemRepresentation::updateStemNodes(const std::vector< std::vector<float> >
             m_x_nodes.pop_back();
             m_y_nodes.pop_back();
             m_z_nodes.pop_back();
-        }
-        else
-        {
-            WARNING_STREAM("Attempt to remove a node in stem representation while we have less than 3 nodes left, are we below start_xyz?");
         }
 
         updateNumberOfNodes();

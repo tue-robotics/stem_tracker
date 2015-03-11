@@ -54,10 +54,12 @@ public:
     void updateCartSetpoint(const std::vector<float>& gripper_pos_err);
     void setPointMoveUp();
 
+    KDL::Rotation getDesiredGripperPose();
     inline KDL::JntArray getJointPosRefs() { return m_joint_pos_refs; }
     KDL::JntArray getJointVelRefs() { return m_joint_vel_refs; }
     inline const KDL::Vector getCartSetpointKDLVect() { return m_setpoint_vector; }
     inline const KDL::Frame getCartSetpointKDLFrame() { return m_setpoint_frame; }
+    std::vector<float> getCartSetpointXYZ();
 
     ~StemTrackController();
 

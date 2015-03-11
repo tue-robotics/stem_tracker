@@ -18,10 +18,10 @@ class StemRepresentation
         std::vector<float> m_y_nodes;
         std::vector<float> m_z_nodes;
         std::vector<float> m_nearestXYZ;
-        std::vector<float> m_xyz_below;
-        std::vector<float> m_rot_xyz, m_start_at_xyz;
+        std::vector<float> m_tangent_xyz, m_start_at_xyz, m_tangent_bottom_xyz;
         float m_lin_tangent_d, m_add_or_remove_node_euclidian_threshold;
         void updateNumberOfNodes();
+        std::vector<float> getNodeXYZ(uint node);
 
     public:
         StemRepresentation(int stem_id);
@@ -37,7 +37,8 @@ class StemRepresentation
         inline const std::vector<float>& getNodesZ() { return m_z_nodes; }
         inline const std::vector<float>& getStemTrackingStartXYZ() const { return m_start_at_xyz; }
         inline const std::vector<float>& getNearestXYZ() { return m_nearestXYZ; }
-        inline const std::vector<float>& getCurrentTangent() { return m_rot_xyz; }
+        inline const std::vector<float>& getTangent() { return m_tangent_xyz; }
+        inline const std::vector<float>& getTangentBottomXYZ() { return m_tangent_bottom_xyz; }
 
         inline void setAddOrRemoveNodeThreshold( float threshold ) { m_add_or_remove_node_euclidian_threshold = threshold; }
         inline void setStemTrackingStartXYZ(std::vector<float> start_xyz) { m_start_at_xyz = start_xyz; }
@@ -47,8 +48,7 @@ class StemRepresentation
         void updateStemNodes(const std::vector<float>& touches_xyz, bool ignore_threshold = false);
         bool isXYZonStem(std::vector<float> xyz);
         void updateNearestXYZ(std::vector<float> from_xyz);
-        void updateLocalTangent();
-        void updateXYZbelow();
+        void updateTangent();
         void loadNodesXYZ(std::vector<float> x, std::vector<float> y, std::vector<float> z);
         void flipNodes();
         void printAll();

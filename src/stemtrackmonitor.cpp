@@ -12,18 +12,6 @@
 #include "loggingmacros.h"
 #include "debugfunctions.h"
 
-bool StemTrackMonitor::reachedEndOfStem()
-{
-    if( m_p_stem_representation->getNearestXYZ().size() != 3)
-    {
-        ERROR_STREAM("Trying to check for end of stem while stem-intersection is not known!");
-    }
-
-    if( fabs(m_p_stem_representation->getNearestXYZ().at(2) - m_p_stem_representation->getNodesZ().back()) < 0.05 )
-        return true;
-    else
-        return false;
-}
 
 const std::string StemTrackMonitor::stateToString(stemtrack_state_t state) const
 {
@@ -200,18 +188,19 @@ void StemTrackMonitor::doFollowBehavior()
                                              m_p_robot_status->gripperFrameVectorsToBaseFrameVectors(
                                                  m_p_whisker_gripper_interpreter->getTouchedWhiskerVectorOrigins() ), whisker_touch );
 
-    m_p_visualization_interface->showXYZ(m_p_robot_status->getGripperXYZ(), m_p_whisker_gripper_interpreter->getEstimatedPosError(),
-                                         nearest_stem_intersection);
-
     /* add or remove stem nodes */
     if(m_p_whisker_gripper_interpreter->getTouchedWhiskerVectorTips().size() > 0)
         m_p_stem_representation->updateStemNodes( m_p_robot_status->gripperFrameVectorsToBaseFrameVectors( m_p_whisker_gripper_interpreter->getTouchedWhiskerVectorTips() ));
     else
         m_p_stem_representation->updateStemNodes( m_p_robot_status->getGripperXYZ());
 
+    /* update stem tangent */
+    m_p_stem_representation->updateTangent();
+    m_p_visualization_interface->showArrow(m_p_stem_representation->getTangent(), m_p_stem_representation->getTangentBottomXYZ(), stem_tangent);
+
     /* update position setpoint in cartesian space */
     m_p_stemtrack_control->updateCartSetpoint( m_p_whisker_gripper_interpreter->getEstimatedPosError() );
-    m_p_visualization_interface->showArrow(m_p_stem_representation->getCurrentTangent(), m_p_robot_status->getGripperXYZ(), stem_tangent);
+    m_p_visualization_interface->showXYZ(m_p_stemtrack_control->getCartSetpointXYZ(), cartesian_setpoint);
 
     /* translate cartesian setpoint to joint coordinates */
     m_p_stemtrack_control->updateJointPosReferences();

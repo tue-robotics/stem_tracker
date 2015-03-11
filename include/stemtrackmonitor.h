@@ -44,7 +44,6 @@ private:
     RobotInterface* m_p_robot_interface;
     VisualizationInterface* m_p_visualization_interface;
 
-    bool reachedEndOfStem();
     void updateState();
     bool inputIsUpToDate();
     const std::string stateToString(stemtrack_state_t state) const;

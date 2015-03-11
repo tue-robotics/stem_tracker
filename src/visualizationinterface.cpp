@@ -37,7 +37,7 @@ bool VisualizationInterface::configureSelf(const MarkerIDs& marker_id)
 
         return true;
 
-    case nearest_stem_intersection:
+    case cartesian_setpoint:
 
         m_frame = m_base_frame;
         m_rgb.clear();
@@ -47,7 +47,7 @@ bool VisualizationInterface::configureSelf(const MarkerIDs& marker_id)
         m_ros_marker_id = 2;
         m_sphere_radius = 0.015;
         m_lifetime = m_show_setpoint_lifetime;
-        m_name = "nearest_stem_intersection";
+        m_name = "cartesian_setpoint";
         return true;
 
     case whisker_touch:
@@ -90,6 +90,20 @@ bool VisualizationInterface::configureSelf(const MarkerIDs& marker_id)
         m_arrowhead_diam = 0.02;
         m_lifetime = m_show_stem_tangent_lifetime;
         m_name = "stem_tangent";
+        return true;
+
+    case blue_debug_arrow:
+
+        m_frame = m_base_frame;
+        m_rgb.clear();
+        m_rgb.push_back(0.0f);
+        m_rgb.push_back(0.0f);
+        m_rgb.push_back(1.0f);
+        m_ros_marker_id = 5;
+        m_arrow_diam = 0.015;
+        m_arrowhead_diam = 0.025;
+        m_lifetime = m_show_stem_tangent_lifetime;
+        m_name = "blue_debug_arrow";
         return true;
 
     default:
@@ -233,14 +247,14 @@ void VisualizationInterface::showArrowInRviz(const std::vector<float>& tip, cons
     /* construct nodes point */
     geometry_msgs::Point p_start, p_end;
 
-    p_start.x = origin.at(0) - tip.at(0);
-    p_start.y = origin.at(1) - tip.at(1);
-    p_start.z = origin.at(2) - tip.at(2);
+    p_start.x = origin.at(0);
+    p_start.y = origin.at(1);
+    p_start.z = origin.at(2);
     marker.points.push_back(p_start);
 
-    p_end.x = origin.at(0);
-    p_end.y = origin.at(1);
-    p_end.z = origin.at(2);
+    p_end.x = origin.at(0) + tip.at(0);
+    p_end.y = origin.at(1) + tip.at(1);
+    p_end.z = origin.at(2) + tip.at(2);
     marker.points.push_back(p_end);
 
     /* publish marker */

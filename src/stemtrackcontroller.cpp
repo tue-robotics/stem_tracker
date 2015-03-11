@@ -48,24 +48,29 @@ void StemTrackController::setPointMoveUp()
     }
     m_setpoint_vector = KDL::Vector(m_p_robot_status->getGripperXYZ()[0], m_p_robot_status->getGripperXYZ()[1],
                                     m_p_robot_status->getGripperXYZ()[2]+move_up_ref);
-    m_setpoint_frame = KDL::Frame( KDL::Rotation::Identity(), m_setpoint_vector);
+
+    KDL::Rotation gripper_rotation = getDesiredGripperPose();
+    m_setpoint_frame = KDL::Frame( gripper_rotation, m_setpoint_vector);
+
     return;
 }
 
-void StemTrackController::setCartSetpoint(const std::vector<float> setpoint_xyz)
+std::vector<float> StemTrackController::getCartSetpointXYZ()
 {
-    /* sets setpoint for the gripper (xyz defined in the baseframe) to setpoint_xyz */
+    std::vector<float> xyz;
+    xyz.push_back(m_setpoint_vector.x());
+    xyz.push_back(m_setpoint_vector.y());
+    xyz.push_back(m_setpoint_vector.z());
+    return xyz;
+}
 
-    if(setpoint_xyz.size() != 3)
-        ERROR_STREAM("Unexpected vector length in update cart setpoint, setpoint_xyz.size() = " << setpoint_xyz.size() << ".");
-
-    m_setpoint_vector = KDL::Vector( setpoint_xyz[0], setpoint_xyz[1], setpoint_xyz[2]);
-
+KDL::Rotation StemTrackController::getDesiredGripperPose()
+{
     KDL::Rotation gripper_rotation = KDL::Rotation::Identity();
 
     if(m_tilt_with_stem)
     {
-        std::vector<float> stem_tangent = m_p_stem_representation->getCurrentTangent();
+        std::vector<float> stem_tangent = m_p_stem_representation->getTangent();
 
         if(stem_tangent.size() == 3)
         {
@@ -77,6 +82,20 @@ void StemTrackController::setCartSetpoint(const std::vector<float> setpoint_xyz)
             }
         }
     }
+
+    return gripper_rotation;
+}
+
+void StemTrackController::setCartSetpoint(const std::vector<float> setpoint_xyz)
+{
+    /* sets setpoint for the gripper (xyz defined in the baseframe) to setpoint_xyz */
+
+    if(setpoint_xyz.size() != 3)
+        ERROR_STREAM("Unexpected vector length in update cart setpoint, setpoint_xyz.size() = " << setpoint_xyz.size() << ".");
+
+    m_setpoint_vector = KDL::Vector( setpoint_xyz[0], setpoint_xyz[1], setpoint_xyz[2]);
+
+    KDL::Rotation gripper_rotation = getDesiredGripperPose();
 
     m_setpoint_frame = KDL::Frame( gripper_rotation, m_setpoint_vector);
 
@@ -110,23 +129,25 @@ void StemTrackController::updateJointPosReferences()
 
         fksolver_.reset(new KDL::ChainFkSolverPos_recursive(m_p_robot_representation->getKinematicChain()));
         ik_vel_solver_.reset(new KDL::ChainIkSolverVel_pinv(m_p_robot_representation->getKinematicChain()));
-        ik_solver_.reset(new KDL::ChainIkSolverPos_NR_JL(m_p_robot_representation->getKinematicChain(), m_p_robot_representation->getJointMinima(), m_p_robot_representation->getJointMaxima(), *fksolver_, *ik_vel_solver_, 100) );
+        ik_solver_.reset(new KDL::ChainIkSolverPos_NR_JL(m_p_robot_representation->getKinematicChain(), m_p_robot_representation->getJointMinima(),
+                                                         m_p_robot_representation->getJointMaxima(), *fksolver_, *ik_vel_solver_, 100) );
 
 
-        KDL::Frame f_in(m_p_robot_status->getGripperKDLframe().M, m_setpoint_vector );
+//        KDL::Frame f_in(m_p_robot_status->getGripperKDLframe().M, m_setpoint_vector );
 
         int status = ik_solver_->CartToJnt(m_p_robot_representation->getJointSeeds(), m_setpoint_frame, m_joint_pos_refs);
         if(m_debug_ik_solver)
             INFO_STREAM("Status ik_solver: " << status);
-
-        if(m_print_ref_vs_current)
-        {
-            INFO_STREAM("refs:");
-            printKDLJntArray(m_joint_pos_refs);
-            INFO_STREAM("current:");
-            printKDLJntArray(m_p_robot_status->getJointStatus());
-        }
     }
+
+    if(m_print_ref_vs_current)
+    {
+        INFO_STREAM("refs:");
+        printKDLJntArray(m_joint_pos_refs);
+        INFO_STREAM("current:");
+        printKDLJntArray(m_p_robot_status->getJointStatus());
+    }
+
     return;
 }
 

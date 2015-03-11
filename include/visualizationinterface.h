@@ -9,10 +9,11 @@
 enum MarkerIDs
 {
     stem,
-    nearest_stem_intersection,
+    cartesian_setpoint,
     gripper_center,
     whisker_touch,
-    stem_tangent
+    stem_tangent,
+    blue_debug_arrow
 };
 
 #define ARROW_IDS_OFFSET 10;
