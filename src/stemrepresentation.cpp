@@ -1,5 +1,6 @@
 #include "stemrepresentation.h"
 #include "loggingmacros.h"
+#include <cmath>
 
 StemRepresentation::StemRepresentation(int stem_id=-1)
 {
@@ -147,8 +148,8 @@ void StemRepresentation::loadNodesXYZ(std::vector<float> x, std::vector<float> y
         m_z_nodes.push_back(z.at(i));
     }
 
-    m_n_nodes = m_x_nodes.size();
-
+    updateNumberOfNodes();
+    return;
 }
 
 void StemRepresentation::flipNodes()
@@ -157,6 +158,80 @@ void StemRepresentation::flipNodes()
     {
         m_y_nodes.at(i) *= -1;
     }
+}
+
+void StemRepresentation::updateNumberOfNodes()
+{
+    if(m_x_nodes.size() != m_y_nodes.size() || m_y_nodes.size() != m_z_nodes.size())
+    {
+        ERROR_STREAM("In stemrepresentation x y z nodes don't match!");
+        return;
+    }
+    m_n_nodes = m_x_nodes.size();
+    return;
+}
+
+void StemRepresentation::updateStemNodes(const std::vector<float>& gripper_xyz, bool ignore_threshold)
+{
+    /* if gripper is not touched, assume stem is at middle of gripper */
+
+    if(ignore_threshold)
+    {
+        m_x_nodes.push_back(gripper_xyz[0]);
+        m_y_nodes.push_back(gripper_xyz[1]);
+        m_z_nodes.push_back(gripper_xyz[2]);
+    }
+    else
+    {
+        std::vector< std::vector<float> > possible_stem_xyz_s;
+        possible_stem_xyz_s.push_back(gripper_xyz);
+        updateStemNodes(possible_stem_xyz_s);
+    }
+    return;
+}
+
+void StemRepresentation::updateStemNodes(const std::vector< std::vector<float> >& possible_stem_xyz_s)
+{
+    /* first: average xyz of touched whiskers, possibly the
+        gripper is touched at multiple places at once*/
+    std::vector<float> average_point_of_touch;
+    average_point_of_touch.assign(3,0.0);
+    for(uint i = 0; i < possible_stem_xyz_s.size(); ++i)
+    {
+        for(uint j = 0; j < 3; ++j)
+            average_point_of_touch[j] += possible_stem_xyz_s[i][j] / ((float) possible_stem_xyz_s.size());
+    }
+
+    /* check distance to highest node of stem */
+    float dist = sqrt(  pow(average_point_of_touch[0]-m_x_nodes.back(),2.0) +
+                        pow(average_point_of_touch[1]-m_y_nodes.back(),2.0) +
+                        pow(average_point_of_touch[2]-m_z_nodes.back(),2.0)  );
+
+    if(dist > m_add_or_remove_node_euclidian_threshold)
+    {
+        if(average_point_of_touch[2] > m_z_nodes.back())
+        {
+            /* add a stem node */
+            m_x_nodes.push_back(average_point_of_touch[0]);
+            m_y_nodes.push_back(average_point_of_touch[1]);
+            m_z_nodes.push_back(average_point_of_touch[2]);
+
+        }
+        else if (m_n_nodes > 2)
+        {
+            /* remove a stem node */
+            m_x_nodes.pop_back();
+            m_y_nodes.pop_back();
+            m_z_nodes.pop_back();
+        }
+        else
+        {
+            WARNING_STREAM("Attempt to remove a node in stem representation while we have less than 3 nodes left, are we below start_xyz?");
+        }
+
+        updateNumberOfNodes();
+    }
+
 }
 
 void StemRepresentation::printAll()

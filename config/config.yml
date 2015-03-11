@@ -85,6 +85,8 @@ stem_start_xyz:
     - {x: 0.5, y: 0.26, z: 0.53}
 
 length_first_node:              0.25           # first stem node is put x meters underneath stem_start_xyz
+add_or_remove_node_euclidian_threshold: 0.05    # when gripper xyz is further than x meters away from highest node in stem
+                                                # representation a node is removed when gripper is below it, or added when gripper is above
 
 ##########################
 # TRACKING CONTROL CONFIG

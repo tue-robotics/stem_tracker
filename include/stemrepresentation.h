@@ -20,7 +20,8 @@ class StemRepresentation
         std::vector<float> m_nearestXYZ;
         std::vector<float> m_xyz_below;
         std::vector<float> m_rot_xyz, m_start_at_xyz;
-        float m_lin_tangent_d;
+        float m_lin_tangent_d, m_add_or_remove_node_euclidian_threshold;
+        void updateNumberOfNodes();
 
     public:
         StemRepresentation(int stem_id);
@@ -38,9 +39,12 @@ class StemRepresentation
         inline const std::vector<float>& getNearestXYZ() { return m_nearestXYZ; }
         inline const std::vector<float>& getCurrentTangent() { return m_rot_xyz; }
 
+        inline void setAddOrRemoveNodeThreshold( float threshold ) { m_add_or_remove_node_euclidian_threshold = threshold; }
         inline void setStemTrackingStartXYZ(std::vector<float> start_xyz) { m_start_at_xyz = start_xyz; }
         inline void setLinTangentDistance(float lin_tan_d) { m_lin_tangent_d = lin_tan_d; }
 
+        void updateStemNodes(const std::vector< std::vector<float> >& touches_xyz);
+        void updateStemNodes(const std::vector<float>& touches_xyz, bool ignore_threshold = false);
         bool isXYZonStem(std::vector<float> xyz);
         void updateNearestXYZ(std::vector<float> from_xyz);
         void updateLocalTangent();

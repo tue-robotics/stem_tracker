@@ -155,6 +155,7 @@ bool StemTrackMonitor::inputIsUpToDate()
 
 void StemTrackMonitor::doPreposBehavior()
 {
+    m_trial_is_done = false;
     m_p_robot_interface->publishAmigoJointPosRefs(m_p_robot_representation->getInitialPoseJointRefs());
     m_p_robot_interface->publishAmigoOpenGripperMessage();
 
@@ -202,6 +203,12 @@ void StemTrackMonitor::doFollowBehavior()
     m_p_visualization_interface->showXYZ(m_p_robot_status->getGripperXYZ(), m_p_whisker_gripper_interpreter->getEstimatedPosError(),
                                          nearest_stem_intersection);
 
+    /* add or remove stem nodes */
+    if(m_p_whisker_gripper_interpreter->getTouchedWhiskerVectorTips().size() > 0)
+        m_p_stem_representation->updateStemNodes( m_p_robot_status->gripperFrameVectorsToBaseFrameVectors( m_p_whisker_gripper_interpreter->getTouchedWhiskerVectorTips() ));
+    else
+        m_p_stem_representation->updateStemNodes( m_p_robot_status->getGripperXYZ());
+
     /* update position setpoint in cartesian space */
     m_p_stemtrack_control->updateCartSetpoint( m_p_whisker_gripper_interpreter->getEstimatedPosError() );
     m_p_visualization_interface->showArrow(m_p_stem_representation->getCurrentTangent(), m_p_robot_status->getGripperXYZ(), stem_tangent);
@@ -225,6 +232,11 @@ void StemTrackMonitor::doEndBehaviour()
                                                  m_p_whisker_gripper_interpreter->getTouchedWhiskerVectorTips() ),
                                              m_p_robot_status->gripperFrameVectorsToBaseFrameVectors(
                                                  m_p_whisker_gripper_interpreter->getTouchedWhiskerVectorOrigins() ), whisker_touch );
+    if(!m_trial_is_done)
+    {
+        m_p_stem_representation->updateStemNodes(m_p_robot_status->getGripperXYZ(),true);
+        m_trial_is_done = true;
+    }
 
     return;
 }

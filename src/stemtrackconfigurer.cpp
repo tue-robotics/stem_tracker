@@ -123,6 +123,8 @@ void StemTrackConfigurer::configureStemRepresentation(StemRepresentation& stem_r
     }
     stem_representation.setStemTrackingStartXYZ( stem_start_xyz );
 
+    stem_representation.setAddOrRemoveNodeThreshold( getConfigPar<float>(m_general_config, "add_or_remove_node_euclidian_threshold"));
+
     std::vector<float> stemNodesX, stemNodesY, stemNodesZ;
 
     /* store initial stem nodes on stem_start_xyz and directly below */

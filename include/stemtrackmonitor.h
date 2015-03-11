@@ -32,7 +32,7 @@ private:
 
     bool m_prev_sample_joint_status_up_to_date;
     bool m_prev_sample_gripper_sensing_up_to_date;
-    bool m_debug_state_par, m_find_max_touched_values;
+    bool m_debug_state_par, m_find_max_touched_values, m_trial_is_done;
     stemtrack_state_t m_state;
 
     StemRepresentation* m_p_stem_representation;
