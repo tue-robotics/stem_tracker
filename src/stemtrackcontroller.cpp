@@ -42,9 +42,9 @@ void StemTrackController::setPointMoveUp()
             take current stem tangent into account when moving up */
 
     float move_up_ref = m_move_up_ref;
-    if(m_p_robot_status->amigoTorsoIsAtMax())
+    if(m_p_robot_status->amigoTorsoIsAtMax())  //ugly implementation, no amigo specific stuff here
     {
-        move_up_ref = 10*m_move_up_ref;
+        move_up_ref = m_setpoint_multiplication_at_max_torso*m_move_up_ref;
     }
     m_setpoint_vector = KDL::Vector(m_p_robot_status->getGripperXYZ()[0], m_p_robot_status->getGripperXYZ()[1],
                                     m_p_robot_status->getGripperXYZ()[2]+move_up_ref);

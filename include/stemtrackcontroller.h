@@ -28,7 +28,7 @@ private:
     RobotStatus* m_p_robot_status;
     KDL::JntArray m_joint_pos_refs;
     KDL::JntArray m_joint_vel_refs;
-    float m_straight_forward_ref;
+    float m_straight_forward_ref, m_setpoint_multiplication_at_max_torso;
     std::vector<float> m_touch_started_at_xyz;
 
 public:
@@ -44,6 +44,7 @@ public:
     inline void setStraightForwardRef(float ref) { m_straight_forward_ref = ref; }
     inline void setTouchStartedAtXYZ( const std::vector<float>& xyz ) { m_touch_started_at_xyz = xyz; }
     inline void setPrintRefVsCurrent(bool print) { m_print_ref_vs_current = print; }
+    inline void setSetpointMultiplicationAtMaxTorso(float multiplication) { m_setpoint_multiplication_at_max_torso = multiplication; } //ugly hack alert
 
     void setCartSetpoint(const std::vector<float> setpoint_xyz);
     void updateJointPosReferences();
