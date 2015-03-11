@@ -166,8 +166,6 @@ void StemTrackMonitor::doPreposBehavior()
         m_p_stemtrack_configurer->storeWhiskerTouchedMaxValues( m_p_whisker_gripper_interpreter->getWhiskersTouchedMax() );
     }
 
-    INFO_STREAM("prepos:");
-    printVector(m_p_robot_status->getGripperXYZ());
     return;
 }
 

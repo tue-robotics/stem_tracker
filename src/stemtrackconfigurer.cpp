@@ -317,6 +317,7 @@ void StemTrackConfigurer::configureStemTrackController(StemTrackController& stem
     stem_track_controller.setDebugIKsolver( getConfigPar<bool>(m_general_config, "debug_ik_solver") );
     stem_track_controller.setUseInverseVelocitySolverOnly( getConfigPar<bool>(m_general_config, "ik_vel_only") );
     stem_track_controller.setStraightForwardRef( getConfigPar<float>(m_general_config, "straight_forward_ref") );
+    stem_track_controller.setPrintRefVsCurrent( getConfigPar<bool>(m_general_config, "print_joint_ref_vs_current") );
 
     INFO_STREAM("=============================================");
     INFO_STREAM("Configured stem track controller object");
@@ -382,7 +383,7 @@ void StemTrackConfigurer::configureStemTrackMonitor(StemTrackMonitor& stemtrack_
 
     INFO_STREAM("=============================================");
     INFO_STREAM("Configured stemtrack monitor object");
-
+    INFO_STREAM("=============================================");
 }
 
 void StemTrackConfigurer::configureVisualizationInterface(VisualizationInterface& visualization_interface)
@@ -394,7 +395,6 @@ void StemTrackConfigurer::configureVisualizationInterface(VisualizationInterface
 
     INFO_STREAM("=============================================");
     INFO_STREAM("Configured visualization object");
-    INFO_STREAM("=============================================");
 
 }
 

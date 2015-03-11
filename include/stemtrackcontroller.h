@@ -19,7 +19,7 @@ private:
     float m_move_up_ref;
     int m_update_rate;
     bool m_tilt_with_stem;
-    bool m_debug_ik_solver;
+    bool m_debug_ik_solver, m_print_ref_vs_current;
     bool m_use_ik_velocity_solver_only;
     KDL::Vector m_setpoint_vector;
     KDL::Frame m_setpoint_frame;
@@ -43,6 +43,7 @@ public:
     inline void setUseInverseVelocitySolverOnly(bool use_ik_vel_only) { m_use_ik_velocity_solver_only = use_ik_vel_only; }
     inline void setStraightForwardRef(float ref) { m_straight_forward_ref = ref; }
     inline void setTouchStartedAtXYZ( const std::vector<float>& xyz ) { m_touch_started_at_xyz = xyz; }
+    inline void setPrintRefVsCurrent(bool print) { m_print_ref_vs_current = print; }
 
     void setCartSetpoint(const std::vector<float> setpoint_xyz);
     void updateJointPosReferences();

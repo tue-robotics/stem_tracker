@@ -163,6 +163,8 @@ void RobotRepresentation::printAll()
 
     INFO_STREAM(tmp_stream.str());
 
+    INFO_STREAM("Joint max and min values should match parameters in ops files!");
+
     tmp_stream.str(""); tmp_stream << "Joint seeds:";
     for(int i=0;i<m_n_joints_in_chain;++i)
         tmp_stream << std::endl << "\t\t\t\t\t " << m_q_seed.data[i];

@@ -119,11 +119,13 @@ void StemTrackController::updateJointPosReferences()
         if(m_debug_ik_solver)
             INFO_STREAM("Status ik_solver: " << status);
 
-        INFO_STREAM("refs:");
-        printKDLJntArray(m_joint_pos_refs);
-        INFO_STREAM("current:");
-        printKDLJntArray(m_p_robot_status->getJointStatus());
-
+        if(m_print_ref_vs_current)
+        {
+            INFO_STREAM("refs:");
+            printKDLJntArray(m_joint_pos_refs);
+            INFO_STREAM("current:");
+            printKDLJntArray(m_p_robot_status->getJointStatus());
+        }
     }
     return;
 }
