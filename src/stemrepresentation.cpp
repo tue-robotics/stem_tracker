@@ -1,6 +1,7 @@
 #include "stemrepresentation.h"
 #include "loggingmacros.h"
 #include <cmath>
+#include "debugfunctions.h"
 
 StemRepresentation::StemRepresentation(int stem_id=-1)
 {
@@ -12,6 +13,7 @@ StemRepresentation::StemRepresentation(int stem_id=-1)
 std::vector<float> StemRepresentation::getStemXYZatZ(float z)
 {
 
+
     std::vector<float> xyz;
     xyz.clear();
 
@@ -21,32 +23,31 @@ std::vector<float> StemRepresentation::getStemXYZatZ(float z)
         return xyz;
     }
 
-    int index_first_above;
-    for( index_first_above=0; index_first_above<m_z_nodes.size(); ++index_first_above)
+    for( m_index_first_node_above=0; m_index_first_node_above<m_z_nodes.size(); ++m_index_first_node_above)
     {
-        if(m_z_nodes.at(index_first_above) > z)
+        if(m_z_nodes.at(m_index_first_node_above) > z)
             break;
     }
 
-    if (index_first_above < 1)
+    if (m_index_first_node_above < 1)
     {
         WARNING_STREAM("Z below stem start or not enough nodes to calc xy for stem at z!");
         return xyz;
     }
 
     float atFraction;
-    if(m_z_nodes.at(index_first_above) - m_z_nodes.at(index_first_above-1) <= 0.0)
+    if(m_z_nodes.at(m_index_first_node_above) - m_z_nodes.at(m_index_first_node_above-1) <= 0.0)
     {
         ERROR_STREAM("stem bends down or goes horizontally, we don't support that. sorry");
         atFraction = 0.0;
     }
     else
     {
-        atFraction = (z - m_z_nodes.at(index_first_above-1)) / (m_z_nodes.at(index_first_above) - m_z_nodes.at(index_first_above-1));
+        atFraction = (z - m_z_nodes.at(m_index_first_node_above-1)) / (m_z_nodes.at(m_index_first_node_above) - m_z_nodes.at(m_index_first_node_above-1));
     }
 
-    xyz.push_back( m_x_nodes.at(index_first_above-1) + atFraction * ( m_x_nodes.at(index_first_above) - m_x_nodes.at(index_first_above-1) ) );
-    xyz.push_back( m_y_nodes.at(index_first_above-1) + atFraction * ( m_y_nodes.at(index_first_above) - m_y_nodes.at(index_first_above-1) ) );
+    xyz.push_back( m_x_nodes.at(m_index_first_node_above-1) + atFraction * ( m_x_nodes.at(m_index_first_node_above) - m_x_nodes.at(m_index_first_node_above-1) ) );
+    xyz.push_back( m_y_nodes.at(m_index_first_node_above-1) + atFraction * ( m_y_nodes.at(m_index_first_node_above) - m_y_nodes.at(m_index_first_node_above-1) ) );
     xyz.push_back(z);
 
     return xyz;
@@ -78,17 +79,39 @@ std::vector<float> StemRepresentation::getNodeXYZ(uint node)
 
 void StemRepresentation::updateTangent()
 {
+    initializeTangent();
 
     if((m_z_nodes.back() - m_z_nodes.front()) > m_lin_tangent_d)
     {
-        std::vector<float> top = getNodeXYZ(m_n_nodes-1);
         m_tangent_bottom_xyz = getStemXYZatZ(m_z_nodes.back() - m_lin_tangent_d);
-        for(int i=0; i<3; ++i)
-                m_tangent_xyz[i] = top[i] - m_tangent_bottom_xyz[i];
+        uint n = m_z_nodes.size() - m_index_first_node_above;
+
+        for(uint j = m_index_first_node_above; j < m_index_first_node_above + n; ++j)
+        {
+            /* get distance from regression starting point to this node */
+            std::vector<float> dist;
+            for(uint i = 0; i < 3; ++i)
+                dist.push_back(getNodeXYZ(j)[i] - m_tangent_bottom_xyz[i]);
+
+            /*normalize*/
+            float len = sqrt(dist[0]*dist[0]+dist[1]*dist[1]+dist[2]*dist[2]);
+
+            for(uint i = 0; i < 3; ++i)
+                dist[i] /= len;
+
+            /* add increment to overall tangent */
+            for(uint i=0; i<3; ++i)
+                m_tangent_xyz[i] +=  dist[i]/ ((float) n);
+
+        }
+
+        /* for plotting purposes, make stem tangent vector a bit smaller */
+        for(uint i = 0; i < 3; ++i)
+            m_tangent_xyz[i] /= ((float) 4);
     }
     else
     {
-        initializeTangent();
+        WARNING_STREAM("Asking to update stem tangent while we have not enough stem");
     }
 
     return;

@@ -66,7 +66,7 @@ std::vector<float> StemTrackController::getCartSetpointXYZ()
 
 KDL::Rotation StemTrackController::getDesiredGripperPose()
 {
-    KDL::Rotation gripper_rotation = KDL::Rotation::Identity();
+    float roll = 0.0, pitch = 0.0, yaw = 0.0;
 
     if(m_tilt_with_stem)
     {
@@ -76,20 +76,24 @@ KDL::Rotation StemTrackController::getDesiredGripperPose()
         {
             float len = sqrt(stem_tangent[0] * stem_tangent[0] + stem_tangent[1] * stem_tangent[1] + stem_tangent[2] * stem_tangent[2]);
             if(len > 0.0)
-                gripper_rotation = KDL::Rotation::RPY(asin(-stem_tangent[1]/len), asin(stem_tangent[0]/len), 0.0);
+            {
+                roll = asin(-stem_tangent[1]/len);
+                pitch = asin(stem_tangent[0]/len);
+                INFO_STREAM("roll " << roll << " pitch: " << pitch);
+            }
         }
     }
 
-    return gripper_rotation;
+    return KDL::Rotation::RPY(roll, pitch, yaw);
 }
 
 std::vector< std::vector<float> > StemTrackController::getDesiredGripperPoseVectors()
 {
     std::vector< std::vector<float> > xyz_xyz_xyz;
 
-    KDL::Vector x = KDL::Vector(0.5,0.0,0.0);
-    KDL::Vector y = KDL::Vector(0.0,0.5,0.0);
-    KDL::Vector z = KDL::Vector(0.0,0.0,0.5);
+    KDL::Vector x = KDL::Vector(0.2,0.0,0.0);
+    KDL::Vector y = KDL::Vector(0.0,0.2,0.0);
+    KDL::Vector z = KDL::Vector(0.0,0.0,0.2);
 
     x = getDesiredGripperPose() * x;
     y = getDesiredGripperPose() * y;
@@ -118,7 +122,7 @@ std::vector< std::vector<float> > StemTrackController::getDesiredGripperPoseVect
 
 void StemTrackController::setCartSetpoint(const std::vector<float> setpoint_xyz)
 {
-    /* sets setpoint for the gripper (xyz defined in the baseframe) to setpoint_xyz */
+    /* sets setpoint for the gripper (defined in the baseframe) to setpoint_xyz */
 
     if(setpoint_xyz.size() != 3)
         ERROR_STREAM("Unexpected vector length in update cart setpoint, setpoint_xyz.size() = " << setpoint_xyz.size() << ".");

@@ -12,7 +12,7 @@ class StemRepresentation
 {
     private:
 
-        int m_stem_id;
+        int m_stem_id, m_index_first_node_above;
         int m_n_nodes;
         std::vector<float> m_x_nodes;
         std::vector<float> m_y_nodes;

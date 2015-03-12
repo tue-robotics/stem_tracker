@@ -86,8 +86,8 @@ bool VisualizationInterface::configureSelf(const MarkerIDs& marker_id)
         m_rgb.push_back(0.5f);
         m_rgb.push_back(0.5f);
         m_ros_marker_id = 4;
-        m_arrow_diam = 0.015;
-        m_arrowhead_diam = 0.025;
+        m_arrow_diam = 0.01;
+        m_arrowhead_diam = 0.02;
         m_lifetime = m_show_stem_tangent_lifetime;
         m_name = "stem_tangent";
         return true;
