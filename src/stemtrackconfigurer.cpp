@@ -322,8 +322,19 @@ void StemTrackConfigurer::configureStemTrackController(StemTrackController& stem
     stem_track_controller.setStraightForwardRef( getConfigPar<float>(m_general_config, "straight_forward_ref") );
     stem_track_controller.setPrintRefVsCurrent( getConfigPar<bool>(m_general_config, "print_joint_ref_vs_current") );
     stem_track_controller.setSetpointMultiplicationAtMaxTorso( getConfigPar<float>(m_general_config, "xyz_setpoint_multiplication_at_max_torso"));
+    if (m_general_config.readArray("max_gripper_pose"))
+    {
+        while(m_general_config.nextArrayItem())
+        {
+            stem_track_controller.setMaxGripperRoll( getConfigPar<float>(m_general_config, "roll") );
+            stem_track_controller.setMaxGripperPitch( getConfigPar<float>(m_general_config, "pitch") );
+            stem_track_controller.setMaxGripperYaw( getConfigPar<float>(m_general_config, "yaw") );
+        }
+        m_general_config.endArray();
+    }
 
-    INFO_STREAM("=============================================");
+
+            INFO_STREAM("=============================================");
     INFO_STREAM("Configured stem track controller object");
 
 }

@@ -28,6 +28,9 @@ initial_pose:               # pose used as preposition, length should be equal t
     - q: 0.4
     - q: 0.0
 
+max_gripper_pose:                               # max gripper rotation wrt base frame (radians)
+    - {roll: 0.3, pitch: 0.1, yaw: 0.2}
+
 #######################
 # WHISKERGRIPPER CONFIG
 #######################
@@ -94,7 +97,7 @@ add_or_remove_node_euclidian_threshold: 0.06    # when gripper xyz is further th
 
 move_up_ref:                    0.002         # put xyz ref up (in direction of stem tangent) for x meters when moving
                                                # up (state FOLLOW)
-tilt_with_stem:                 0             # if true (1) tilt gripper based on local derivative of stem
+tilt_with_stem:                 1             # if true (1) tilt gripper based on local derivative of stem
 debug_ik_solver:                0             # if true (1) status of kdl ik solver will be printed
 ik_vel_only:                    0             # if true (1) after initialization we only use kdl ik velocity solver, no
                                                # fk or ik position solvers

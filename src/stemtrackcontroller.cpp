@@ -79,10 +79,22 @@ KDL::Rotation StemTrackController::getDesiredGripperPose()
             {
                 roll = asin(-stem_tangent[1]/len);
                 pitch = asin(stem_tangent[0]/len);
-                INFO_STREAM("roll " << roll << " pitch: " << pitch);
             }
         }
     }
+
+    if(roll > m_gripper_max_roll)
+        roll = m_gripper_max_roll;
+    if(roll < -m_gripper_max_roll)
+        roll = -m_gripper_max_roll;
+    if(pitch > m_gripper_max_pitch)
+        pitch = m_gripper_max_pitch;
+    if(pitch < -m_gripper_max_pitch)
+        pitch = -m_gripper_max_pitch;
+    if(yaw > m_gripper_max_yaw)
+        yaw = m_gripper_max_yaw;
+    if(yaw < -m_gripper_max_yaw)
+        yaw = - m_gripper_max_yaw;
 
     return KDL::Rotation::RPY(roll, pitch, yaw);
 }

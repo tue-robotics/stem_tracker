@@ -16,7 +16,7 @@ class StemTrackController
 
 private:
 
-    float m_move_up_ref;
+    float m_move_up_ref, m_gripper_max_roll, m_gripper_max_pitch, m_gripper_max_yaw;
     int m_update_rate;
     bool m_tilt_with_stem;
     bool m_debug_ik_solver, m_print_ref_vs_current;
@@ -45,6 +45,9 @@ public:
     inline void setTouchStartedAtXYZ( const std::vector<float>& xyz ) { m_touch_started_at_xyz = xyz; }
     inline void setPrintRefVsCurrent(bool print) { m_print_ref_vs_current = print; }
     inline void setSetpointMultiplicationAtMaxTorso(float multiplication) { m_setpoint_multiplication_at_max_torso = multiplication; } //ugly hack alert
+    inline void setMaxGripperRoll(float max) { m_gripper_max_roll = max; }
+    inline void setMaxGripperPitch(float max) { m_gripper_max_pitch = max; }
+    inline void setMaxGripperYaw(float max) { m_gripper_max_yaw = max; }
 
     void setCartSetpoint(const std::vector<float> setpoint_xyz);
     void updateJointPosReferences();
