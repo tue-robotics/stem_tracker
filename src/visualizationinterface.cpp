@@ -82,14 +82,42 @@ bool VisualizationInterface::configureSelf(const MarkerIDs& marker_id)
 
         m_frame = m_base_frame;
         m_rgb.clear();
+        m_rgb.push_back(0.0f);
+        m_rgb.push_back(0.5f);
+        m_rgb.push_back(0.5f);
+        m_ros_marker_id = 4;
+        m_arrow_diam = 0.015;
+        m_arrowhead_diam = 0.025;
+        m_lifetime = m_show_stem_tangent_lifetime;
+        m_name = "stem_tangent";
+        return true;
+
+    case red_debug_arrow:
+
+        m_frame = m_base_frame;
+        m_rgb.clear();
         m_rgb.push_back(1.0f);
         m_rgb.push_back(0.0f);
         m_rgb.push_back(0.0f);
-        m_ros_marker_id = 4;
+        m_ros_marker_id = 5;
         m_arrow_diam = 0.01;
         m_arrowhead_diam = 0.02;
         m_lifetime = m_show_stem_tangent_lifetime;
-        m_name = "stem_tangent";
+        m_name = "red_debug_arrow";
+        return true;
+
+    case green_debug_arrow:
+
+        m_frame = m_base_frame;
+        m_rgb.clear();
+        m_rgb.push_back(0.0f);
+        m_rgb.push_back(1.0f);
+        m_rgb.push_back(0.0f);
+        m_ros_marker_id = 6;
+        m_arrow_diam = 0.01;
+        m_arrowhead_diam = 0.02;
+        m_lifetime = m_show_stem_tangent_lifetime;
+        m_name = "green_debug_arrow";
         return true;
 
     case blue_debug_arrow:
@@ -99,9 +127,9 @@ bool VisualizationInterface::configureSelf(const MarkerIDs& marker_id)
         m_rgb.push_back(0.0f);
         m_rgb.push_back(0.0f);
         m_rgb.push_back(1.0f);
-        m_ros_marker_id = 5;
-        m_arrow_diam = 0.015;
-        m_arrowhead_diam = 0.025;
+        m_ros_marker_id = 7;
+        m_arrow_diam = 0.01;
+        m_arrowhead_diam = 0.02;
         m_lifetime = m_show_stem_tangent_lifetime;
         m_name = "blue_debug_arrow";
         return true;
@@ -158,7 +186,7 @@ void VisualizationInterface::showArrow(const std::vector<float>& xyz, const std:
 {
     if(xyz.size() != 3)
     {
-        WARNING_STREAM("Unknown force vector in showArrow!");
+        WARNING_STREAM("Unknown xyz vector in showArrow!");
         return;
     }
 

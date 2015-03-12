@@ -107,6 +107,11 @@ const bool StemTrackConfigurer::configIsOk() const
     }
 }
 
+const bool StemTrackConfigurer::debugDesiredGripperPose()
+{
+    return getConfigPar<bool>(m_general_config, "debug_desired_gripper_pose");
+}
+
 void StemTrackConfigurer::configureStemRepresentation(StemRepresentation& stem_representation)
 {
     stem_representation.setLinTangentDistance( getConfigPar<float>(m_general_config, "lin_tan_d") );

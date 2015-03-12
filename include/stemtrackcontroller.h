@@ -55,6 +55,7 @@ public:
     void setPointMoveUp();
 
     KDL::Rotation getDesiredGripperPose();
+    std::vector< std::vector<float> > getDesiredGripperPoseVectors();
     inline KDL::JntArray getJointPosRefs() { return m_joint_pos_refs; }
     KDL::JntArray getJointVelRefs() { return m_joint_vel_refs; }
     inline const KDL::Vector getCartSetpointKDLVect() { return m_setpoint_vector; }

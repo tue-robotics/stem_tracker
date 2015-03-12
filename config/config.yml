@@ -94,7 +94,7 @@ add_or_remove_node_euclidian_threshold: 0.06    # when gripper xyz is further th
 
 move_up_ref:                    0.002         # put xyz ref up (in direction of stem tangent) for x meters when moving
                                                # up (state FOLLOW)
-tilt_with_stem:                 0             # if true (1) tilt gripper based on local derivative of stem
+tilt_with_stem:                 1             # if true (1) tilt gripper based on local derivative of stem
 debug_ik_solver:                0             # if true (1) status of kdl ik solver will be printed
 ik_vel_only:                    0             # if true (1) after initialization we only use kdl ik velocity solver, no
                                                # fk or ik position solvers
@@ -106,7 +106,8 @@ straight_forward_ref:           0.03          # put xyz ref forward for x meters
 print_joint_ref_vs_current:     0             # if true (1) current joint positions and reference joint positions are printed
                                                # every time a cart setpoint is converted to joint position setpoints
 xyz_setpoint_multiplication_at_max_torso: 1.0    # ugly hack, temporary
-
+debug_desired_gripper_pose:     1              # if true (1) desired gripper pose will be shown in rviz together with estimated
+                                                # stem tangent
 ##########################
 # TRACKING MONITOR CONFIG
 ##########################

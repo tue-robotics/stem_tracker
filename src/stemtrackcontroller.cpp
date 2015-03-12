@@ -72,18 +72,48 @@ KDL::Rotation StemTrackController::getDesiredGripperPose()
     {
         std::vector<float> stem_tangent = m_p_stem_representation->getTangent();
 
-        if(stem_tangent.size() == 3)
+        if(m_p_stem_representation->getTangent().size() == 3)
         {
             float len = sqrt(stem_tangent[0] * stem_tangent[0] + stem_tangent[1] * stem_tangent[1] + stem_tangent[2] * stem_tangent[2]);
             if(len > 0.0)
-            {
-                gripper_rotation.DoRotX( asin(-stem_tangent[1]/len) );
-                gripper_rotation.DoRotY( asin(stem_tangent[0]/len) );
-            }
+                gripper_rotation = KDL::Rotation::RPY(asin(-stem_tangent[1]/len), asin(stem_tangent[0]/len), 0.0);
         }
     }
 
     return gripper_rotation;
+}
+
+std::vector< std::vector<float> > StemTrackController::getDesiredGripperPoseVectors()
+{
+    std::vector< std::vector<float> > xyz_xyz_xyz;
+
+    KDL::Vector x = KDL::Vector(0.5,0.0,0.0);
+    KDL::Vector y = KDL::Vector(0.0,0.5,0.0);
+    KDL::Vector z = KDL::Vector(0.0,0.0,0.5);
+
+    x = getDesiredGripperPose() * x;
+    y = getDesiredGripperPose() * y;
+    z = getDesiredGripperPose() * z;
+
+    std::vector<float> tmp;
+    tmp.push_back(x.x());
+    tmp.push_back(x.y());
+    tmp.push_back(x.z());
+    xyz_xyz_xyz.push_back(tmp);
+
+    tmp.clear();
+    tmp.push_back(y.x());
+    tmp.push_back(y.y());
+    tmp.push_back(y.z());
+    xyz_xyz_xyz.push_back(tmp);
+
+    tmp.clear();
+    tmp.push_back(z.x());
+    tmp.push_back(z.y());
+    tmp.push_back(z.z());
+    xyz_xyz_xyz.push_back(tmp);
+
+    return xyz_xyz_xyz;
 }
 
 void StemTrackController::setCartSetpoint(const std::vector<float> setpoint_xyz)
@@ -133,7 +163,7 @@ void StemTrackController::updateJointPosReferences()
                                                          m_p_robot_representation->getJointMaxima(), *fksolver_, *ik_vel_solver_, 100) );
 
 
-//        KDL::Frame f_in(m_p_robot_status->getGripperKDLframe().M, m_setpoint_vector );
+        //        KDL::Frame f_in(m_p_robot_status->getGripperKDLframe().M, m_setpoint_vector );
 
         int status = ik_solver_->CartToJnt(m_p_robot_representation->getJointSeeds(), m_setpoint_frame, m_joint_pos_refs);
         if(m_debug_ik_solver)

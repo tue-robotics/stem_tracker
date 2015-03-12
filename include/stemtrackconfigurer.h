@@ -46,6 +46,7 @@ public:
     const std::string getBaseFrame();
     const bool useLeftArm();
     const int getNumberOfWhiskers();
+    const bool debugDesiredGripperPose();
 
     void storePressureSensorTouchedMaxValues(const std::vector<float>& pressure_sensor_touched_max);
     void storeWhiskerTouchedMaxValues(const std::vector<float>& whiskers_touched_max);

@@ -13,6 +13,8 @@ enum MarkerIDs
     gripper_center,
     whisker_touch,
     stem_tangent,
+    red_debug_arrow,
+    green_debug_arrow,
     blue_debug_arrow
 };
 
@@ -50,7 +52,7 @@ public:
     void showXYZ(const std::vector<float>& xyz, const MarkerIDs& marker_id);
     void showXYZ(const std::vector<float>& xyz, const std::vector<float> xyz_2, const MarkerIDs& marker_id);
     void showXYZInRviz(const std::vector<float>& xyz);
-    void showArrow(const std::vector<float>& force, const std::vector<float>& origin, const MarkerIDs& marker_id);
+    void showArrow(const std::vector<float>& xyz, const std::vector<float>& origin, const MarkerIDs& marker_id);
     void showArrows(const std::vector< std::vector<float> >& tips, const std::vector< std::vector<float> >& origins, const MarkerIDs& marker_id);
     void showArrowInRviz(const std::vector<float>& tip, const std::vector<float>& origin);
     void showArrowsInRviz(const std::vector< std::vector<float> >& tips, const std::vector< std::vector<float> >& origins);

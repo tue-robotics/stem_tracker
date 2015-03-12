@@ -201,6 +201,12 @@ void StemTrackMonitor::doFollowBehavior()
     /* update position setpoint in cartesian space */
     m_p_stemtrack_control->updateCartSetpoint( m_p_whisker_gripper_interpreter->getEstimatedPosError() );
     m_p_visualization_interface->showXYZ(m_p_stemtrack_control->getCartSetpointXYZ(), cartesian_setpoint);
+    if(m_p_stemtrack_configurer->debugDesiredGripperPose())
+    {
+        m_p_visualization_interface->showArrow(m_p_stemtrack_control->getDesiredGripperPoseVectors()[0],m_p_stem_representation->getTangentBottomXYZ(), red_debug_arrow);
+        m_p_visualization_interface->showArrow(m_p_stemtrack_control->getDesiredGripperPoseVectors()[1],m_p_stem_representation->getTangentBottomXYZ(), green_debug_arrow);
+        m_p_visualization_interface->showArrow(m_p_stemtrack_control->getDesiredGripperPoseVectors()[2],m_p_stem_representation->getTangentBottomXYZ(), blue_debug_arrow);
+    }
 
     /* translate cartesian setpoint to joint coordinates */
     m_p_stemtrack_control->updateJointPosReferences();

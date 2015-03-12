@@ -17,8 +17,8 @@ class StemRepresentation
         std::vector<float> m_x_nodes;
         std::vector<float> m_y_nodes;
         std::vector<float> m_z_nodes;
-        std::vector<float> m_nearestXYZ;
-        std::vector<float> m_tangent_xyz, m_start_at_xyz, m_tangent_bottom_xyz;
+        std::vector<float> m_nearestXYZ, m_start_at_xyz;
+        std::vector<float> m_tangent_xyz, m_tangent_bottom_xyz;
         float m_lin_tangent_d, m_add_or_remove_node_euclidian_threshold;
         void updateNumberOfNodes();
         std::vector<float> getNodeXYZ(uint node);
