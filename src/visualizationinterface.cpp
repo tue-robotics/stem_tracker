@@ -50,6 +50,18 @@ bool VisualizationInterface::configureSelf(const MarkerIDs& marker_id)
         m_name = "cartesian_setpoint";
         return true;
 
+    case white_debug_dot:
+        m_frame = m_base_frame;
+        m_rgb.clear();
+        m_rgb.push_back(1.0f);
+        m_rgb.push_back(1.0f);
+        m_rgb.push_back(1.0f);
+        m_ros_marker_id = 3;
+        m_sphere_radius = 0.015;
+        m_lifetime = m_show_setpoint_lifetime;
+        m_name = "white_debug_dot";
+        return true;
+
     case whisker_touch:
 
         m_frame = m_base_frame;
@@ -132,6 +144,18 @@ bool VisualizationInterface::configureSelf(const MarkerIDs& marker_id)
         m_arrowhead_diam = 0.02;
         m_lifetime = m_show_stem_tangent_lifetime;
         m_name = "blue_debug_arrow";
+        return true;
+
+    case tomato_truss:
+        m_frame = m_base_frame;
+        m_rgb.clear();
+        m_rgb.push_back(1.0f);
+        m_rgb.push_back(0.0f);
+        m_rgb.push_back(0.0f);
+        m_ros_marker_id = 8;
+        m_sphere_radius = 0.05;
+        m_lifetime = m_show_setpoint_lifetime;
+        m_name = "tomato_truss";
         return true;
 
     default:

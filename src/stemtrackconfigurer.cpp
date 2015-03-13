@@ -328,13 +328,13 @@ void StemTrackConfigurer::configureStemTrackController(StemTrackController& stem
         {
             stem_track_controller.setMaxGripperRoll( getConfigPar<float>(m_general_config, "roll") );
             stem_track_controller.setMaxGripperPitch( getConfigPar<float>(m_general_config, "pitch") );
-            stem_track_controller.setMaxGripperYaw( getConfigPar<float>(m_general_config, "yaw") );
+            stem_track_controller.setMaxGripperRotateAlongStem( getConfigPar<float>(m_general_config, "along_stem") );
         }
         m_general_config.endArray();
     }
+    stem_track_controller.setRotateAlongStem(getConfigPar<bool>(m_general_config,"rotate_along_stem") );
 
-
-            INFO_STREAM("=============================================");
+    INFO_STREAM("=============================================");
     INFO_STREAM("Configured stem track controller object");
 
 }
@@ -384,7 +384,7 @@ void StemTrackConfigurer::configureRobotInterface(RobotInterface& robot_interfac
     robot_interface.connectToWhiskers();
     robot_interface.connectToPressureSensors();
     robot_interface.connectToAmigoGripper( useLeftArm() );
-
+    robot_interface.setDebugJointMax(getConfigPar<bool>(m_general_config,"debug_joint_max"));
 
     INFO_STREAM("=============================================");
     INFO_STREAM("Configured robot interface object");

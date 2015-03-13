@@ -10,7 +10,7 @@
 #include "robotstatus.h"
 #include "loggingmacros.h"
 
-void StemTrackController::updateCartSetpoint(const std::vector<float>& gripper_pos_err)
+void StemTrackController::updateSetpointAndPose(const std::vector<float>& gripper_pos_err)
 {
     /* Check position error from gripper (touch), if no touch error than move upward, else
        move in direction to undo touch. gripper_pos_error is defined in the frame of the gripper */
@@ -19,6 +19,7 @@ void StemTrackController::updateCartSetpoint(const std::vector<float>& gripper_p
     {
         if(gripper_pos_err[i] > 0.0)
         {
+            /* gripper is touched */
             std::vector<float> setpoint;
             setpoint.push_back(m_p_robot_status->gripperFrameVectorToBaseFrameVector(gripper_pos_err)[0]);
             setpoint.push_back(m_p_robot_status->gripperFrameVectorToBaseFrameVector(gripper_pos_err)[1]);
@@ -29,9 +30,12 @@ void StemTrackController::updateCartSetpoint(const std::vector<float>& gripper_p
             }
             setpoint.push_back(m_touch_started_at_xyz[2]);
             setCartSetpoint(setpoint);
+            updateSetpointPose();
             return;
         }
     }
+
+    /* gripper is not touched */
     setPointMoveUp();
     return;
 }
@@ -42,16 +46,13 @@ void StemTrackController::setPointMoveUp()
             take current stem tangent into account when moving up */
 
     float move_up_ref = m_move_up_ref;
-    if(m_p_robot_status->amigoTorsoIsAtMax())  //ugly implementation, no amigo specific stuff here
+    if(m_p_robot_status->amigoTorsoIsAtMax())  //ugly implementation, don't want amigo specific stuff here
     {
         move_up_ref = m_setpoint_multiplication_at_max_torso*m_move_up_ref;
     }
     m_setpoint_vector = KDL::Vector(m_p_robot_status->getGripperXYZ()[0], m_p_robot_status->getGripperXYZ()[1],
                                     m_p_robot_status->getGripperXYZ()[2]+move_up_ref);
-
-    KDL::Rotation gripper_rotation = getDesiredGripperPose();
-    m_setpoint_frame = KDL::Frame( gripper_rotation, m_setpoint_vector);
-
+    updateSetpointPose();
     return;
 }
 
@@ -64,9 +65,13 @@ std::vector<float> StemTrackController::getCartSetpointXYZ()
     return xyz;
 }
 
-KDL::Rotation StemTrackController::getDesiredGripperPose()
+void StemTrackController::updateSetpointPose()
 {
-    float roll = 0.0, pitch = 0.0, yaw = 0.0;
+    double roll = 0.0, pitch = 0.0, along_stem = 0.0;
+
+    /* roll and pitch are rotation wrt the x and y axis of the base frame,
+       along_stem is a rotation around the z axis of the (possibly tilted)
+       gripper frame */
 
     if(m_tilt_with_stem)
     {
@@ -91,12 +96,26 @@ KDL::Rotation StemTrackController::getDesiredGripperPose()
         pitch = m_gripper_max_pitch;
     if(pitch < -m_gripper_max_pitch)
         pitch = -m_gripper_max_pitch;
-    if(yaw > m_gripper_max_yaw)
-        yaw = m_gripper_max_yaw;
-    if(yaw < -m_gripper_max_yaw)
-        yaw = - m_gripper_max_yaw;
 
-    return KDL::Rotation::RPY(roll, pitch, yaw);
+    m_setpoint_pose = KDL::Rotation::RPY(roll, pitch, 0.0);
+
+    if(m_rotate_gripper_along_stem)
+    {
+        /* get current target pose */
+        ERROR_STREAM("rotate along stem not implemented yet!");
+
+        /* along_stem: radians we should rotate along z in frame which is possibly already tilted for stem tangent */
+
+
+        if(along_stem > m_gripper_max_rotate_along_stem)
+            along_stem = m_gripper_max_rotate_along_stem;
+        if(along_stem < -m_gripper_max_rotate_along_stem)
+            along_stem = - m_gripper_max_rotate_along_stem;
+
+        m_setpoint_pose = KDL::Rotation::RPY(0.0, 0.0, along_stem) * m_setpoint_pose;
+    }
+
+    return;
 }
 
 std::vector< std::vector<float> > StemTrackController::getDesiredGripperPoseVectors()
@@ -107,9 +126,9 @@ std::vector< std::vector<float> > StemTrackController::getDesiredGripperPoseVect
     KDL::Vector y = KDL::Vector(0.0,0.2,0.0);
     KDL::Vector z = KDL::Vector(0.0,0.0,0.2);
 
-    x = getDesiredGripperPose() * x;
-    y = getDesiredGripperPose() * y;
-    z = getDesiredGripperPose() * z;
+    x = m_setpoint_pose * x;
+    y = m_setpoint_pose * y;
+    z = m_setpoint_pose * z;
 
     std::vector<float> tmp;
     tmp.push_back(x.x());
@@ -141,10 +160,6 @@ void StemTrackController::setCartSetpoint(const std::vector<float> setpoint_xyz)
 
     m_setpoint_vector = KDL::Vector( setpoint_xyz[0], setpoint_xyz[1], setpoint_xyz[2]);
 
-    KDL::Rotation gripper_rotation = getDesiredGripperPose();
-
-    m_setpoint_frame = KDL::Frame( gripper_rotation, m_setpoint_vector);
-
     return;
 }
 
@@ -157,7 +172,8 @@ void StemTrackController::setPointMoveForward(const std::vector<float> gripper_x
     }
 
     m_setpoint_vector = KDL::Vector(gripper_xyz[0]+m_straight_forward_ref, gripper_xyz[1], z);
-    m_setpoint_frame = KDL::Frame( KDL::Rotation::Identity(), m_setpoint_vector);
+    m_setpoint_pose = KDL::Rotation::Identity();
+
     return;
 }
 
@@ -179,9 +195,8 @@ void StemTrackController::updateJointPosReferences()
                                                          m_p_robot_representation->getJointMaxima(), *fksolver_, *ik_vel_solver_, 100) );
 
 
-        //        KDL::Frame f_in(m_p_robot_status->getGripperKDLframe().M, m_setpoint_vector );
+        int status = ik_solver_->CartToJnt(m_p_robot_representation->getJointSeeds(), getCartSetpointKDLFrame(), m_joint_pos_refs);
 
-        int status = ik_solver_->CartToJnt(m_p_robot_representation->getJointSeeds(), m_setpoint_frame, m_joint_pos_refs);
         if(m_debug_ik_solver)
             INFO_STREAM("Status ik_solver: " << status);
     }
@@ -200,7 +215,7 @@ void StemTrackController::updateJointPosReferences()
 void StemTrackController::updateJointVelReferences()
 {
     KDL::Vector vel = m_setpoint_vector - m_p_robot_status->getGripperKDLframe().p;
-    KDL::Vector rot = m_setpoint_frame.M.GetRot();
+    KDL::Vector rot = getCartSetpointKDLFrame().M.GetRot();
     KDL::Twist twist = KDL::Twist(vel, rot);
 
     boost::shared_ptr<KDL::ChainIkSolverVel> ik_vel_solver_;

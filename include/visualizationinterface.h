@@ -15,7 +15,9 @@ enum MarkerIDs
     stem_tangent,
     red_debug_arrow,
     green_debug_arrow,
-    blue_debug_arrow
+    blue_debug_arrow,
+    white_debug_dot,
+    tomato_truss
 };
 
 #define ARROW_IDS_OFFSET 10;

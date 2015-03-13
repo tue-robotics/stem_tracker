@@ -99,6 +99,21 @@ void RobotInterface::publishAmigoOpenGripperMessage()
     return;
 }
 
+void RobotInterface::checkForJointLimits(const float& q_val, const int& i) const
+{
+    if(q_val >= m_p_robot_representation->getJointMaxima()(i))
+    {
+        WARNING_STREAM("Publishing " << q_val << " as a reference for joint " << m_p_robot_representation->getJointNames()[i]
+                       << " while joint max limit is " << m_p_robot_representation->getJointMaxima()(i));
+    }
+    if(q_val <= m_p_robot_representation->getJointMinima()(i))
+    {
+        WARNING_STREAM("Publishing " << q_val << " as a reference for joint " << m_p_robot_representation->getJointNames()[i]
+                       << " while joint min limit is " << m_p_robot_representation->getJointMinima()(i));
+    }
+    return;
+}
+
 void RobotInterface::publishAmigoJointPosRefs(KDL::JntArray q_out)
 {
     if( q_out.rows() == m_p_robot_status->getJointStatus().rows())
@@ -112,6 +127,9 @@ void RobotInterface::publishAmigoJointPosRefs(KDL::JntArray q_out)
 
         for(int i = 1; i<8; ++i) // joints no. 2-8 in joints_monitoring are for amigo arm
         {
+            if(m_debug_joint_max)
+                checkForJointLimits(q_out(i),i);
+
             arm_ref.position.push_back(q_out(i));
             arm_ref.name.push_back(joint_names[i]);
         }
@@ -122,6 +140,9 @@ void RobotInterface::publishAmigoJointPosRefs(KDL::JntArray q_out)
 
         torso_ref.header.stamp = ros::Time::now();
         torso_ref.position.clear();
+
+        if(m_debug_joint_max)
+            checkForJointLimits(q_out(0), 0);
 
         torso_ref.position.push_back(q_out(0));   // joint no. 1 in joints_monitoring is for amigo torso
         torso_ref.name.push_back(joint_names[0]);

@@ -199,7 +199,7 @@ void StemTrackMonitor::doFollowBehavior()
     m_p_visualization_interface->showArrow(m_p_stem_representation->getTangent(), m_p_stem_representation->getTangentBottomXYZ(), stem_tangent);
 
     /* update position setpoint in cartesian space */
-    m_p_stemtrack_control->updateCartSetpoint( m_p_whisker_gripper_interpreter->getEstimatedPosError() );
+    m_p_stemtrack_control->updateSetpointAndPose( m_p_whisker_gripper_interpreter->getEstimatedPosError() );
     m_p_visualization_interface->showXYZ(m_p_stemtrack_control->getCartSetpointXYZ(), cartesian_setpoint);
     if(m_p_stemtrack_configurer->debugDesiredGripperPose())
     {
@@ -261,6 +261,11 @@ bool StemTrackMonitor::update()
                 return false;
             }
 
+            std::vector<float> tmp;
+            tmp.push_back(-0.1);
+            tmp.push_back(0.35);
+            tmp.push_back(m_p_robot_status->getGripperXYZ()[2]);
+            m_p_visualization_interface->showXYZ(tmp,white_debug_dot);
             /* do state dependent behavior */
             switch(m_state)
             {

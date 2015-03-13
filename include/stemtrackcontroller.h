@@ -16,13 +16,13 @@ class StemTrackController
 
 private:
 
-    float m_move_up_ref, m_gripper_max_roll, m_gripper_max_pitch, m_gripper_max_yaw;
+    float m_move_up_ref, m_gripper_max_roll, m_gripper_max_pitch, m_gripper_max_rotate_along_stem;
     int m_update_rate;
     bool m_tilt_with_stem;
-    bool m_debug_ik_solver, m_print_ref_vs_current;
+    bool m_debug_ik_solver, m_print_ref_vs_current, m_rotate_gripper_along_stem;
     bool m_use_ik_velocity_solver_only;
     KDL::Vector m_setpoint_vector;
-    KDL::Frame m_setpoint_frame;
+    KDL::Rotation m_setpoint_pose;
     RobotRepresentation* m_p_robot_representation;
     StemRepresentation* m_p_stem_representation;
     RobotStatus* m_p_robot_status;
@@ -47,22 +47,23 @@ public:
     inline void setSetpointMultiplicationAtMaxTorso(float multiplication) { m_setpoint_multiplication_at_max_torso = multiplication; } //ugly hack alert
     inline void setMaxGripperRoll(float max) { m_gripper_max_roll = max; }
     inline void setMaxGripperPitch(float max) { m_gripper_max_pitch = max; }
-    inline void setMaxGripperYaw(float max) { m_gripper_max_yaw = max; }
+    inline void setMaxGripperRotateAlongStem(float max) { m_gripper_max_rotate_along_stem = max; }
+    inline void setRotateAlongStem(bool rotate) { m_rotate_gripper_along_stem = rotate; }
 
     void setCartSetpoint(const std::vector<float> setpoint_xyz);
     void updateJointPosReferences();
     void updateJointVelReferences();
     void turnVelRefInPosRef();
     void setPointMoveForward(const std::vector<float> gripper_xyz, const float z);
-    void updateCartSetpoint(const std::vector<float>& gripper_pos_err);
+    void updateSetpointAndPose(const std::vector<float>& gripper_pos_err);
     void setPointMoveUp();
+    void updateSetpointPose();
 
-    KDL::Rotation getDesiredGripperPose();
     std::vector< std::vector<float> > getDesiredGripperPoseVectors();
     inline KDL::JntArray getJointPosRefs() { return m_joint_pos_refs; }
     KDL::JntArray getJointVelRefs() { return m_joint_vel_refs; }
     inline const KDL::Vector getCartSetpointKDLVect() { return m_setpoint_vector; }
-    inline const KDL::Frame getCartSetpointKDLFrame() { return m_setpoint_frame; }
+    inline const KDL::Frame getCartSetpointKDLFrame() { return KDL::Frame(m_setpoint_pose, m_setpoint_vector); }
     std::vector<float> getCartSetpointXYZ();
 
     ~StemTrackController();
