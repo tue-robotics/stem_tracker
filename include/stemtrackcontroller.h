@@ -18,7 +18,7 @@ private:
 
     float m_move_up_ref, m_gripper_max_roll, m_gripper_max_pitch, m_gripper_max_rotate_along_stem;
     int m_update_rate;
-    bool m_tilt_with_stem;
+    bool m_tilt_with_stem, m_move_up_in_tilt_direction;
     bool m_debug_ik_solver, m_print_ref_vs_current, m_rotate_gripper_along_stem;
     bool m_use_ik_velocity_solver_only;
     KDL::Vector m_setpoint_vector;
@@ -49,6 +49,7 @@ public:
     inline void setMaxGripperPitch(float max) { m_gripper_max_pitch = max; }
     inline void setMaxGripperRotateAlongStem(float max) { m_gripper_max_rotate_along_stem = max; }
     inline void setRotateAlongStem(bool rotate) { m_rotate_gripper_along_stem = rotate; }
+    inline void setMoveUpInStemTiltDirection(bool move_in_tilt_direction) { m_move_up_in_tilt_direction = move_in_tilt_direction; }
 
     void setCartSetpoint(const std::vector<float> setpoint_xyz);
     void updateJointPosReferences();

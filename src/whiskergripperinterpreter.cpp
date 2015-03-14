@@ -312,8 +312,8 @@ void WhiskerGripperInterpreter::updateWhiskerPosErrVecs()
     for(uint i = 0; i < getWhiskersTouchedAtAngles().size(); ++i)
     {
         angle_rad = getWhiskersTouchedAtAngles()[i]/360.0f*2.0f*3.141592f;
-        vec.push_back(- cos(angle_rad) * (getGripperRadius()-0.5*getWhiskerLength()) );
-        vec.push_back(- sin(angle_rad) * (getGripperRadius()-0.5*getWhiskerLength()) );
+        vec.push_back( cos(angle_rad) * (getGripperRadius()+0.5*getWhiskerLength()) );
+        vec.push_back( sin(angle_rad) * (getGripperRadius()+0.5*getWhiskerLength()) );
         vec.push_back( 0.0 );
         m_whisker_pos_err_vectors.push_back(vec);
         vec.clear();

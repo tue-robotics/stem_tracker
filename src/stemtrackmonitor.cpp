@@ -261,11 +261,6 @@ bool StemTrackMonitor::update()
                 return false;
             }
 
-            std::vector<float> tmp;
-            tmp.push_back(-0.1);
-            tmp.push_back(0.35);
-            tmp.push_back(m_p_robot_status->getGripperXYZ()[2]);
-            m_p_visualization_interface->showXYZ(tmp,white_debug_dot);
             /* do state dependent behavior */
             switch(m_state)
             {

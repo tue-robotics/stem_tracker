@@ -322,6 +322,8 @@ void StemTrackConfigurer::configureStemTrackController(StemTrackController& stem
     stem_track_controller.setStraightForwardRef( getConfigPar<float>(m_general_config, "straight_forward_ref") );
     stem_track_controller.setPrintRefVsCurrent( getConfigPar<bool>(m_general_config, "print_joint_ref_vs_current") );
     stem_track_controller.setSetpointMultiplicationAtMaxTorso( getConfigPar<float>(m_general_config, "xyz_setpoint_multiplication_at_max_torso"));
+    stem_track_controller.setMoveUpInStemTiltDirection( getConfigPar<bool>(m_general_config, "move_in_tilt_direction"));
+
     if (m_general_config.readArray("max_gripper_pose"))
     {
         while(m_general_config.nextArrayItem())

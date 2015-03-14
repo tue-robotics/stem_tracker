@@ -101,12 +101,12 @@ void RobotInterface::publishAmigoOpenGripperMessage()
 
 void RobotInterface::checkForJointLimits(const float& q_val, const int& i) const
 {
-    if(q_val >= m_p_robot_representation->getJointMaxima()(i))
+    if(q_val > m_p_robot_representation->getJointMaxima()(i))
     {
         WARNING_STREAM("Publishing " << q_val << " as a reference for joint " << m_p_robot_representation->getJointNames()[i]
                        << " while joint max limit is " << m_p_robot_representation->getJointMaxima()(i));
     }
-    if(q_val <= m_p_robot_representation->getJointMinima()(i))
+    if(q_val < m_p_robot_representation->getJointMinima()(i))
     {
         WARNING_STREAM("Publishing " << q_val << " as a reference for joint " << m_p_robot_representation->getJointNames()[i]
                        << " while joint min limit is " << m_p_robot_representation->getJointMinima()(i));

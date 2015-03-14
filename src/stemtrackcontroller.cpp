@@ -42,17 +42,42 @@ void StemTrackController::updateSetpointAndPose(const std::vector<float>& grippe
 
 void StemTrackController::setPointMoveUp()
 {
-    /*todo: add case for tilt_with stem
-            take current stem tangent into account when moving up */
-
     float move_up_ref = m_move_up_ref;
-    if(m_p_robot_status->amigoTorsoIsAtMax())  //ugly implementation, don't want amigo specific stuff here
+
+    if(m_p_robot_status->amigoTorsoIsAtMax())  //ugly, don't want amigo specific stuff here!
     {
         move_up_ref = m_setpoint_multiplication_at_max_torso*m_move_up_ref;
     }
-    m_setpoint_vector = KDL::Vector(m_p_robot_status->getGripperXYZ()[0], m_p_robot_status->getGripperXYZ()[1],
-                                    m_p_robot_status->getGripperXYZ()[2]+move_up_ref);
+
+    std::vector<float> dir;
+    dir.assign(3,0.0);
+    if(m_move_up_in_tilt_direction)
+    {
+        dir = m_p_stem_representation->getTangent();
+    }
+    else
+    {
+        dir[2] = 1.0;
+    }
+
+    float len = sqrt(pow(dir[0],2)+pow(dir[1],2)+pow(dir[2],2));
+    if(len>0.0)
+    {
+        /* normalize */
+        for(uint i = 0; i < 3; ++i)
+            dir[i] /= len;
+
+        /* set to ref */
+        for(uint i = 0; i < 3; ++i)
+            dir[i] *= move_up_ref;
+
+    }
+
+    m_setpoint_vector = KDL::Vector(m_p_robot_status->getGripperXYZ()[0] + dir[0],
+                                    m_p_robot_status->getGripperXYZ()[1] + dir[1],
+                                    m_p_robot_status->getGripperXYZ()[2] + dir[2] );
     updateSetpointPose();
+
     return;
 }
 

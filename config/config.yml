@@ -72,12 +72,8 @@ pressure_sensor_touched_normalized_threshold:  0.03   # Pressure sensor deviatio
 
 config_file_pressure_sensor_touched_max: "pressure_sensor_touched_max.yml"
 
-#######################
-# WHISKER SIM CONFIG
-#######################
-
-whisker_length:                 0.03          # length of a single whisker, in meters (used only for sim)
-gripper_diameter:               0.01           # diameter of gripper at whisker-root, in meters (used only for sim)
+whisker_length:                 0.03          # length of a single whisker, in meters
+gripper_diameter:               0.01           # diameter of gripper at whisker-root, in meters
 
 #######################
 # TOMATO STEM CONFIG
@@ -96,11 +92,13 @@ add_or_remove_node_euclidian_threshold: 0.06    # when gripper xyz is further th
 # TRACKING CONTROL CONFIG
 ##########################
 
-move_up_ref:                    0.002         # put xyz ref up (in direction of stem tangent) for x meters when moving
+move_up_ref:                    0.001         # put xyz ref up (in direction of stem tangent) for x meters when moving
                                                # up (state FOLLOW)
+move_in_tilt_direction:         1             # if true (1) move_up_ref will be in the estimated tilt direction of the stem, else move_up_ref will be
+                                               # straight up in z-direction of the base frame
 tilt_with_stem:                 0             # if true (1) tilt gripper based on local derivative of stem
 rotate_along_stem:              0             # if true (1) the gripper will rotate along the stem to avoid its gipper yaw joint limits. Note:
-                                               # implemented yet!!
+                                               # currently not implemented!!
 debug_ik_solver:                0             # if true (1) status of kdl ik solver will be printed
 ik_vel_only:                    0             # if true (1) after initialization we only use kdl ik velocity solver, no
                                                # fk or ik position solvers
@@ -114,7 +112,7 @@ print_joint_ref_vs_current:     0             # if true (1) current joint positi
 xyz_setpoint_multiplication_at_max_torso: 1.0    # ugly hack, temporary
 debug_desired_gripper_pose:     1              # if true (1) desired gripper pose will be shown in rviz together with estimated
                                                 # stem tangent
-debug_joint_max:                1              # if true (1) warnings will be printed every time a joint reference reaches or passes a
+debug_joint_max:                0              # if true (1) warnings will be printed every time a joint reference reaches or passes a
                                                 # joint limit
 ##########################
 # TRACKING MONITOR CONFIG
