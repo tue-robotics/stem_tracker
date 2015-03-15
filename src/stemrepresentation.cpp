@@ -133,6 +133,21 @@ void StemRepresentation::updateTangent()
         m_tangent_xyz[2] = 1.0;
     }
 
+    /* check for max tilt threshold */
+    if(m_tangent_xyz[0] > m_max_stemtilt_xx)
+        m_tangent_xyz[0] = m_max_stemtilt_xx;
+    if(m_tangent_xyz[0] < -m_max_stemtilt_xx)
+        m_tangent_xyz[0] = - m_max_stemtilt_xx;
+    if(m_tangent_xyz[1] > m_max_stemtilt_yy)
+        m_tangent_xyz[1] = m_max_stemtilt_yy;
+    if(m_tangent_xyz[1] < -m_max_stemtilt_yy)
+        m_tangent_xyz[1] = - m_max_stemtilt_yy;
+
+    /* (re)normalize */
+    float length = sqrt(pow(m_tangent_xyz[0],2)+pow(m_tangent_xyz[1],2)+pow(m_tangent_xyz[2],2));
+    for(uint i = 0; i < 3; ++i)
+        m_tangent_xyz[i] /= length;
+
     return;
 
 }

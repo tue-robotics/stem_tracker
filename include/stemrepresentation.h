@@ -22,6 +22,7 @@ class StemRepresentation
         float m_stem_length_for_tangent, m_add_or_remove_node_euclidian_threshold;
         void updateNumberOfNodes();
         std::vector<float> getNodeXYZ(uint node);
+        float m_max_stemtilt_xx, m_max_stemtilt_yy;
 
     public:
         StemRepresentation(int stem_id);
@@ -38,6 +39,8 @@ class StemRepresentation
         inline const std::vector<float>& getStemTrackingStartXYZ() const { return m_start_at_xyz; }
         inline const std::vector<float>& getNearestXYZ() { return m_nearestXYZ; }
         inline const std::vector<float>& getTangent() { return m_tangent_xyz; }
+        inline void setMaxTiltXX(float max) { m_max_stemtilt_xx = max; }
+        inline void setMaxTiltYY(float max) { m_max_stemtilt_yy = max; }
 
         inline void setAddOrRemoveNodeThreshold( float threshold ) { m_add_or_remove_node_euclidian_threshold = threshold; }
         inline void setStemTrackingStartXYZ(std::vector<float> start_xyz) { m_start_at_xyz = start_xyz; }

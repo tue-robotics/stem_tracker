@@ -87,6 +87,8 @@ stem_start_xyz:
 length_first_node:              0.25           # first stem node is put x meters underneath stem_start_xyz
 add_or_remove_node_euclidian_threshold: 0.01    # when gripper xyz is further than x meters away from highest node in stem
                                                 # representation a node is removed when gripper is below it, or added when gripper is above
+max_stemtilt_possible:                         # estimated stem tilt cannot exceed these values (xx, yy, zz wrt normalized tilt vector in base frame)
+    - { xx: 1.0, yy: 1.0}
 
 ##########################
 # TRACKING CONTROL CONFIG
@@ -114,6 +116,7 @@ debug_desired_gripper_pose:     1              # if true (1) desired gripper pos
                                                 # stem tangent
 debug_joint_max:                0              # if true (1) warnings will be printed every time a joint reference reaches or passes a
                                                 # joint limit
+
 ##########################
 # TRACKING MONITOR CONFIG
 ##########################

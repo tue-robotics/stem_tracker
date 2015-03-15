@@ -128,6 +128,15 @@ void StemTrackConfigurer::configureStemRepresentation(StemRepresentation& stem_r
     }
     stem_representation.setStemTrackingStartXYZ( stem_start_xyz );
 
+    if (m_general_config.readArray("max_stemtilt_possible"))
+    {
+        while(m_general_config.nextArrayItem())
+        {
+            stem_representation.setMaxTiltXX( getConfigPar<float>(m_general_config, "xx"));
+            stem_representation.setMaxTiltYY( getConfigPar<float>(m_general_config, "yy"));
+        }
+        m_general_config.endArray();
+    }
     stem_representation.setAddOrRemoveNodeThreshold( getConfigPar<float>(m_general_config, "add_or_remove_node_euclidian_threshold"));
 
     std::vector<float> stemNodesX, stemNodesY, stemNodesZ;
