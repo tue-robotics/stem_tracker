@@ -17,7 +17,7 @@ private:
     ros::NodeHandle m_node;
     ros::Publisher m_arm_ref_pub;
     ros::Publisher m_torso_ref_pub;
-    ros::Publisher m_gripper_ref_pub;
+    ros::Publisher m_gripper_ref_pub, m_gripper_meas_pub;
     ros::Subscriber m_arm_meas_sub;
     ros::Subscriber m_torso_meas_sub;
     ros::Subscriber m_whisker_sub;

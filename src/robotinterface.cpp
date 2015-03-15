@@ -3,6 +3,7 @@
 #include "robotrepresentation.h"
 #include "robotstatus.h"
 #include "tue_msgs/GripperCommand.h"
+#include "tue_msgs/GripperMeasurement.h"
 
 void RobotInterface::connectToWhiskers()
 {
@@ -27,9 +28,15 @@ void RobotInterface::receivedPressureSensorMsg(const std_msgs::Float32MultiArray
 void RobotInterface::connectToAmigoGripper(const bool leftArmIsPreferred)
 {
     if(leftArmIsPreferred)
+    {
         m_gripper_ref_pub = m_node.advertise<tue_msgs::GripperCommand>("/amigo/left_arm/gripper/references",0);
+        m_gripper_meas_pub = m_node.advertise<tue_msgs::GripperMeasurement>("/amigo/left_arm/gripper/measurements",0);
+    }
     else
+    {
         m_gripper_ref_pub = m_node.advertise<tue_msgs::GripperCommand>("/amigo/right_arm/gripper/references",0);
+        m_gripper_meas_pub = m_node.advertise<tue_msgs::GripperMeasurement>("/amigo/right_arm/gripper/measurements",0);
+    }
 
     return;
 }
@@ -96,6 +103,12 @@ void RobotInterface::publishAmigoOpenGripperMessage()
     msg.direction = tue_msgs::GripperCommand::OPEN;
     msg.max_torque = 120;
     m_gripper_ref_pub.publish(msg);
+
+    tue_msgs::GripperMeasurement msg_2;
+    msg_2.direction = tue_msgs::GripperMeasurement::OPEN;
+    msg_2.torque = 0;
+    msg_2.position = 0;
+    m_gripper_meas_pub.publish(msg_2);
     return;
 }
 
