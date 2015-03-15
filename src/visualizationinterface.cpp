@@ -151,16 +151,17 @@ bool VisualizationInterface::configureSelf(const MarkerIDs& marker_id)
         m_name = "blue_debug_arrow";
         return true;
 
-    case tomato_truss:
+    case peduncle:
+
         m_frame = m_base_frame;
         m_rgb.clear();
-        m_rgb.push_back(1.0f);
-        m_rgb.push_back(0.0f);
-        m_rgb.push_back(0.0f);
+        m_rgb.push_back(0.05f);
+        m_rgb.push_back(0.7f);
+        m_rgb.push_back(0.4f);
+        m_linestrip_diam = 0.015;
+        m_lifetime = 0.2;
         m_ros_marker_id = 10;
-        m_sphere_radius = 0.05;
-        m_lifetime = m_show_setpoint_lifetime;
-        m_name = "tomato_truss";
+        m_name = "peduncle";
         return true;
 
     default:
@@ -244,6 +245,38 @@ void VisualizationInterface::showArrow(const std::vector<float>& xyz, const std:
         showArrowInRviz(xyz_, origin);
     }
 
+    return;
+}
+
+void VisualizationInterface::showTomatoTruss(const float& angle, const std::vector<float>& origin)
+{
+    std::vector<float> ped_x, ped_y, ped_z;
+    float angle_ = angle;
+
+    /* don't show truss within wrist */
+    if(angle_ < 220 && angle_ > 140)
+    {
+        if(m_truss_in_wrist_than_show_left)
+            angle_ = 140;
+        else
+            angle_ = 220;
+    }
+
+    float angle_rad = angle_/360.0f*2.0f*3.141592f;
+
+    /* show peduncle */
+    ped_x.push_back(origin[0]);
+    ped_y.push_back(origin[1]);
+    ped_z.push_back(origin[2]+0.03);
+    ped_x.push_back(origin[0]+cos(angle_rad) * 0.08);
+    ped_y.push_back(origin[1]+sin(angle_rad) * 0.08);
+    ped_z.push_back(origin[2]+0.02);
+    ped_x.push_back(origin[0]+cos(angle_rad) * 0.1);
+    ped_y.push_back(origin[1]+sin(angle_rad) * 0.1);
+    ped_z.push_back(origin[2]-0.04);
+    showLineStrip(ped_x, ped_y, ped_z, peduncle);
+
+    /* show tomatoes */
     return;
 }
 

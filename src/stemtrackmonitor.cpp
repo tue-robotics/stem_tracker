@@ -240,6 +240,8 @@ void StemTrackMonitor::doEndBehaviour()
         m_trial_is_done = true;
     }
 
+    m_p_visualization_interface->showTomatoTruss(m_p_whisker_gripper_interpreter->getEstimatedTopSensorTouchLocation(), m_p_robot_status->getGripperXYZ());
+
     return;
 }
 

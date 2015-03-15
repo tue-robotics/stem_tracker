@@ -422,7 +422,7 @@ void StemTrackConfigurer::configureVisualizationInterface(VisualizationInterface
     visualization_interface.setStemTangentArrowElongation( getConfigPar<float>(m_general_config, "elongate_stem_tangent_vector"));
     visualization_interface.setDebugArrowElongation( getConfigPar<float>(m_general_config, "elongate_debug_arrows"));
     visualization_interface.setDebugArrowLifetime( getConfigPar<float>(m_general_config, "show_debug_arrows_lifetime") );
-
+    visualization_interface.setTrussInWristThanShowLeft( getConfigPar<bool>(m_general_config, "truss_in_wrist_than_show_left") );
     INFO_STREAM("=============================================");
     INFO_STREAM("Configured visualization object");
 

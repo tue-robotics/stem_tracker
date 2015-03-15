@@ -17,7 +17,7 @@ enum MarkerIDs
     green_debug_arrow,
     blue_debug_arrow,
     white_debug_dot,
-    tomato_truss
+    peduncle
 };
 
 #define ARROW_IDS_OFFSET 10;
@@ -39,6 +39,7 @@ private:
     float m_linestrip_diam;    // in meters
     float m_arrow_diam;        // arrow diameter, in meters
     float m_arrowhead_diam;    // arow head diameter, in meters
+    bool m_truss_in_wrist_than_show_left;
     float m_multiply_arrow_with, m_stem_tangent_arrow_multiplication, m_debug_arrow_multiplication;
 public:
     VisualizationInterface(ros::NodeHandle node, std::string base_frame) : m_node(node), m_base_frame(base_frame) {}
@@ -51,6 +52,7 @@ public:
     inline void setStemTangentArrowElongation(float multiply_with) { m_stem_tangent_arrow_multiplication = multiply_with; }
     inline void setDebugArrowElongation(float multiply_with) { m_debug_arrow_multiplication = multiply_with; }
     inline void setDebugArrowLifetime(float lifetime) { m_debug_arrow_lifetime = lifetime; }
+    inline void setTrussInWristThanShowLeft(bool show_left) { m_truss_in_wrist_than_show_left = show_left; }
 
     inline const float& getStemTangentVectorElongation() const { return m_stem_tangent_arrow_multiplication; }
 
@@ -65,6 +67,7 @@ public:
     void showArrows(const std::vector< std::vector<float> >& tips, const std::vector< std::vector<float> >& origins, const MarkerIDs& marker_id);
     void showArrowInRviz(const std::vector<float>& tip, const std::vector<float>& origin);
     void showArrowsInRviz(const std::vector< std::vector<float> >& tips, const std::vector< std::vector<float> >& origins);
+    void showTomatoTruss(const float& angle, const std::vector<float>& origin);
 
     virtual ~VisualizationInterface();
 };
