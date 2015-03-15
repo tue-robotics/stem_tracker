@@ -57,7 +57,6 @@ void StemRepresentation::initializeTangent()
 {
     m_tangent_xyz.clear();
     m_tangent_xyz.assign(3,0.0);
-    m_tangent_bottom_xyz.assign(3,0.0);
 }
 
 std::vector<float> StemRepresentation::getNodeXYZ(uint node)
@@ -81,38 +80,63 @@ void StemRepresentation::updateTangent()
 {
     initializeTangent();
 
-    if((m_z_nodes.back() - m_z_nodes.front()) > m_lin_tangent_d)
+    if(m_n_nodes < 2)
     {
-        m_tangent_bottom_xyz = getStemXYZatZ(m_z_nodes.back() - m_lin_tangent_d);
-        uint n = m_z_nodes.size() - m_index_first_node_above;
+        WARNING_STREAM("Cannot calculate stem tangent for less than 2 stem nodes!");
+        return;
+    }
 
-        for(uint j = m_index_first_node_above; j < m_index_first_node_above + n; ++j)
+    int n_nodes_required = (int) ceil( m_stem_length_for_tangent / m_add_or_remove_node_euclidian_threshold);
+
+    if(m_n_nodes >= n_nodes_required)
+    {
+        /* do a Theil-Sen regression fit (average of slopes for all combinations of
+           points we're doing a fit through) */
+
+        std::vector< std::vector<float> > nodes;
+        std::vector<float> averaged_slope;
+
+        /* first, obtain relevant stem nodes */
+        for(uint i = 0; i < n_nodes_required; ++i)
+            nodes.push_back(getNodeXYZ(m_n_nodes - n_nodes_required + i));
+
+        /* for each stem node, find the average slope it makes with all other nodes */
+        for(uint i = 0; i < n_nodes_required; ++i)
         {
-            /* get distance from regression starting point to this node */
-            std::vector<float> dist;
+            averaged_slope.assign(3,0.0);
+            for(uint j = 0; j < n_nodes_required; ++j)
+            {
+                if(j != i)
+                {
+                    /* length (for normalization) */
+                    float len = sqrt(pow(nodes[i][0]-nodes[j][0],2)+pow(nodes[i][1]-nodes[j][1],2)+pow(nodes[i][2]-nodes[j][2],2));
+
+                    for(uint k = 0; k < 3; ++k)
+                    {
+                        /* make sure all slopes are in positive z direction */
+                        if(nodes[i][2] - nodes[j][2] > 0.0)
+                            averaged_slope[k] += ( nodes[i][k] - nodes[j][k] ) / len / ((float) (n_nodes_required - 1 ) );
+                        if(nodes[i][2] - nodes[j][2] < 0.0)
+                            averaged_slope[k] -= ( nodes[i][k] - nodes[j][k] ) / len / ((float) (n_nodes_required - 1 ) );
+                    }
+                }
+            }
+
             for(uint i = 0; i < 3; ++i)
-                dist.push_back(getNodeXYZ(j)[i] - m_tangent_bottom_xyz[i]);
-
-            /*normalize*/
-            float len = sqrt(dist[0]*dist[0]+dist[1]*dist[1]+dist[2]*dist[2]);
-
-            for(uint i = 0; i < 3; ++i)
-                dist[i] /= len;
-
-            /* add increment to overall tangent */
-            for(uint i=0; i<3; ++i)
-                m_tangent_xyz[i] +=  dist[i]/ ((float) n);
+                m_tangent_xyz[i] += averaged_slope[i] / ((float) n_nodes_required);
 
         }
 
-        /* for plotting purposes, make stem tangent vector a bit smaller */
-        for(uint i = 0; i < 3; ++i)
-            m_tangent_xyz[i] /= ((float) 4);
     }
     else
     {
-        WARNING_STREAM("Asking to update stem tangent while we have not enough stem");
+        m_tangent_xyz[2] = 1.0;
     }
+
+    /* for plotting purposes, make stem tangent vector smaller */
+    for(uint i = 0; i < 3; ++i)
+        m_tangent_xyz[i] /= ((float) 3);
+
 
     return;
 

@@ -55,6 +55,7 @@ public:
     void showXYZ(const std::vector<float>& xyz, const std::vector<float> xyz_2, const MarkerIDs& marker_id);
     void showXYZInRviz(const std::vector<float>& xyz);
     void showArrow(const std::vector<float>& xyz, const std::vector<float>& origin, const MarkerIDs& marker_id);
+    void showArrow(const std::vector<float>& xyz, const float& origin_x, const float& origin_y, const float& origin_z, const MarkerIDs& marker_id);
     void showArrows(const std::vector< std::vector<float> >& tips, const std::vector< std::vector<float> >& origins, const MarkerIDs& marker_id);
     void showArrowInRviz(const std::vector<float>& tip, const std::vector<float>& origin);
     void showArrowsInRviz(const std::vector< std::vector<float> >& tips, const std::vector< std::vector<float> >& origins);

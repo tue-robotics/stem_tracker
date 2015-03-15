@@ -206,6 +206,16 @@ void VisualizationInterface::showLineStripInRviz(const std::vector<float>& x_coo
 
 }
 
+void VisualizationInterface::showArrow(const std::vector<float>& xyz, const float& origin_x, const float& origin_y, const float& origin_z, const MarkerIDs& marker_id)
+{
+    std::vector<float> origin;
+    origin.push_back(origin_x);
+    origin.push_back(origin_y);
+    origin.push_back(origin_z);
+    showArrow(xyz, origin, marker_id);
+    return;
+}
+
 void VisualizationInterface::showArrow(const std::vector<float>& xyz, const std::vector<float>& origin, const MarkerIDs& marker_id)
 {
     if(xyz.size() != 3)

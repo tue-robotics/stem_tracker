@@ -114,7 +114,7 @@ const bool StemTrackConfigurer::debugDesiredGripperPose()
 
 void StemTrackConfigurer::configureStemRepresentation(StemRepresentation& stem_representation)
 {
-    stem_representation.setLinTangentDistance( getConfigPar<float>(m_general_config, "lin_tan_d") );
+    stem_representation.setStemLengthToDetermineTangent( getConfigPar<float>(m_general_config, "stem_length_used_for_tangent") );
     std::vector<float> stem_start_xyz;
     if( m_general_config.readArray("stem_start_xyz"))
     {
