@@ -98,7 +98,7 @@ additional_stem_height_when_done:    0.2        # show additional piece of stem 
 # TRACKING CONTROL CONFIG
 ##########################
 
-move_up_ref:                    0.0         # put xyz ref up (in direction of stem tangent) for x meters when moving
+move_up_ref:                    0.005         # put xyz ref up (in direction of stem tangent) for x meters when moving
                                                # up (state FOLLOW)
 move_up_fraction_when_touched:  0.2           # fraction of mpve_up_ref we keep in setpoint while the gripper is touched
 move_in_tilt_direction:         0             # if true (1) move_up_ref will be in the estimated tilt direction of the stem, else move_up_ref will be
@@ -140,7 +140,7 @@ touched_arrow_liftime:          0.2        # when whisker touched show an arrow 
                                              # next msg
 show_setpoint_lifetime:         0.02        # show cartesian setpoint and current pos of gripper for x seconds, set to
                                              # -1.0 to show until next msg
-show_stem_tangent_lifetime:     0.0         # show estimated tangent of stem at current gripper pos for x seconds, set to
+show_stem_tangent_lifetime:     0.02         # show estimated tangent of stem at current gripper pos for x seconds, set to
                                              # -1.0 to show until next msg
 show_debug_arrows_lifetime:     2.0         # same, but for red, green and blue debug arrows
 elongate_stem_tangent_vector:   0.3         # multiply normalized stem tangent vector with this value, only for visualization purposes
