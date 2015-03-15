@@ -133,20 +133,38 @@ void StemRepresentation::updateTangent()
         m_tangent_xyz[2] = 1.0;
     }
 
-    /* check for max tilt threshold */
-    if(m_tangent_xyz[0] > m_max_stemtilt_xx)
-        m_tangent_xyz[0] = m_max_stemtilt_xx;
-    if(m_tangent_xyz[0] < -m_max_stemtilt_xx)
-        m_tangent_xyz[0] = - m_max_stemtilt_xx;
-    if(m_tangent_xyz[1] > m_max_stemtilt_yy)
-        m_tangent_xyz[1] = m_max_stemtilt_yy;
-    if(m_tangent_xyz[1] < -m_max_stemtilt_yy)
-        m_tangent_xyz[1] = - m_max_stemtilt_yy;
-
     /* (re)normalize */
     float length = sqrt(pow(m_tangent_xyz[0],2)+pow(m_tangent_xyz[1],2)+pow(m_tangent_xyz[2],2));
     for(uint i = 0; i < 3; ++i)
         m_tangent_xyz[i] /= length;
+
+    /* check for max tilt threshold */
+    bool shortened = false;
+    if(m_tangent_xyz[0] > m_max_stemtilt_xx)
+    {
+        m_tangent_xyz[0] = m_max_stemtilt_xx;
+        shortened = true;
+    }
+    if(m_tangent_xyz[0] < -m_max_stemtilt_xx)
+    {
+        m_tangent_xyz[0] = - m_max_stemtilt_xx;
+        shortened = true;
+    }
+    if(m_tangent_xyz[1] > m_max_stemtilt_yy)
+    {
+        m_tangent_xyz[1] = m_max_stemtilt_yy;
+        shortened = true;
+    }
+    if(m_tangent_xyz[1] < -m_max_stemtilt_yy)
+    {
+        m_tangent_xyz[1] = - m_max_stemtilt_yy;
+        shortened = true;
+    }
+    if(shortened)
+    {
+        /* normalize along z */
+        m_tangent_xyz[2] = sqrt(1-pow(m_tangent_xyz[0],2)-pow(m_tangent_xyz[1],2));
+    }
 
     return;
 
@@ -239,9 +257,18 @@ void StemRepresentation::updateNumberOfNodes()
     return;
 }
 
+void StemRepresentation::updateStemNodes(const float& x, const float& y, const float& z, bool ignore_threshold)
+{
+    std::vector<float> xyz;
+    xyz.push_back(x);
+    xyz.push_back(y);
+    xyz.push_back(z);
+    updateStemNodes(xyz, ignore_threshold);
+    return;
+}
+
 void StemRepresentation::updateStemNodes(const std::vector<float>& gripper_xyz, bool ignore_threshold)
 {
-    /* if gripper is not touched, assume stem is at middle of gripper */
 
     if(ignore_threshold)
     {

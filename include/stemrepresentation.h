@@ -48,6 +48,7 @@ class StemRepresentation
 
         void updateStemNodes(const std::vector< std::vector<float> >& touches_xyz);
         void updateStemNodes(const std::vector<float>& touches_xyz, bool ignore_threshold = false);
+        void updateStemNodes(const float& x, const float& y, const float& z, bool ignore_threshold);
         bool isXYZonStem(std::vector<float> xyz);
         void updateNearestXYZ(std::vector<float> from_xyz);
         void updateTangent();

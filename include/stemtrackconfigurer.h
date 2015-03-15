@@ -47,6 +47,7 @@ public:
     const bool useLeftArm();
     const int getNumberOfWhiskers();
     const bool debugDesiredGripperPose();
+    const float getAdditionalStemHeight() { return getConfigPar<float>(m_general_config, "additional_stem_height_when_done"); }
 
     void storePressureSensorTouchedMaxValues(const std::vector<float>& pressure_sensor_touched_max);
     void storeWhiskerTouchedMaxValues(const std::vector<float>& whiskers_touched_max);

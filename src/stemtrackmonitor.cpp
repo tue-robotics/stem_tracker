@@ -233,6 +233,10 @@ void StemTrackMonitor::doEndBehaviour()
     if(!m_trial_is_done)
     {
         m_p_stem_representation->updateStemNodes(m_p_robot_status->getGripperXYZ(),true);
+        m_p_stem_representation->updateStemNodes(
+                    m_p_robot_status->getGripperXYZ()[0] + m_p_stemtrack_configurer->getAdditionalStemHeight() * m_p_stem_representation->getTangent()[0],
+                    m_p_robot_status->getGripperXYZ()[1] + m_p_stemtrack_configurer->getAdditionalStemHeight() * m_p_stem_representation->getTangent()[1],
+                    m_p_robot_status->getGripperXYZ()[2] + m_p_stemtrack_configurer->getAdditionalStemHeight() * m_p_stem_representation->getTangent()[2], true);
         m_trial_is_done = true;
     }
 

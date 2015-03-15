@@ -90,6 +90,8 @@ add_or_remove_node_euclidian_threshold: 0.01    # when gripper xyz is further th
 max_stemtilt_possible:                         # estimated stem tilt cannot exceed these values (xx, yy, zz wrt normalized tilt vector in base frame)
     - { xx: 0.2, yy: 0.5}
 
+additional_stem_height_when_done:    0.2        # show additional piece of stem straight obove gripper xyz when in end state, in direction of stem tangent
+
 ##########################
 # TRACKING CONTROL CONFIG
 ##########################
@@ -113,10 +115,10 @@ straight_forward_ref:           0.03          # put xyz ref forward for x meters
 print_joint_ref_vs_current:     0             # if true (1) current joint positions and reference joint positions are printed
                                                # every time a cart setpoint is converted to joint position setpoints
 xyz_setpoint_multiplication_at_max_torso: 1.2  # cartesian setpoint multiplication when amigo is at max torso height
-debug_desired_gripper_pose:     1              # if true (1) desired gripper pose will be shown in rviz together with estimated
-                                                # stem tangent
-debug_joint_max:                0              # if true (1) warnings will be printed every time a joint reference reaches or passes a
-                                                # joint limit
+debug_desired_gripper_pose:     1             # if true (1) desired gripper pose will be shown in rviz together with estimated
+                                               # stem tangent
+debug_joint_max:                0             # if true (1) warnings will be printed every time a joint reference reaches or passes a
+                                               # joint limit
 
 ##########################
 # TRACKING MONITOR CONFIG
