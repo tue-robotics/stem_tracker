@@ -281,14 +281,34 @@ void WhiskerGripperInterpreter::checkForTopSensorTouched()
         }
 
         m_pressure_sensor_is_touched = false;
+        m_pressure_sensors_touched_at.clear();
         for(uint i = 0; i < m_n_pressure_sensors; ++i)
         {
             if( fabs(topsensor_measurements[i]-m_nominal_pressure_sensor_values[i])/m_pressure_sensor_touched_max[i]
                     > m_pressure_sensor_touched_normalized_threshold  )
+            {
                 m_pressure_sensor_is_touched = true;
+                m_pressure_sensors_touched_at.push_back(m_pressure_sensors_at[i]);
+
+            }
         }
        return;
 }
+
+float WhiskerGripperInterpreter::getEstimatedTopSensorTouchLocation()
+{
+    float av = 0.0;
+    for(uint i = 0; i < m_pressure_sensors_touched_at.size(); ++i)
+    {
+        av += m_pressure_sensors_touched_at[i] / ((float) m_pressure_sensors_touched_at.size());
+    }
+
+    if(m_pressure_sensors_touched_at.size() == 0)
+        WARNING_STREAM("Calling getEstimatedTopSensorTouchLocation while apparently we're not touched");
+
+    return av;
+}
+
 void WhiskerGripperInterpreter::updateWhiskerInterpretation()
 {
     checkForWhiskersTouched();

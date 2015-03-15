@@ -20,7 +20,7 @@ private:
     std::vector<float> m_min_whisker_unit_area_covered, m_max_whisker_unit_area_covered;
     std::vector<float> m_gripper_inside_touched_at, m_gripper_top_touched_at;
     std::vector<bool> m_whisker_unit_is_grasp_check;
-    std::vector<float> m_estimated_pos;
+    std::vector<float> m_estimated_pos, m_pressure_sensors_touched_at;
     int m_took_n_samples_for_initialization;
     int m_n_samples_for_initialization;
     std::vector<float> m_pressure_sensor_covers_min, m_pressure_sensor_covers_max, m_pressure_sensors_at;
@@ -67,13 +67,13 @@ public:
     inline void setNumberOfSamplesForMovingAverage(const int n_samples, const int n_whiskers) { m_n_samples_for_average = n_samples;
                                                            m_whisker_values_for_average.assign(n_samples,std::vector<float>(n_whiskers,0.0)); }
 
-
     void updateWhiskerInterpretation();
     void checkForTopSensorTouched();
     void obtainNominalValues();
     void findWhiskerMaxTouchedValues();
     void resetInitialization();
     void findPressureSensorMaxTouchedValues();
+    float getEstimatedTopSensorTouchLocation();
 
     inline bool graspWhiskerIsTouched() { return m_grasp_whisker_touched; }
     inline const bool isInitialized() const { return m_has_nominal_values; }
