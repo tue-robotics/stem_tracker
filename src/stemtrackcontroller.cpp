@@ -211,6 +211,8 @@ void StemTrackController::setPointMoveForward(const std::vector<float> gripper_x
 
     m_setpoint_vector = KDL::Vector(gripper_xyz[0]+m_straight_forward_ref, gripper_xyz[1], z);
     m_setpoint_pose = KDL::Rotation::Identity();
+    /* quick fix */
+    m_setpoint_pose.DoRotX(-0.7);
 
     return;
 }

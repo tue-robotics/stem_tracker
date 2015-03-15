@@ -52,7 +52,7 @@ void StemTrackMonitor::updateState()
         break;
 
     case PREPOS:
-        if( m_p_robot_status->reachedPosition( m_p_robot_representation->getInitialPoseJointRefs() ) && !m_find_max_touched_values)
+        if( m_p_robot_status->reachedPosition( m_p_stem_representation->getStemTrackingStartXYZ() ) && !m_find_max_touched_values)
         {
             m_state = CALIBRATE;
             INFO_STREAM("=============================================");
@@ -70,7 +70,7 @@ void StemTrackMonitor::updateState()
         break;
 
     case GRASP:
-        if( m_p_robot_status->reachedPosition( m_p_stem_representation->getStemTrackingStartXYZ()) )
+        if( m_p_robot_status->getGripperXYZ()[0] - m_p_stem_representation->getStemTrackingStartXYZ()[0] > 0.1 )
         {
             m_state = FOLLOW;
             INFO_STREAM("=============================================");
@@ -144,7 +144,14 @@ bool StemTrackMonitor::inputIsUpToDate()
 void StemTrackMonitor::doPreposBehavior()
 {
     m_trial_is_done = false;
-    m_p_robot_interface->publishAmigoJointPosRefs(m_p_robot_representation->getInitialPoseJointRefs());
+
+    /* go to cartesian prepos */
+    m_p_stemtrack_control->setCartSetpoint(m_p_stem_representation->getStemTrackingStartXYZ());
+    /* translate cartesian setpoint to joint coordinates */
+    m_p_stemtrack_control->updateJointPosReferences();
+    /* send references to joint controllers */
+    m_p_robot_interface->publishAmigoJointPosRefs(m_p_stemtrack_control->getJointPosRefs());
+
     m_p_robot_interface->publishAmigoOpenGripperMessage();
 
     if(m_find_max_touched_values)
