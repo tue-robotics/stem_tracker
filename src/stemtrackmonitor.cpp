@@ -167,7 +167,7 @@ void StemTrackMonitor::doGraspBehavior()
                                                  m_p_whisker_gripper_interpreter->getTouchedWhiskerVectorOrigins() ), whisker_touch );
 
     /* set reference to forward in same plane */
-    m_p_stemtrack_control->setCartSetpoint( m_p_stem_representation->getStemTrackingStartXYZ() );
+    m_p_stemtrack_control->setPointMoveForward(m_p_robot_status->getGripperXYZ(),0.8);
 
     /* translate cartesian setpoint to joint coordinates */
     m_p_stemtrack_control->updateJointPosReferences();
