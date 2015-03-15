@@ -100,10 +100,10 @@ additional_stem_height_when_done:    0.2        # show additional piece of stem 
 
 move_up_ref:                    0.005         # put xyz ref up (in direction of stem tangent) for x meters when moving
                                                # up (state FOLLOW)
-move_up_fraction_when_touched:  0.2           # fraction of mpve_up_ref we keep in setpoint while the gripper is touched
-move_in_tilt_direction:         0             # if true (1) move_up_ref will be in the estimated tilt direction of the stem, else move_up_ref will be
+move_up_fraction_when_touched:  0.05           # fraction of mpve_up_ref we keep in setpoint while the gripper is touched
+move_in_tilt_direction:         1             # if true (1) move_up_ref will be in the estimated tilt direction of the stem, else move_up_ref will be
                                                # straight up in z-direction of the base frame
-tilt_with_stem:                 0             # if true (1) tilt gripper based on local derivative of stem
+tilt_with_stem:                 1             # if true (1) tilt gripper based on local derivative of stem
 rotate_along_stem:              0             # if true (1) the gripper will rotate along the stem to avoid its gipper yaw joint limits. Note:
                                                # currently not implemented!!
 debug_ik_solver:                0             # if true (1) status of kdl ik solver will be printed
