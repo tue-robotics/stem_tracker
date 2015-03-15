@@ -19,14 +19,14 @@ whiskers_up_to_date_threshold:  0.1            # consider whisker status up to d
 pressure_sensors_up_to_date_threshold:  0.1    # consider pressure sensors status up to date if measurement received
                                                 # within passed x sec
 initial_pose:               # pose used as preposition, length should be equal to the number
-    - q: 0.1                 # of joints in kinematic chain
-    - q: -0.1
-    - q: -0.6
-    - q: 0.0
-    - q: 1.8
-    - q: -0.1
-    - q: 0.4
-    - q: 0.0
+    - q: 0.4                 # of joints in kinematic chain
+    - q: -0.2
+    - q: -0.23
+    - q: 0.12
+    - q: 1.56
+    - q: -0.18
+    - q: 0.27
+    - q: -0.07
 
 max_gripper_pose:                               # roll and pitch: max gripper rotation wrt base frame, along_stem: max gripper
     - {roll: 0.3, pitch: 0.1, along_stem: 0.2}   # rotation around possibly tilted stem (all radians)
@@ -84,7 +84,7 @@ gripper_diameter:               0.01           # diameter of gripper at whisker-
 stem_length_used_for_tangent:             0.2           # we use the last x meters of the stem to fit an approximated tangent of stem, if the stem length is less
                                                          # than this value we assume the tangent is straight up (z-axis)
 stem_start_xyz:
-    - {x: 0.5, y: 0.26, z: 0.53}
+    - {x: 0.4, y: 0.26, z: 0.8}
 
 length_first_node:              0.25           # first stem node is put x meters underneath stem_start_xyz
 add_or_remove_node_euclidian_threshold: 0.01    # when gripper xyz is further than x meters away from highest node in stem
