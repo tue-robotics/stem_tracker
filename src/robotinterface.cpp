@@ -104,11 +104,11 @@ void RobotInterface::publishAmigoOpenGripperMessage()
     msg.max_torque = 120;
     m_gripper_ref_pub.publish(msg);
 
-    tue_msgs::GripperMeasurement msg_2;
-    msg_2.direction = tue_msgs::GripperMeasurement::OPEN;
-    msg_2.torque = 0;
-    msg_2.position = 0;
-    m_gripper_meas_pub.publish(msg_2);
+//    tue_msgs::GripperMeasurement msg_2;
+//    msg_2.direction = tue_msgs::GripperMeasurement::OPEN;
+//    msg_2.torque = 0;
+//    msg_2.position = 0;
+//    m_gripper_meas_pub.publish(msg_2);
     return;
 }
 
