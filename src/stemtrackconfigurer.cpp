@@ -409,6 +409,9 @@ void StemTrackConfigurer::configureVisualizationInterface(VisualizationInterface
     visualization_interface.setShowWhiskerArrowLifetime( getConfigPar<float>(m_general_config, "touched_arrow_liftime") );
     visualization_interface.setShowSetPointLifetime( getConfigPar<float>(m_general_config, "show_setpoint_lifetime") );
     visualization_interface.setShowStemTangentLifetime( getConfigPar<float>(m_general_config, "show_stem_tangent_lifetime") );
+    visualization_interface.setStemTangentArrowElongation( getConfigPar<float>(m_general_config, "elongate_stem_tangent_vector"));
+    visualization_interface.setDebugArrowElongation( getConfigPar<float>(m_general_config, "elongate_debug_arrows"));
+    visualization_interface.setDebugArrowLifetime( getConfigPar<float>(m_general_config, "show_debug_arrows_lifetime") );
 
     INFO_STREAM("=============================================");
     INFO_STREAM("Configured visualization object");

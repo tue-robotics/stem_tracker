@@ -197,9 +197,9 @@ void StemTrackMonitor::doFollowBehavior()
     /* update stem tangent */
     m_p_stem_representation->updateTangent();
     m_p_visualization_interface->showArrow( m_p_stem_representation->getTangent(),
-                                            m_p_robot_status->getGripperXYZ()[0] - 0.5 * m_p_stem_representation->getTangent()[0],
-                                            m_p_robot_status->getGripperXYZ()[1] - 0.5 * m_p_stem_representation->getTangent()[1],
-                                            m_p_robot_status->getGripperXYZ()[2] - 0.5 * m_p_stem_representation->getTangent()[2], stem_tangent );
+            m_p_robot_status->getGripperXYZ()[0] - 0.5 * m_p_visualization_interface->getStemTangentVectorElongation() * m_p_stem_representation->getTangent()[0],
+            m_p_robot_status->getGripperXYZ()[1] - 0.5 * m_p_visualization_interface->getStemTangentVectorElongation() * m_p_stem_representation->getTangent()[1],
+            m_p_robot_status->getGripperXYZ()[2] - 0.5 * m_p_visualization_interface->getStemTangentVectorElongation() * m_p_stem_representation->getTangent()[2], stem_tangent );
 
     /* update position setpoint in cartesian space */
     m_p_stemtrack_control->updateSetpointAndPose( m_p_whisker_gripper_interpreter->getEstimatedPosError() );

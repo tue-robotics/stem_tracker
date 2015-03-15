@@ -1,5 +1,6 @@
 #include "visualizationinterface.h"
 #include "loggingmacros.h"
+#include "debugfunctions.h"
 
 #include <math.h>
 #include <string>
@@ -30,7 +31,7 @@ bool VisualizationInterface::configureSelf(const MarkerIDs& marker_id)
         m_rgb.push_back(1.0f);
         m_rgb.push_back(0.0f);
         m_rgb.push_back(0.0f);
-        m_ros_marker_id = 0;
+        m_ros_marker_id = 1;
         m_sphere_radius = 0.015;
         m_name = "gripper_center";
         m_lifetime = m_show_setpoint_lifetime;
@@ -69,7 +70,7 @@ bool VisualizationInterface::configureSelf(const MarkerIDs& marker_id)
         m_rgb.push_back(0.0f);
         m_rgb.push_back(0.0f);
         m_rgb.push_back(1.0f);
-        m_ros_marker_id = 1;
+        m_ros_marker_id = 4;
         m_arrow_diam = 0.01;
         m_arrowhead_diam = 0.02;
         m_name = "whisker_touch";
@@ -86,7 +87,7 @@ bool VisualizationInterface::configureSelf(const MarkerIDs& marker_id)
         m_rgb.push_back(0.35f);
         m_linestrip_diam = 0.02;
         m_lifetime = -1.0;
-        m_ros_marker_id = 3;
+        m_ros_marker_id = 5;
         m_name = "stem";
         return true;
 
@@ -97,9 +98,10 @@ bool VisualizationInterface::configureSelf(const MarkerIDs& marker_id)
         m_rgb.push_back(0.0f);
         m_rgb.push_back(0.5f);
         m_rgb.push_back(0.5f);
-        m_ros_marker_id = 4;
+        m_ros_marker_id = 6;
         m_arrow_diam = 0.01;
         m_arrowhead_diam = 0.02;
+        m_multiply_arrow_with = m_stem_tangent_arrow_multiplication;
         m_lifetime = m_show_stem_tangent_lifetime;
         m_name = "stem_tangent";
         return true;
@@ -111,10 +113,11 @@ bool VisualizationInterface::configureSelf(const MarkerIDs& marker_id)
         m_rgb.push_back(1.0f);
         m_rgb.push_back(0.0f);
         m_rgb.push_back(0.0f);
-        m_ros_marker_id = 5;
+        m_ros_marker_id = 7;
         m_arrow_diam = 0.01;
         m_arrowhead_diam = 0.02;
-        m_lifetime = m_show_stem_tangent_lifetime;
+        m_multiply_arrow_with = m_debug_arrow_multiplication;
+        m_lifetime = m_debug_arrow_lifetime;
         m_name = "red_debug_arrow";
         return true;
 
@@ -125,10 +128,11 @@ bool VisualizationInterface::configureSelf(const MarkerIDs& marker_id)
         m_rgb.push_back(0.0f);
         m_rgb.push_back(1.0f);
         m_rgb.push_back(0.0f);
-        m_ros_marker_id = 6;
+        m_ros_marker_id = 8;
         m_arrow_diam = 0.01;
         m_arrowhead_diam = 0.02;
-        m_lifetime = m_show_stem_tangent_lifetime;
+        m_multiply_arrow_with = m_debug_arrow_multiplication;
+        m_lifetime = m_debug_arrow_lifetime;
         m_name = "green_debug_arrow";
         return true;
 
@@ -139,10 +143,11 @@ bool VisualizationInterface::configureSelf(const MarkerIDs& marker_id)
         m_rgb.push_back(0.0f);
         m_rgb.push_back(0.0f);
         m_rgb.push_back(1.0f);
-        m_ros_marker_id = 7;
+        m_ros_marker_id = 9;
         m_arrow_diam = 0.01;
         m_arrowhead_diam = 0.02;
-        m_lifetime = m_show_stem_tangent_lifetime;
+        m_multiply_arrow_with = m_debug_arrow_multiplication;
+        m_lifetime = m_debug_arrow_lifetime;
         m_name = "blue_debug_arrow";
         return true;
 
@@ -152,7 +157,7 @@ bool VisualizationInterface::configureSelf(const MarkerIDs& marker_id)
         m_rgb.push_back(1.0f);
         m_rgb.push_back(0.0f);
         m_rgb.push_back(0.0f);
-        m_ros_marker_id = 8;
+        m_ros_marker_id = 10;
         m_sphere_radius = 0.05;
         m_lifetime = m_show_setpoint_lifetime;
         m_name = "tomato_truss";
@@ -231,7 +236,13 @@ void VisualizationInterface::showArrow(const std::vector<float>& xyz, const std:
     }
 
     if(configureSelf(marker_id))
-        showArrowInRviz(xyz, origin);
+    {
+        std::vector<float> xyz_ = xyz;
+        for(uint i = 0; i < 3; ++i)
+            xyz_[i] *= m_multiply_arrow_with;
+
+        showArrowInRviz(xyz_, origin);
+    }
 
     return;
 }

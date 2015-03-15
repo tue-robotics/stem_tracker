@@ -134,3 +134,6 @@ show_setpoint_lifetime:         0.02        # show cartesian setpoint and curren
                                              # -1.0 to show until next msg
 show_stem_tangent_lifetime:     3.0         # show estimated tangent of stem at current gripper pos for x seconds, set to
                                              # -1.0 to show until next msg
+show_debug_arrows_lifetime:     2.0         # same, but for red, green and blue debug arrows
+elongate_stem_tangent_vector:   0.3         # multiply normalized stem tangent vector with this value, only for visualization purposes
+elongate_debug_arrows:          0.2         # same, but for red, green and blue debug arrows

@@ -115,9 +115,9 @@ void StemRepresentation::updateTangent()
                     {
                         /* make sure all slopes are in positive z direction */
                         if(nodes[i][2] - nodes[j][2] > 0.0)
-                            averaged_slope[k] += ( nodes[i][k] - nodes[j][k] ) / len / ((float) (n_nodes_required - 1 ) );
+                            averaged_slope[k] += ( ( nodes[i][k] - nodes[j][k] ) / len ) / ((float) (n_nodes_required - 1 ) );
                         if(nodes[i][2] - nodes[j][2] < 0.0)
-                            averaged_slope[k] -= ( nodes[i][k] - nodes[j][k] ) / len / ((float) (n_nodes_required - 1 ) );
+                            averaged_slope[k] -= ( ( nodes[i][k] - nodes[j][k] ) / len ) / ((float) (n_nodes_required - 1 ) );
                     }
                 }
             }
@@ -132,11 +132,6 @@ void StemRepresentation::updateTangent()
     {
         m_tangent_xyz[2] = 1.0;
     }
-
-    /* for plotting purposes, make stem tangent vector smaller */
-    for(uint i = 0; i < 3; ++i)
-        m_tangent_xyz[i] /= ((float) 3);
-
 
     return;
 

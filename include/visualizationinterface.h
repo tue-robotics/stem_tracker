@@ -33,12 +33,13 @@ private:
     std::string m_base_frame;
     std::vector<float> m_rgb;
     std::string m_name;
-    float m_show_whisker_arrow_lifetime, m_lifetime, m_show_setpoint_lifetime, m_show_stem_tangent_lifetime;
+    float m_show_whisker_arrow_lifetime, m_lifetime, m_show_setpoint_lifetime, m_show_stem_tangent_lifetime, m_debug_arrow_lifetime;
     int m_ros_marker_id;
     float m_sphere_radius;     // in meters
     float m_linestrip_diam;    // in meters
     float m_arrow_diam;        // arrow diameter, in meters
     float m_arrowhead_diam;    // arow head diameter, in meters
+    float m_multiply_arrow_with, m_stem_tangent_arrow_multiplication, m_debug_arrow_multiplication;
 public:
     VisualizationInterface(ros::NodeHandle node, std::string base_frame) : m_node(node), m_base_frame(base_frame) {}
 
@@ -47,6 +48,11 @@ public:
     inline void setShowWhiskerArrowLifetime(float seconds) { m_show_whisker_arrow_lifetime = seconds; }
     inline void setShowSetPointLifetime(float seconds) { m_show_setpoint_lifetime = seconds; }
     inline void setShowStemTangentLifetime(float seconds) { m_show_stem_tangent_lifetime = seconds; }
+    inline void setStemTangentArrowElongation(float multiply_with) { m_stem_tangent_arrow_multiplication = multiply_with; }
+    inline void setDebugArrowElongation(float multiply_with) { m_debug_arrow_multiplication = multiply_with; }
+    inline void setDebugArrowLifetime(float lifetime) { m_debug_arrow_lifetime = lifetime; }
+
+    inline const float& getStemTangentVectorElongation() const { return m_stem_tangent_arrow_multiplication; }
 
     bool configureSelf(const MarkerIDs& marker_id);
     void showLineStrip(const std::vector<float>& x_coordinates, const std::vector<float>& y_coordinates, const std::vector<float>& z_coordinates, const MarkerIDs& marker_id);

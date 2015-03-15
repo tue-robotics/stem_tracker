@@ -147,9 +147,9 @@ std::vector< std::vector<float> > StemTrackController::getDesiredGripperPoseVect
 {
     std::vector< std::vector<float> > xyz_xyz_xyz;
 
-    KDL::Vector x = KDL::Vector(0.2,0.0,0.0);
-    KDL::Vector y = KDL::Vector(0.0,0.2,0.0);
-    KDL::Vector z = KDL::Vector(0.0,0.0,0.2);
+    KDL::Vector x = KDL::Vector(1.0,0.0,0.0);
+    KDL::Vector y = KDL::Vector(0.0,1.0,0.0);
+    KDL::Vector z = KDL::Vector(0.0,0.0,1.0);
 
     x = m_setpoint_pose * x;
     y = m_setpoint_pose * y;
