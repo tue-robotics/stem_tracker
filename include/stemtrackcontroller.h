@@ -28,7 +28,7 @@ private:
     RobotStatus* m_p_robot_status;
     KDL::JntArray m_joint_pos_refs;
     KDL::JntArray m_joint_vel_refs;
-    float m_straight_forward_ref, m_setpoint_multiplication_at_max_torso;
+    float m_straight_forward_ref, m_setpoint_multiplication_at_max_torso, m_move_up_fraction_when_touched;
     std::vector<float> m_touch_started_at_xyz;
 
 public:
@@ -50,6 +50,7 @@ public:
     inline void setMaxGripperRotateAlongStem(float max) { m_gripper_max_rotate_along_stem = max; }
     inline void setRotateAlongStem(bool rotate) { m_rotate_gripper_along_stem = rotate; }
     inline void setMoveUpInStemTiltDirection(bool move_in_tilt_direction) { m_move_up_in_tilt_direction = move_in_tilt_direction; }
+    inline void setMoveUpFractionWhenTouched(float fraction) { m_move_up_fraction_when_touched = fraction; }
 
     void setCartSetpoint(const std::vector<float> setpoint_xyz);
     void updateJointPosReferences();

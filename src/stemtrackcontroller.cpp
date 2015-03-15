@@ -28,7 +28,20 @@ void StemTrackController::updateSetpointAndPose(const std::vector<float>& grippe
                 ERROR_STREAM("Touched but xyz not stored in m_touch_started_at_xyz!");
                 return;
             }
-            setpoint.push_back(m_touch_started_at_xyz[2]);
+            if(m_move_up_fraction_when_touched > 0.0)
+                if(m_p_robot_status->amigoTorsoIsAtMax())  //ugly, don't want amigo specific stuff here!
+                {
+                    setpoint.push_back(m_p_robot_status->getGripperXYZ()[2] + m_move_up_fraction_when_touched * m_setpoint_multiplication_at_max_torso * m_move_up_ref);
+                }
+                else
+                {
+                    setpoint.push_back(m_p_robot_status->getGripperXYZ()[2] + m_move_up_fraction_when_touched * m_move_up_ref);
+                }
+            else
+            {
+                /* stay in plane z = touch_started_at */
+                setpoint.push_back(m_touch_started_at_xyz[2]);
+            }
             setCartSetpoint(setpoint);
             updateSetpointPose();
             return;
