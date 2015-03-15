@@ -36,10 +36,10 @@ max_gripper_pose:                               # roll and pitch: max gripper ro
 # WHISKERGRIPPER CONFIG
 #######################
 
-n_seconds_for_initialization:	10.0             # number of seconds we take to average whisker and pressure sensor values during
+n_seconds_for_initialization:	5.0             # number of seconds we take to average whisker and pressure sensor values during
                                                  # initialization (the average will be used as nominal value)
 
-n_sec_for_moving_av:    3.0
+n_sec_for_moving_av:    5.0
 
 whisker_coverage:                                                 # Angular 'piece of the pie' covered by a whisker in the xy plane
     - {min: 0, max: 65, n_whiskers: 2, grasp_check: 1}            # of the gripper. Positive is rotating x towards y. Direction of x
@@ -50,7 +50,7 @@ whisker_coverage:                                                 # Angular 'pie
     - {min: 250, max: 295, n_whiskers: 2, grasp_check: 0}
     - {min: 295, max: 360, n_whiskers: 2, grasp_check: 1}
 
-whisker_touched_normalized_threshold: 0.04      # Whisker deviations are normalized based on config_file_whisker_touched_max. We consider a whisker unit
+whisker_touched_normalized_threshold: 0.015      # Whisker deviations are normalized based on config_file_whisker_touched_max. We consider a whisker unit
                                                 # touched when the normalized error is larger than this threshold
 
 config_file_whiskers_touched_max:   "whisker_touched_max.yml"
@@ -98,12 +98,12 @@ additional_stem_height_when_done:    0.2        # show additional piece of stem 
 # TRACKING CONTROL CONFIG
 ##########################
 
-move_up_ref:                    0.0         # put xyz ref up (in direction of stem tangent) for x meters when moving
+move_up_ref:                    0.002         # put xyz ref up (in direction of stem tangent) for x meters when moving
                                                # up (state FOLLOW)
 move_up_fraction_when_touched:  0.2           # fraction of mpve_up_ref we keep in setpoint while the gripper is touched
-move_in_tilt_direction:         0             # if true (1) move_up_ref will be in the estimated tilt direction of the stem, else move_up_ref will be
+move_in_tilt_direction:         1             # if true (1) move_up_ref will be in the estimated tilt direction of the stem, else move_up_ref will be
                                                # straight up in z-direction of the base frame
-tilt_with_stem:                 0             # if true (1) tilt gripper based on local derivative of stem
+tilt_with_stem:                 1             # if true (1) tilt gripper based on local derivative of stem
 rotate_along_stem:              0             # if true (1) the gripper will rotate along the stem to avoid its gipper yaw joint limits. Note:
                                                # currently not implemented!!
 debug_ik_solver:                0             # if true (1) status of kdl ik solver will be printed
@@ -117,7 +117,7 @@ straight_forward_ref:           0.03          # put xyz ref forward for x meters
 print_joint_ref_vs_current:     0             # if true (1) current joint positions and reference joint positions are printed
                                                # every time a cart setpoint is converted to joint position setpoints
 xyz_setpoint_multiplication_at_max_torso: 1.2  # cartesian setpoint multiplication when amigo is at max torso height
-debug_desired_gripper_pose:     0             # if true (1) desired gripper pose will be shown in rviz together with estimated
+debug_desired_gripper_pose:     1             # if true (1) desired gripper pose will be shown in rviz together with estimated
                                                # stem tangent
 debug_joint_max:                0             # if true (1) warnings will be printed every time a joint reference reaches or passes a
                                                # joint limit
@@ -136,11 +136,11 @@ find_max_touched_values:        0              # if true (1) robot will move to 
 ##########################
 
 buffer_size:                    100         # buffer size for rviz marker topic
-touched_arrow_liftime:          0.2        # when whisker touched show an arrow for x seconds, set to -1.0 to show until
+touched_arrow_liftime:          0.02        # when whisker touched show an arrow for x seconds, set to -1.0 to show until
                                              # next msg
 show_setpoint_lifetime:         0.02        # show cartesian setpoint and current pos of gripper for x seconds, set to
                                              # -1.0 to show until next msg
-show_stem_tangent_lifetime:     0.0         # show estimated tangent of stem at current gripper pos for x seconds, set to
+show_stem_tangent_lifetime:     3.0         # show estimated tangent of stem at current gripper pos for x seconds, set to
                                              # -1.0 to show until next msg
 show_debug_arrows_lifetime:     2.0         # same, but for red, green and blue debug arrows
 elongate_stem_tangent_vector:   0.3         # multiply normalized stem tangent vector with this value, only for visualization purposes
