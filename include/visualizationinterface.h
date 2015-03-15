@@ -17,7 +17,12 @@ enum MarkerIDs
     green_debug_arrow,
     blue_debug_arrow,
     white_debug_dot,
-    peduncle
+    peduncle,
+    tomato_1,
+    tomato_2,
+    tomato_3,
+    tomato_4,
+    tomato_5
 };
 
 #define ARROW_IDS_OFFSET 10;
