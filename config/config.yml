@@ -39,7 +39,7 @@ max_gripper_pose:                               # roll and pitch: max gripper ro
 n_seconds_for_initialization:	5.0             # number of seconds we take to average whisker and pressure sensor values during
                                                  # initialization (the average will be used as nominal value)
 
-n_sec_for_moving_av:    3.0
+n_sec_for_moving_av:    5.0
 
 whisker_coverage:                                                 # Angular 'piece of the pie' covered by a whisker in the xy plane
     - {min: 0, max: 65, n_whiskers: 2, grasp_check: 1}            # of the gripper. Positive is rotating x towards y. Direction of x
@@ -50,7 +50,7 @@ whisker_coverage:                                                 # Angular 'pie
     - {min: 250, max: 295, n_whiskers: 2, grasp_check: 0}
     - {min: 295, max: 360, n_whiskers: 2, grasp_check: 1}
 
-whisker_touched_normalized_threshold: 0.02      # Whisker deviations are normalized based on config_file_whisker_touched_max. We consider a whisker unit
+whisker_touched_normalized_threshold: 0.015      # Whisker deviations are normalized based on config_file_whisker_touched_max. We consider a whisker unit
                                                 # touched when the normalized error is larger than this threshold
 
 config_file_whiskers_touched_max:   "whisker_touched_max.yml"
@@ -67,7 +67,7 @@ pressure_sensor_location:      # Angular location of the pressure sensors in the
     - ang: 250
     - ang: 295
 
-pressure_sensor_touched_normalized_threshold:  0.03   # Pressure sensor deviations are normalized based on config_file_pressure_sensor_touched_max. We
+pressure_sensor_touched_normalized_threshold:  0.01   # Pressure sensor deviations are normalized based on config_file_pressure_sensor_touched_max. We
                                                        # consider a pressure sensor coverage touched when the normalized deviation is larger than this value
 
 config_file_pressure_sensor_touched_max: "pressure_sensor_touched_max.yml"
@@ -98,12 +98,12 @@ additional_stem_height_when_done:    0.2        # show additional piece of stem 
 # TRACKING CONTROL CONFIG
 ##########################
 
-move_up_ref:                    0.001         # put xyz ref up (in direction of stem tangent) for x meters when moving
+move_up_ref:                    0.002         # put xyz ref up (in direction of stem tangent) for x meters when moving
                                                # up (state FOLLOW)
-move_up_fraction_when_touched:  0.5           # fraction of mpve_up_ref we keep in setpoint while the gripper is touched
+move_up_fraction_when_touched:  0.2           # fraction of mpve_up_ref we keep in setpoint while the gripper is touched
 move_in_tilt_direction:         1             # if true (1) move_up_ref will be in the estimated tilt direction of the stem, else move_up_ref will be
                                                # straight up in z-direction of the base frame
-tilt_with_stem:                 0             # if true (1) tilt gripper based on local derivative of stem
+tilt_with_stem:                 1             # if true (1) tilt gripper based on local derivative of stem
 rotate_along_stem:              0             # if true (1) the gripper will rotate along the stem to avoid its gipper yaw joint limits. Note:
                                                # currently not implemented!!
 debug_ik_solver:                0             # if true (1) status of kdl ik solver will be printed
