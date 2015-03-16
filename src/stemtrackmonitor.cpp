@@ -177,8 +177,8 @@ void StemTrackMonitor::doGraspBehavior()
     //m_p_stemtrack_control->setPointMoveForward(m_p_robot_status->getGripperXYZ(),0.83);
     std::vector<float> xyz;
     xyz.push_back(m_p_stem_representation->getStemTrackingStartXYZ()[0]);
-    xyz.push_back(m_p_stem_representation->getStemTrackingStartXYZ()[1]-0.1);
-    xyz.push_back(m_p_stem_representation->getStemTrackingStartXYZ()[2]+0.11);
+    xyz.push_back(m_p_stem_representation->getStemTrackingStartXYZ()[1]+0.08);
+    xyz.push_back(m_p_stem_representation->getStemTrackingStartXYZ()[2]+0.13);
     m_p_stemtrack_control->setCartSetpoint(xyz);
 
     /* translate cartesian setpoint to joint coordinates */
