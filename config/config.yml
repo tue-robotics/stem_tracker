@@ -73,7 +73,7 @@ pressure_sensor_touched_normalized_threshold:  0.01   # Pressure sensor deviatio
 config_file_pressure_sensor_touched_max: "pressure_sensor_touched_max.yml"
 
 whisker_length:                 0.03          # length of a single whisker, in meters
-gripper_diameter:               0.01           # diameter of gripper at whisker-root, in meters
+gripper_diameter:               0.02           # diameter of gripper at whisker-root, in meters
 
 #######################
 # TOMATO STEM CONFIG
@@ -98,9 +98,9 @@ additional_stem_height_when_done:    0.2        # show additional piece of stem 
 # TRACKING CONTROL CONFIG
 ##########################
 
-move_up_ref:                    0.005         # put xyz ref up (in direction of stem tangent) for x meters when moving
+move_up_ref:                    0.003         # put xyz ref up (in direction of stem tangent) for x meters when moving
                                                # up (state FOLLOW)
-move_up_fraction_when_touched:  0.05           # fraction of mpve_up_ref we keep in setpoint while the gripper is touched
+move_up_fraction_when_touched:  0.03           # fraction of mpve_up_ref we keep in setpoint while the gripper is touched
 move_in_tilt_direction:         1             # if true (1) move_up_ref will be in the estimated tilt direction of the stem, else move_up_ref will be
                                                # straight up in z-direction of the base frame
 tilt_with_stem:                 1             # if true (1) tilt gripper based on local derivative of stem
