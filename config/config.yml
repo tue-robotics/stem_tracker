@@ -50,7 +50,7 @@ whisker_coverage:                                                 # Angular 'pie
     - {min: 250, max: 295, n_whiskers: 2, grasp_check: 0}
     - {min: 295, max: 360, n_whiskers: 2, grasp_check: 1}
 
-whisker_touched_normalized_threshold: 0.04      # Whisker deviations are normalized based on config_file_whisker_touched_max. We consider a whisker unit
+whisker_touched_normalized_threshold: 0.03      # Whisker deviations are normalized based on config_file_whisker_touched_max. We consider a whisker unit
                                                 # touched when the normalized error is larger than this threshold
 
 config_file_whiskers_touched_max:   "whisker_touched_max.yml"
