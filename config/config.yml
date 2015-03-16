@@ -50,7 +50,7 @@ whisker_coverage:                                                 # Angular 'pie
     - {min: 250, max: 295, n_whiskers: 2, grasp_check: 0}
     - {min: 295, max: 360, n_whiskers: 2, grasp_check: 1}
 
-whisker_touched_normalized_threshold: 0.03      # Whisker deviations are normalized based on config_file_whisker_touched_max. We consider a whisker unit
+whisker_touched_normalized_threshold: 0.04      # Whisker deviations are normalized based on config_file_whisker_touched_max. We consider a whisker unit
                                                 # touched when the normalized error is larger than this threshold
 
 config_file_whiskers_touched_max:   "whisker_touched_max.yml"
@@ -116,7 +116,7 @@ pos_reached_threshold:          0.01          # if absolute position error for e
 straight_forward_ref:           0.03          # put xyz ref forward for x meters when asked moving forward
 print_joint_ref_vs_current:     0             # if true (1) current joint positions and reference joint positions are printed
                                                # every time a cart setpoint is converted to joint position setpoints
-xyz_setpoint_multiplication_at_max_torso: 1.2  # cartesian setpoint multiplication when amigo is at max torso height
+xyz_setpoint_multiplication_at_max_torso: 1.4  # cartesian setpoint multiplication when amigo is at max torso height
 debug_desired_gripper_pose:     0             # if true (1) desired gripper pose will be shown in rviz together with estimated
                                                # stem tangent
 debug_joint_max:                0             # if true (1) warnings will be printed every time a joint reference reaches or passes a
