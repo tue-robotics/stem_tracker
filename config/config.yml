@@ -67,7 +67,7 @@ pressure_sensor_location:      # Angular location of the pressure sensors in the
     - ang: 250
     - ang: 295
 
-pressure_sensor_touched_normalized_threshold:  0.03   # Pressure sensor deviations are normalized based on config_file_pressure_sensor_touched_max. We
+pressure_sensor_touched_normalized_threshold:  0.02   # Pressure sensor deviations are normalized based on config_file_pressure_sensor_touched_max. We
                                                        # consider a pressure sensor coverage touched when the normalized deviation is larger than this value
 
 config_file_pressure_sensor_touched_max: "pressure_sensor_touched_max.yml"
