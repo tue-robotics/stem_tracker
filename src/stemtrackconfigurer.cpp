@@ -120,7 +120,7 @@ void StemTrackConfigurer::configureStemRepresentation(StemRepresentation& stem_r
     {
         while(m_general_config.nextArrayItem())
         {
-            stem_start_xyz.push_back( getConfigPar<float>(m_general_config, "x") ); //quick fix
+            stem_start_xyz.push_back( getConfigPar<float>(m_general_config, "x") ); 
             stem_start_xyz.push_back( getConfigPar<float>(m_general_config, "y") );
             stem_start_xyz.push_back( getConfigPar<float>(m_general_config, "z") );
         }
@@ -142,8 +142,8 @@ void StemTrackConfigurer::configureStemRepresentation(StemRepresentation& stem_r
     std::vector<float> stemNodesX, stemNodesY, stemNodesZ;
 
     /* store initial stem nodes on stem_start_xyz and directly below */
-    stemNodesX.push_back(stem_start_xyz[0]+0.15); //quick fix
-    stemNodesX.push_back(stem_start_xyz[0]+0.13);
+    stemNodesX.push_back(stem_start_xyz[0]+0.05); //quick fix
+    stemNodesX.push_back(stem_start_xyz[0]+0.1);
     stemNodesY.push_back(stem_start_xyz[1]+0.07);
     stemNodesY.push_back(stem_start_xyz[1]);
     stemNodesZ.push_back(stem_start_xyz[2]-getConfigPar<float>(m_general_config,"length_first_node"));
