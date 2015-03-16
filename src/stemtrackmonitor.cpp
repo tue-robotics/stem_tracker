@@ -70,12 +70,12 @@ void StemTrackMonitor::updateState()
         break;
 
     case GRASP:
-        if( m_p_robot_status->getGripperXYZ()[0] - m_p_stem_representation->getStemTrackingStartXYZ()[0] > 0.14 )
-        {
-            m_state = FOLLOW;
-            INFO_STREAM("=============================================");
-            INFO_STREAM("==> I have the stem, going to move up now");
-        }
+        //if( m_p_robot_status->getGripperXYZ()[0] - m_p_stem_representation->getStemTrackingStartXYZ()[0] > 0.14 )
+        //{
+          //  m_state = FOLLOW;
+           // INFO_STREAM("=============================================");
+           // INFO_STREAM("==> I have the stem, going to move up now");
+        //}
         break;
 
     case FOLLOW:
@@ -174,7 +174,12 @@ void StemTrackMonitor::doGraspBehavior()
                                                  m_p_whisker_gripper_interpreter->getTouchedWhiskerVectorOrigins() ), whisker_touch );
 
     /* set reference to forward in same plane */
-    m_p_stemtrack_control->setPointMoveForward(m_p_robot_status->getGripperXYZ(),0.83);
+    //m_p_stemtrack_control->setPointMoveForward(m_p_robot_status->getGripperXYZ(),0.83);
+    std::vector<float> xyz;
+    xyz.push_back(m_p_stem_representation->getStemTrackingStartXYZ()[0]);
+    xyz.push_back(m_p_stem_representation->getStemTrackingStartXYZ()[1]-0.15);
+    xyz.push_back(m_p_stem_representation->getStemTrackingStartXYZ()[2]+0.11);
+    m_p_stemtrack_control->setCartSetpoint(xyz);
 
     /* translate cartesian setpoint to joint coordinates */
     m_p_stemtrack_control->updateJointPosReferences();
