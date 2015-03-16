@@ -81,12 +81,12 @@ gripper_diameter:               0.02           # diameter of gripper at whisker-
 
 # important assumption: stem can only move up! (direction of positive z in base_frame)
 
-stem_length_used_for_tangent:             0.2           # we use the last x meters of the stem to fit an approximated tangent of stem, if the stem length is less
+stem_length_used_for_tangent:             0.3           # we use the last x meters of the stem to fit an approximated tangent of stem, if the stem length is less
                                                          # than this value we assume the tangent is straight up (z-axis)
 stem_start_xyz:
     - {x: 0.38, y: 0.26, z: 0.83}
 
-length_first_node:              0.25           # first stem node is put x meters underneath stem_start_xyz
+length_first_node:              0.1           # first stem node is put x meters underneath stem_start_xyz
 add_or_remove_node_euclidian_threshold: 0.01    # when gripper xyz is further than x meters away from highest node in stem
                                                 # representation a node is removed when gripper is below it, or added when gripper is above
 max_stemtilt_possible:                         # estimated stem tilt cannot exceed these values (xx, yy, zz wrt normalized tilt vector in base frame)

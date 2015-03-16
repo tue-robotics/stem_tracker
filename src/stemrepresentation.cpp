@@ -130,7 +130,8 @@ void StemRepresentation::updateTangent()
     }
     else
     {
-        m_tangent_xyz[2] = 1.0;
+	m_tangent_xyz[1] = -0.3; //quit fix
+        m_tangent_xyz[2] = 0.8;
     }
 
     /* (re)normalize */
