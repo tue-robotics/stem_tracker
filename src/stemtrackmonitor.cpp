@@ -70,7 +70,7 @@ void StemTrackMonitor::updateState()
         break;
 
     case GRASP:
-        if( m_p_robot_status->getGripperXYZ()[0] - m_p_stem_representation->getStemTrackingStartXYZ()[0] > 0.1 )
+        if( m_p_robot_status->getGripperXYZ()[0] - m_p_stem_representation->getStemTrackingStartXYZ()[0] > 0.14 )
         {
             m_state = FOLLOW;
             INFO_STREAM("=============================================");
@@ -174,7 +174,7 @@ void StemTrackMonitor::doGraspBehavior()
                                                  m_p_whisker_gripper_interpreter->getTouchedWhiskerVectorOrigins() ), whisker_touch );
 
     /* set reference to forward in same plane */
-    m_p_stemtrack_control->setPointMoveForward(m_p_robot_status->getGripperXYZ(),0.8);
+    m_p_stemtrack_control->setPointMoveForward(m_p_robot_status->getGripperXYZ(),0.83);
 
     /* translate cartesian setpoint to joint coordinates */
     m_p_stemtrack_control->updateJointPosReferences();
