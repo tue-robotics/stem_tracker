@@ -145,4 +145,4 @@ show_stem_tangent_lifetime:     0.02         # show estimated tangent of stem at
 show_debug_arrows_lifetime:     2.0         # same, but for red, green and blue debug arrows
 elongate_stem_tangent_vector:   0.3         # multiply normalized stem tangent vector with this value, only for visualization purposes
 elongate_debug_arrows:          0.2         # same, but for red, green and blue debug arrows
-truss_in_wrist_than_show_left:  1           # if true (1) truss will be rotated negative yaw to prevent truss in wrist, if false than rotation in positive yaw
+truss_in_wrist_than_show_left:  0           # if true (1) truss will be rotated negative yaw to prevent truss in wrist, if false than rotation in positive yaw
