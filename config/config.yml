@@ -81,7 +81,7 @@ gripper_diameter:               0.02           # diameter of gripper at whisker-
 
 # important assumption: stem can only move up! (direction of positive z in base_frame)
 
-stem_length_used_for_tangent:             0.3           # we use the last x meters of the stem to fit an approximated tangent of stem, if the stem length is less
+stem_length_used_for_tangent:             0.5           # we use the last x meters of the stem to fit an approximated tangent of stem, if the stem length is less
                                                          # than this value we assume the tangent is straight up (z-axis)
 stem_start_xyz:
     - {x: 0.38, y: 0.26, z: 0.83}
