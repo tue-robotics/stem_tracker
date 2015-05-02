@@ -85,8 +85,14 @@ add_executable(whisker_simulator
     src/whisker_simulator.cpp
 )
 
+add_executable(topsensor_locator
+    ${HEADERS}
+    src/topsensor_locator.cpp
+)
+
 target_link_libraries(stem_tracker ${catkin_LIBRARIES} stem_tracker_libs)
 target_link_libraries(whisker_simulator ${catkin_LIBRARIES} stem_tracker_libs)
+target_link_libraries(topsensor_locator ${catkin_LIBRARIES} stem_tracker_libs)
 
 
 
